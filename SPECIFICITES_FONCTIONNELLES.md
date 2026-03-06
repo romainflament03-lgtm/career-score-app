@@ -1,163 +1,166 @@
 ﻿# Spécificités Fonctionnelles - Career Score App (JobPulse)
 
-## 1. Objectif
-L'application évalue la santé de carrière d'un utilisateur via :
-- un questionnaire court,
-- un calcul d'ISC (Indice de Santé de Carrière),
-- une lecture par dimensions,
-- un profil de carrière,
-- des recommandations contextualisées.
+## 1. Objectif produit
+L'application fournit un diagnostic carrière court, personnalisé et actionnable à partir de :
+- l'ISC (Indice de Santé de Carrière),
+- 4 dimensions psychologiques,
+- les priorités utilisateur,
+- le contexte professionnel.
 
 ## 2. Parcours utilisateur
-Flux principal (SPA) :
 1. Accueil
-2. Étape 1 : classement des priorités (drag-and-drop)
+2. Classement des priorités (drag-and-drop)
 3. Questionnaire (10 questions)
-4. Étape contexte : "Votre situation professionnelle"
-5. Résultats (ISC + profil + recommandations)
+4. Situation professionnelle (contexte)
+5. Résultats diagnostiques
 
-## 3. Étape 1 - Priorités (refactor)
-L'utilisateur classe 4 dimensions de la plus importante à la moins importante :
-- Sens du travail
-- Évolution
+## 3. Données exploitées
+### 3.1 Scores
+- `iscScore`
+- `sensScore` (`Meaning`)
+- `evolutionScore` (`Growth`)
+- `reconnaissanceScore` (`Recognition`)
+- `environnementScore` (`Environment`)
+
+### 3.2 Profil carrière
+- `profileKey`
+- `profileName`
+- `icon`
+- `description`
+- `stateLabel`
+
+### 3.3 Priorités (Step 1)
+- `weights.Meaning`
+- `weights.Growth`
+- `weights.Recognition`
+- `weights.Environment`
+
+### 3.4 Contexte professionnel
+- secteur (domain input)
+- fonction
+- taille entreprise
+- ancienneté entreprise
+- niveau hiérarchique
+- intention de mobilité (offre)
+
+## 4. Page résultats - nouvelle structure
+La page est organisée en 6 sections card-based :
+1. Hero score
+2. Profil carrière
+3. Équilibre professionnel (4 dimensions)
+4. Analyse personnalisée
+5. Recommandations
+6. Partage
+
+## 5. Hero score
+Titre : **Votre Indice de Santé de Carrière**
+
+Affichage :
+- score ISC visible (0-100)
+- état global carrière
+- phrase d'aide contextualisée
+- jauge circulaire + barre de progression 0-100
+
+Règles d'état (`getCareerState`) :
+- `>=80` : 🚀 Aligné
+- `65-79` : 🌱 En progression
+- `50-64` : ⚠️ Désalignement
+- `<50` : 🔥 Risque de rupture
+
+## 6. Profil carrière
+Titre : **Votre profil carrière**
+
+Affichage :
+- icône
+- nom de profil
+- état global
+- description
+- moteur principal
+- seconde dimension clé (si pertinent)
+- point de vigilance
+
+## 7. Équilibre professionnel
+Titre : **Votre équilibre professionnel**
+
+Affichage visuel des 4 dimensions :
+- Sens
+- Evolution
 - Reconnaissance
 - Environnement
 
-### 3.1 Mapping rang -> poids
-- Rang 1 -> 0.40
-- Rang 2 -> 0.30
-- Rang 3 -> 0.20
-- Rang 4 -> 0.10
+Chaque dimension contient :
+- valeur
+- barre de progression
 
-### 3.2 Presets
-- Profil équilibré
-- Priorité carrière
-- Priorité bien-être
-- Priorité impact
+Résumé bas de section :
+- dimension forte
+- point de vigilance
 
-Ces presets appliquent un ordre prédéfini puis recalculent les poids.
+## 8. Analyse personnalisée
+Titre : **Analyse personnalisée**
 
-## 4. Questionnaire
-- 10 items, réponse sur échelle 1 à 5.
-- Les réponses alimentent 4 dimensions : Meaning, Growth, Recognition, Environment.
+L'analyse est déterministe, courte (2 à 4 phrases), en français.
 
-## 5. Étape "Votre situation professionnelle" (refactor)
-Titre : "Votre situation professionnelle"
-Sous-titre : "Ces informations permettent de contextualiser votre score et d'affiner les recommandations."
+Fonction : `buildPersonalizedAnalysis(data)`
 
-### 5.1 Champs collectés
-1. Domaine d'activité (dropdown)
-- Technologie / IT
-- Finance / Banque / Assurance
-- Industrie / Ingénierie
-- Santé / Pharmaceutique
-- Conseil / Audit
-- Marketing / Communication
-- Commerce / Distribution
-- Éducation / Recherche
-- Administration / Secteur public
-- Construction / Immobilier
-- Transport / Logistique
-- Energie / Environnement
-- Médias / Création
-- Hôtellerie / Tourisme
-- Autre
+Entrées utilisées :
+- état ISC
+- dimension forte/faible
+- priorité top + niveau de satisfaction associé
+- profil carrière
+- secteur + fonction
+- ancienneté
+- niveau hiérarchique
+- intention de mobilité
+- taille d'entreprise
 
-2. Fonction (dropdown)
-- Direction / Leadership
-- Management d'équipe
-- Ingénierie / Technique
-- IT / Data / Produit
-- Finance / Comptabilité
-- Marketing / Communication
-- Commercial / Business Development
-- Opérations / Production
-- Support / Administration
-- Ressources Humaines
-- Recherche / Expertise
-- Autre
+Principes :
+- expliquer le niveau global
+- expliciter les moteurs / frictions
+- signaler les écarts priorité vs vécu
+- contextualiser sans stéréotypes excessifs
+- garder cohérence avec le profil carrière
 
-3. Taille de l'entreprise (dropdown)
-- Freelance / Indépendant
-- Startup (<50)
-- PME (50-250)
-- ETI (250-1000)
-- Grande entreprise (1000+)
-- Groupe international
+## 9. Recommandations
+Titre : **Recommandations**
 
-4. Ancienneté dans l'entreprise (dropdown)
-- < 6 mois
-- 6 mois - 2 ans
-- 2 - 5 ans
-- 5 - 10 ans
-- 10 - 20 ans
-- 20+ ans
+Fonction : `buildRecommendations(data)`
 
-5. Niveau hiérarchique (dropdown)
-- Contributeur individuel
-- Manager d'équipe
-- Manager de managers
-- Direction / exécutif
-
-6. Mobilité perçue (optionnel)
-Question : "Si vous recevez une offre intéressante demain"
-- Je partirais immédiatement
-- Je réfléchirais sérieusement
-- Je resterais probablement
-- Je ne partirais pas
-
-## 6. Compatibilité moteur recommandations
-Le moteur historique est conservé.
-Les nouveaux champs sont mappés vers les clés legacy existantes :
-- domaine -> clé domaine legacy (`tech`, `finance`, etc.)
-- fonction -> clé métier legacy (`data`, `production`, etc.)
-- ancienneté entreprise -> clé ancienneté legacy (`lt6`, `6to24`, `gt24`)
-
-Ainsi, `computeISC()` et `buildRecommendations()` restent compatibles.
-
-## 7. Calculs
-### 7.1 Dimensions
-Chaque dimension est calculée sur 100 à partir des réponses associées.
-
-### 7.2 ISC
-ISC = somme pondérée des 4 dimensions avec les poids issus du ranking.
-
-### 7.3 Interprétation ISC
-Bandes : Fragile, Stagnation, Sain, Excellent.
-
-## 8. Profil de carrière
-Le profil est déterminé par ISC + scores dimensions :
-- cas critique ISC < 50 : Désengagé latent,
-- sinon profil dominant ou hybride selon top dimensions et écart.
-
-Sortie :
-- nom du profil,
-- icône,
-- état global,
-- description,
-- dimension forte,
-- seconde dimension (si hybride),
-- dimension faible.
-
-## 9. Restitution résultats
-L'écran résultats contient :
-- carte ISC,
-- carte Profil de Carrière,
-- répartition des dimensions,
-- recommandations contextualisées.
-
-Le contexte affiché dans les recommandations inclut désormais :
-- domaine,
-- fonction,
-- taille d'entreprise,
-- ancienneté,
-- niveau hiérarchique,
-- mobilité (si renseignée).
+Contraintes :
+- exactement 3 recommandations
+- format court : titre + une phrase explicative
+- basées sur :
+  - dimension faible
+  - priorité principale
+  - ancienneté
+  - intention de mobilité
+  - profil carrière
+  - contexte
 
 ## 10. Partage
-Message de partage : ISC + nom du profil carrière.
+Titre : **Partager votre résultat**
 
-## 11. Fichiers principaux
-- `index.html` : structure des écrans et formulaires
-- `script.js` : logique métier, mapping, calculs, rendu
-- `styles.css` : styles, responsive, interactions visuelles
+Affichage :
+- résumé compact (profil + ISC)
+
+Actions :
+- bouton de copie du résumé
+- bouton de partage global existant (footer)
+
+Format résumé :
+`Mon profil carrière : [profileName] — ISC [iscScore]`
+
+## 11. Fonctions utilitaires clés
+- `getCareerState(iscScore)`
+- `getDimensionRanking(scores)`
+- `getTopPriority(weights)`
+- `buildPersonalizedAnalysis(data)`
+- `buildRecommendations(data)`
+
+## 12. Contraintes UX/UI
+- structure claire et séquentielle
+- hiérarchie visuelle forte sur le hero score
+- rendu mobile-first et responsive
+- sections courtes, lisibles, premium
+- labels en français
+- logique 100% déterministe (pas de random)

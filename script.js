@@ -29,42 +29,42 @@ const careerProfiles = {
   explorateur: {
     profileName: "Explorateur",
     icon: "\uD83E\uDDED",
-    description: "You are driven by growth, learning, and new opportunities. You need momentum to stay engaged."
+    description: "Vous \u00eates motiv\u00e9 par l'apprentissage, la progression et les nouvelles opportunit\u00e9s."
   },
   architecte: {
     profileName: "Architecte",
     icon: "\uD83C\uDFD7\uFE0F",
-    description: "You are motivated by purpose and meaningful contribution. Your work needs to feel useful and coherent."
+    description: "Vous \u00eates engag\u00e9 quand votre travail a du sens et une utilit\u00e9 concr\u00e8te."
   },
   stabilisateur: {
     profileName: "Stabilisateur",
     icon: "\uD83D\uDEE1\uFE0F",
-    description: "Your engagement strongly depends on a healthy work environment, team quality, and stability."
+    description: "Votre engagement d\u00e9pend fortement d'un environnement sain, d'une bonne \u00e9quipe et de stabilit\u00e9."
   },
   ambitieux_reconnu: {
     profileName: "Ambitieux reconnu",
     icon: "\uD83C\uDFC6",
-    description: "You are motivated when your work is visible, valued, and recognized."
+    description: "Vous \u00eates motiv\u00e9 quand votre travail est visible, valoris\u00e9 et reconnu."
   },
   stratege: {
     profileName: "Strat\u00E8ge",
     icon: "\u265F\uFE0F",
-    description: "You seek both impact and progression. You want to grow in the right direction, not just move fast."
+    description: "Vous recherchez \u00e0 la fois impact et progression, avec une trajectoire coh\u00e9rente."
   },
   pilier: {
     profileName: "Pilier",
     icon: "\uD83E\uDDF1",
-    description: "You thrive when you can contribute to something useful in a healthy and trustworthy environment."
+    description: "Vous vous \u00e9panouissez en contribuant \u00e0 quelque chose d'utile dans un cadre de confiance."
   },
   challenger: {
     profileName: "Challenger",
     icon: "\u26A1",
-    description: "You are energized by progress, challenge, and visible recognition of your results."
+    description: "Vous \u00eates stimul\u00e9 par le challenge, le progr\u00e8s et la reconnaissance de vos r\u00e9sultats."
   },
   desengage_latent: {
     profileName: "D\u00E9sengag\u00E9 latent",
     icon: "\uD83D\uDD25",
-    description: "Several aspects of your current work situation may no longer match your expectations."
+    description: "Plusieurs aspects de votre situation professionnelle actuelle ne correspondent plus \u00e0 vos attentes."
   }
 };
 
@@ -299,17 +299,12 @@ const ui = {
   valGrowth: document.getElementById("valGrowth"),
   valRecognition: document.getElementById("valRecognition"),
   valEnvironment: document.getElementById("valEnvironment"),
-  lvlMeaning: document.getElementById("lvlMeaning"),
-  lvlGrowth: document.getElementById("lvlGrowth"),
-  lvlRecognition: document.getElementById("lvlRecognition"),
-  lvlEnvironment: document.getElementById("lvlEnvironment"),
+  heroProgressFill: document.getElementById("heroProgressFill"),
+  dimensionSummary: document.getElementById("dimensionSummary"),
+  analysisText: document.getElementById("analysisText"),
   recommendationContext: document.getElementById("recommendationContext"),
-  priorityAction: document.getElementById("priorityAction"),
   actionsList: document.getElementById("actionsList"),
-  zoneFragile: document.getElementById("zoneFragile"),
-  zoneStagnation: document.getElementById("zoneStagnation"),
-  zoneSain: document.getElementById("zoneSain"),
-  zoneExcellent: document.getElementById("zoneExcellent"),
+  copySummaryBtn: document.getElementById("copy-summary-btn"),
   careerProfileIcon: document.getElementById("careerProfileIcon"),
   careerProfileName: document.getElementById("careerProfileName"),
   careerStateLabel: document.getElementById("careerStateLabel"),
@@ -696,84 +691,120 @@ function tenureIndicator(tenure) {
   return "décision de trajectoire interne/externe éclairée par des critères objectifs";
 }
 
-function buildRecommendations(weakestDims, band, domain, job, tenure, contextData) {
-  const [first, second] = weakestDims;
-  const indicative = indicativeByBand[band];
-  const candidates = [
-    {
-      title: `Axe prioritaire: ${dimensionLabelFr[first]}`,
-      badge: "Priorité 1",
-      action: weakDimensionActions[first][band],
-      why: dimensionRationale[first],
-      indicator: dimensionIndicators[first],
-      example: dimensionExamples[first],
-      indicative
-    },
-    {
-      title: `Axe secondaire: ${dimensionLabelFr[second]}`,
-      badge: "Priorité 2",
-      action: weakDimensionActions[second][band],
-      why: dimensionRationale[second],
-      indicator: dimensionIndicators[second],
-      example: dimensionExamples[second],
-      indicative
-    },
-    {
-      title: "Levier métier",
-      badge: "Contexte métier",
-      action: jobActions[job] || jobActions.autre_metier,
-      why: "Action adaptée à votre métier pour augmenter l'impact de vos résultats visibles.",
-      indicator: jobIndicator(job),
-      example: jobExample(job),
-      indicative: "2-6 semaines"
-    },
-    {
-      title: "Levier domaine",
-      badge: "Contexte secteur",
-      action: domainActions[domain] || domainActions.autre,
-      why: "Action alignée sur les contraintes et standards de votre domaine d'activité.",
-      indicator: domainIndicator(domain),
-      example: domainExample(domain),
-      indicative: "2-8 semaines"
-    },
-    {
-      title: "Levier ancienneté",
-      badge: "Contexte poste",
-      action: tenureAction[tenure],
-      why: "Action adaptée à votre maturité sur le poste pour rester réaliste et utile.",
-      indicator: tenureIndicator(tenure),
-      example: tenureExample(tenure),
-      indicative: "2-8 semaines"
-    }
-  ];
+function getCareerState(iscScore) {
+  if (iscScore >= 80) return { label: "\uD83D\uDE80 Align\u00e9", key: "aligned", helper: "Votre situation professionnelle semble globalement tr\u00e8s align\u00e9e avec vos attentes." };
+  if (iscScore >= 65) return { label: "\uD83C\uDF31 En progression", key: "progress", helper: "Votre situation professionnelle est globalement positive, avec encore quelques points \u00e0 renforcer." };
+  if (iscScore >= 50) return { label: "\u26A0\uFE0F D\u00e9salignement", key: "misaligned", helper: "Certains aspects de votre travail semblent en d\u00e9calage avec vos attentes." };
+  return { label: "\uD83D\uDD25 Risque de rupture", key: "risk", helper: "Votre r\u00e9sultat sugg\u00e8re un risque de d\u00e9sengagement ou un besoin de r\u00e9ajustement professionnel." };
+}
 
-  const unique = [];
-  const seen = new Set();
-  candidates.forEach((item) => {
-    if (!seen.has(item.action)) {
-      seen.add(item.action);
-      unique.push(item);
-    }
-  });
+function getDimensionRanking(scores) {
+  return Object.entries(scores).sort((a, b) => b[1] - a[1]);
+}
 
-  return {
-    context: `Domaine: ${contextData.domainLabel} - Fonction: ${contextData.functionLabel} - Taille: ${contextData.companySizeLabel} - Anciennete: ${contextData.tenureLabel} - Niveau: ${contextData.hierarchyLabel}${contextData.offerLabel ? ` - Mobilite: ${contextData.offerLabel}` : ""}`,
-    priority: bandPriority[band],
-    actions: unique.slice(0, 3)
-  };
+function getTopPriority(weights) {
+  return Object.entries(weights).sort((a, b) => b[1] - a[1])[0][0];
+}
+
+function friendlyDimension(key) {
+  return key === "Meaning" ? "Sens" : key === "Growth" ? "Evolution" : key === "Recognition" ? "Reconnaissance" : "Environnement";
+}
+
+function buildPersonalizedAnalysis(data) {
+  const lines = [];
+  if (data.state.key === "aligned") lines.push("Votre score indique une situation professionnelle actuellement bien alignée avec vos attentes.");
+  else if (data.state.key === "progress") lines.push("Votre score montre une base globalement positive, avec des ajustements utiles pour consolider votre équilibre.");
+  else if (data.state.key === "misaligned") lines.push("Votre score révèle un décalage partiel entre ce que vous attendez de votre travail et ce que vous vivez aujourd'hui.");
+  else lines.push("Votre score signale un risque de désengagement qui mérite une action rapide et structurée.");
+
+  if (data.strongestValue > 75) lines.push(`${friendlyDimension(data.strongestKey)} est un vrai moteur de motivation dans votre situation actuelle.`);
+  if (data.weakestValue < 60) {
+    if (data.weakestKey === "Recognition") lines.push("La reconnaissance semble aujourd'hui insuffisante et peut générer de la frustration.");
+    else if (data.weakestKey === "Environment") lines.push("L'environnement de travail paraît être une source de tension ou d'usure.");
+    else if (data.weakestKey === "Meaning") lines.push("Le sens perçu de votre travail paraît fragile, ce qui peut réduire l'engagement.");
+    else lines.push("L'évolution semble freinée, ce qui peut alimenter un sentiment de stagnation.");
+  }
+
+  if (data.topPriorityValue < 60) lines.push(`Votre priorité principale est ${friendlyDimension(data.topPriorityKey)}, mais cette dimension apparaît moins satisfaite aujourd'hui.`);
+  else if (data.topPriorityValue > 75) lines.push(`Votre priorité principale (${friendlyDimension(data.topPriorityKey)}) est bien alimentée actuellement.`);
+
+  if (data.careerProfile.profileKey === "stratege") lines.push("Votre profil Stratège confirme un besoin d'impact et de progression cohérents dans la durée.");
+  else if (data.careerProfile.profileKey === "explorateur") lines.push("Votre profil Explorateur se nourrit d'apprentissage et de mouvement.");
+  else if (data.careerProfile.profileKey === "architecte") lines.push("Votre profil Architecte reste sensible au sens et à l'utilité concrète de vos missions.");
+  else if (data.careerProfile.profileKey === "stabilisateur") lines.push("Votre profil Stabilisateur dépend fortement d'un cadre de travail fiable et sain.");
+  else if (data.careerProfile.profileKey === "ambitieux_reconnu") lines.push("Votre profil Ambitieux reconnu nécessite de la visibilité et des signes clairs de valorisation.");
+  else if (data.careerProfile.profileKey === "pilier") lines.push("Votre profil Pilier cherche un équilibre entre contribution utile et environnement de confiance.");
+  else if (data.careerProfile.profileKey === "challenger") lines.push("Votre profil Challenger a besoin de challenge, de progression et de reconnaissance visible.");
+
+  if (["5_10y", "10_20y", "20plus"].includes(data.profile.tenureInput)) {
+    lines.push("Après plusieurs années dans la même entreprise, les besoins de progression et de reconnaissance deviennent souvent plus structurants.");
+  } else if (["lt6", "6m_2y"].includes(data.profile.tenureInput)) {
+    lines.push("Votre phase d'intégration peut encore influencer la perception globale de votre poste.");
+  }
+
+  if (["team_manager", "manager_of_managers", "executive"].includes(data.profile.hierarchy)) {
+    lines.push("Les responsabilités de leadership peuvent amplifier la sensibilité à la charge, à la reconnaissance et au climat d'équipe.");
+  }
+
+  if (data.profile.offerIntent === "leave_immediately") lines.push("Votre ouverture immédiate à une opportunité externe suggère une urgence de réalignement.");
+  else if (data.profile.offerIntent === "consider_seriously") lines.push("Vous semblez réellement ouvert à un changement, ce qui confirme un besoin d'arbitrage de trajectoire.");
+  else if (data.profile.offerIntent === "likely_stay") lines.push("Vous semblez plutôt orienté vers une amélioration dans votre cadre actuel.");
+  else if (data.profile.offerIntent === "would_not_leave") lines.push("Votre faible intention de départ suggère un socle d'attachement à préserver.");
+
+  if (data.profile.companySize === "large_company" || data.profile.companySize === "global_group") lines.push("Dans les grandes structures, la progression peut nécessiter plus de visibilité et de sponsoring interne.");
+  if (data.profile.companySize === "startup") lines.push("Le contexte startup peut accélérer l'apprentissage mais aussi renforcer l'intensité quotidienne.");
+  if (data.profile.functionInput === "team_management" || data.profile.functionInput === "direction_leadership") lines.push("Dans un rôle d'encadrement, la qualité de l'environnement et la reconnaissance ont souvent un impact direct sur l'engagement.");
+  if (data.profile.domainInput === "consulting_audit" || data.profile.domainInput === "tech_it") lines.push("Dans votre secteur, le rythme et les attentes de performance peuvent accentuer rapidement les écarts de perception.");
+  if (data.careerProfile.profileKey === "desengage_latent") lines.push("Votre profil indique un affaiblissement global de l'alignement, ce qui justifie des décisions de réajustement à court terme.");
+
+  return lines.slice(0, 4).join(" ");
+}
+
+function buildRecommendations(data) {
+  const items = [];
+  const profileHint = data.careerProfile?.profileName ? `Coh\u00e9rent avec votre profil ${data.careerProfile.profileName},` : "";
+
+  if (data.weakestKey === "Recognition") {
+    items.push({ title: "Rendre vos contributions visibles", desc: "Planifiez un point mensuel avec preuves concr\u00e8tes de vos r\u00e9sultats et impacts." });
+  } else if (data.weakestKey === "Growth") {
+    items.push({ title: "N\u00e9gocier une prochaine \u00e9tape", desc: "Demandez une responsabilit\u00e9 additionnelle avec objectifs, p\u00e9rim\u00e8tre et date de revue." });
+  } else if (data.weakestKey === "Meaning") {
+    items.push({ title: "Reconnecter votre r\u00f4le \u00e0 l'impact", desc: "R\u00e9allouez du temps vers des missions utiles et visibles pour renforcer le sens au quotidien." });
+  } else {
+    items.push({ title: "Stabiliser votre environnement", desc: "Isolez un irritant majeur d'\u00e9quipe et traitez-le via un rituel d'alignement hebdomadaire." });
+  }
+
+  if (data.topPriorityKey === "Growth") {
+    items.push({ title: "Prioriser votre progression", desc: `${profileHint} formalisez un plan 90 jours orient\u00e9 comp\u00e9tences et mobilit\u00e9 interne.`.trim() });
+  } else if (data.topPriorityKey === "Meaning") {
+    items.push({ title: "Renforcer l'utilit\u00e9 de vos missions", desc: `${profileHint} n\u00e9gociez un ajustement de p\u00e9rim\u00e8tre autour des sujets \u00e0 plus fort impact.`.trim() });
+  } else if (data.topPriorityKey === "Recognition") {
+    items.push({ title: "Clarifier vos crit\u00e8res de reconnaissance", desc: `${profileHint} alignez avec votre manager les attentes explicites de visibilit\u00e9, contribution et progression.`.trim() });
+  } else {
+    items.push({ title: "Am\u00e9liorer vos conditions d'ex\u00e9cution", desc: `${profileHint} clarifiez charge, priorit\u00e9s et mode de collaboration pour fiabiliser le cadre de travail.`.trim() });
+  }
+
+  if (["5_10y", "10_20y", "20plus"].includes(data.profile.tenureInput)) {
+    items.push({ title: "Relancer votre trajectoire", desc: "Apr\u00e8s une anciennet\u00e9 longue, cadrer une \u00e9tape de repositionnement est souvent d\u00e9cisif." });
+  } else if (data.profile.offerIntent === "leave_immediately" || data.profile.offerIntent === "consider_seriously") {
+    items.push({ title: "Arbitrer votre option de mobilit\u00e9", desc: "Comparez votre poste actuel \u00e0 2 opportunit\u00e9s externes avec une grille factuelle." });
+  } else if (data.careerProfile.profileName === "Stabilisateur" || data.careerProfile.profileName === "Pilier") {
+    items.push({ title: "Consolider la stabilit\u00e9 interne", desc: "Priorisez une am\u00e9lioration relationnelle ou organisationnelle durable dans l'\u00e9quipe actuelle." });
+  } else {
+    items.push({ title: "Ancrer une action visible rapide", desc: "D\u00e9ployez une action mesurable dans les 30 jours, coh\u00e9rente avec votre profil carri\u00e8re." });
+  }
+
+  return items.slice(0, 3);
 }
 
 function updateGauge(isc) {
   const angle = Math.round((isc / 100) * 360);
   ui.chiGauge.style.setProperty("--gauge-angle", `${angle}deg`);
+  if (ui.heroProgressFill) ui.heroProgressFill.style.width = `${isc}%`;
 }
 
 function activateZone(isc) {
-  [ui.zoneFragile, ui.zoneStagnation, ui.zoneSain, ui.zoneExcellent].forEach((node) => node.classList.remove("active"));
-  if (isc < 40) ui.zoneFragile.classList.add("active");
-  else if (isc < 60) ui.zoneStagnation.classList.add("active");
-  else if (isc < 80) ui.zoneSain.classList.add("active");
-  else ui.zoneExcellent.classList.add("active");
+  return isc;
 }
 
 function renderDimensionBars(dimensions) {
@@ -785,26 +816,16 @@ function renderDimensionBars(dimensions) {
   ui.barGrowth.style.width = `${dimensions.Growth}%`;
   ui.barRecognition.style.width = `${dimensions.Recognition}%`;
   ui.barEnvironment.style.width = `${dimensions.Environment}%`;
-  ui.lvlMeaning.textContent = scoreLevel(dimensions.Meaning);
-  ui.lvlGrowth.textContent = scoreLevel(dimensions.Growth);
-  ui.lvlRecognition.textContent = scoreLevel(dimensions.Recognition);
-  ui.lvlEnvironment.textContent = scoreLevel(dimensions.Environment);
 }
 
 function renderRecommendations(target, items) {
   target.innerHTML = "";
-  items.forEach((item) => {
+  items.forEach((item, index) => {
     const li = document.createElement("li");
-    li.className = "recommendation-item";
+    li.className = "action-step";
     li.innerHTML = `
-      <div class="recommendation-head">
-        <p class="recommendation-title">${item.title}</p>
-        <span class="recommendation-badge">${item.badge}</span>
-      </div>
-      <p class="recommendation-action"><strong>Action:</strong> ${item.action}</p>
-      <p class="recommendation-why"><strong>Pourquoi:</strong> ${item.why}</p>
-      <p class="recommendation-indicator"><strong>Indicateur de réussite:</strong> ${item.indicator}${item.indicative ? ` (indicatif: ${item.indicative})` : ""}</p>
-      <p class="recommendation-example"><strong>Exemple concret:</strong> ${item.example || "À adapter à votre contexte."}</p>
+      <p class="action-step-title">${index + 1}. ${item.title}</p>
+      <p class="action-step-desc">${item.desc}</p>
     `;
     target.appendChild(li);
   });
@@ -832,7 +853,15 @@ function renderCareerProfile(careerProfile, isc) {
 function computeAndShowResults() {
   const dimensions = computeDimensions();
   const isc = computeISC(dimensions, customWeights);
-  const interpretation = getInterpretation(isc);
+  const state = getCareerState(isc);
+  const dimensionRanking = getDimensionRanking(dimensions);
+  const strongestKey = dimensionRanking[0][0];
+  const secondStrongestKey = dimensionRanking[1][0];
+  const weakestKey = dimensionRanking[dimensionRanking.length - 1][0];
+  const strongestValue = dimensionRanking[0][1];
+  const weakestValue = dimensionRanking[dimensionRanking.length - 1][1];
+  const topPriorityKey = getTopPriority(customWeights);
+  const topPriorityValue = dimensions[topPriorityKey];
   const careerProfile = getCareerProfile({
     iscScore: isc,
     sensScore: dimensions.Meaning,
@@ -840,55 +869,61 @@ function computeAndShowResults() {
     reconnaissanceScore: dimensions.Recognition,
     environnementScore: dimensions.Environment
   });
-  const ranked = rankDimensions(dimensions);
-  const weakKeys = ranked.slice(-2).map((d) => d[0]);
-  const recommendations = buildRecommendations(
-    weakKeys,
-    interpretation.band,
-    profile.domain,
-    profile.job,
-    profile.tenure,
-    {
-      domainLabel: ui.domainSelect.options[ui.domainSelect.selectedIndex]?.text || "N/A",
-      functionLabel: ui.functionSelect.options[ui.functionSelect.selectedIndex]?.text || "N/A",
-      companySizeLabel: ui.companySizeSelect.options[ui.companySizeSelect.selectedIndex]?.text || "N/A",
-      tenureLabel: ui.tenureSelect.options[ui.tenureSelect.selectedIndex]?.text || "N/A",
-      hierarchyLabel: ui.hierarchySelect.options[ui.hierarchySelect.selectedIndex]?.text || "N/A",
-      offerLabel: ui.offerSelect.value ? (ui.offerSelect.options[ui.offerSelect.selectedIndex]?.text || "") : ""
-    }
-  );
+
+  const contextData = {
+    domainLabel: ui.domainSelect.options[ui.domainSelect.selectedIndex]?.text || "N/A",
+    functionLabel: ui.functionSelect.options[ui.functionSelect.selectedIndex]?.text || "N/A",
+    companySizeLabel: ui.companySizeSelect.options[ui.companySizeSelect.selectedIndex]?.text || "N/A",
+    tenureLabel: ui.tenureSelect.options[ui.tenureSelect.selectedIndex]?.text || "N/A",
+    hierarchyLabel: ui.hierarchySelect.options[ui.hierarchySelect.selectedIndex]?.text || "N/A",
+    offerLabel: ui.offerSelect.value ? (ui.offerSelect.options[ui.offerSelect.selectedIndex]?.text || "") : ""
+  };
+
+  const analysis = buildPersonalizedAnalysis({
+    state,
+    strongestKey,
+    strongestValue,
+    weakestKey,
+    weakestValue,
+    topPriorityKey,
+    topPriorityValue,
+    profile,
+    careerProfile
+  });
+  const recommendations = buildRecommendations({ weakestKey, topPriorityKey, profile, careerProfile });
 
   latestResult = {
     isc,
     dimensions,
     careerProfile,
+    analysis,
+    state,
     profile: { ...profile },
+    contextData,
     weights: { ...customWeights },
     generatedAt: new Date().toISOString()
   };
 
   ui.chiScore.textContent = `${isc} / 100`;
-  ui.chiLabel.textContent = interpretation.label;
-  ui.chiLabel.classList.remove("good", "warn");
-  ui.chiLabel.classList.add(interpretation.tone);
-  ui.chiSummary.textContent = interpretation.summary;
-  ui.calcFormula.textContent = `ISC = Sens*${customWeights.Meaning.toFixed(2)} + Évolution*${customWeights.Growth.toFixed(2)} + Reconnaissance*${customWeights.Recognition.toFixed(2)} + Environnement*${customWeights.Environment.toFixed(2)}`;
-  ui.resultDate.textContent = `Généré le ${new Date(latestResult.generatedAt).toLocaleString("fr-FR")}`;
+  ui.chiLabel.textContent = state.label;
+  ui.chiSummary.textContent = state.helper;
+  ui.calcFormula.textContent = `ISC = Sens*${customWeights.Meaning.toFixed(2)} + Evolution*${customWeights.Growth.toFixed(2)} + Reconnaissance*${customWeights.Recognition.toFixed(2)} + Environnement*${customWeights.Environment.toFixed(2)}`;
+  ui.resultDate.textContent = `Genere le ${new Date(latestResult.generatedAt).toLocaleString("fr-FR")}`;
   updateGauge(isc);
-  activateZone(isc);
   renderDimensionBars(dimensions);
   renderCareerProfile(careerProfile, isc);
-  ui.recommendationContext.textContent = recommendations.context;
-  ui.priorityAction.textContent = recommendations.priority;
-  renderRecommendations(ui.actionsList, recommendations.actions);
+  ui.dimensionSummary.textContent = `Dimension forte : ${friendlyDimension(strongestKey)} - Point de vigilance : ${friendlyDimension(weakestKey)}`;
+  ui.analysisText.textContent = analysis;
+  ui.recommendationContext.textContent = `Contexte : ${contextData.domainLabel} | ${contextData.functionLabel} | ${contextData.companySizeLabel} | ${contextData.tenureLabel} | ${contextData.hierarchyLabel}${contextData.offerLabel ? ` | ${contextData.offerLabel}` : ""}`;
+  renderRecommendations(ui.actionsList, recommendations);
   showScreen("results");
 }
 
 async function shareISC() {
   if (!latestResult) return;
-  const interpretation = getInterpretation(latestResult.isc);
+  const state = getCareerState(latestResult.isc);
   const profileName = latestResult.careerProfile?.profileName || "Non d\u00E9fini";
-  const text = `Mon indice de sant\u00E9 de carri\u00E8re (ISC) est ${latestResult.isc}/100 (${interpretation.label}). Mon profil carri\u00E8re : ${profileName} \u2014 ISC ${latestResult.isc}`;
+  const text = `Mon profil carrière : ${profileName} — ISC ${latestResult.isc} (${state.label})`;
 
   if (navigator.share) {
     try {
@@ -959,6 +994,21 @@ ui.profileNextBtn.addEventListener("click", () => {
 
 ui.restartBtn.addEventListener("click", () => showScreen("landing"));
 ui.shareBtn.addEventListener("click", shareISC);
+if (ui.copySummaryBtn) {
+  ui.copySummaryBtn.addEventListener("click", async () => {
+    if (!latestResult || !navigator.clipboard?.writeText) return;
+    const summary = `Mon profil carrière : ${latestResult.careerProfile.profileName} — ISC ${latestResult.isc}`;
+    try {
+      await navigator.clipboard.writeText(summary);
+      ui.copySummaryBtn.textContent = "Résumé copié";
+      setTimeout(() => { ui.copySummaryBtn.textContent = "Copier le résumé"; }, 1200);
+    } catch {
+      ui.copySummaryBtn.textContent = "Copie impossible";
+      setTimeout(() => { ui.copySummaryBtn.textContent = "Copier le résumé"; }, 1200);
+    }
+  });
+}
 setupPriorityDragAndDrop();
 setupPriorityTouchReorder();
 resetWeights();
+

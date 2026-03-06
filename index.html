@@ -47,15 +47,15 @@
       </header>
       <div class="screen-main">
         <article class="card card-center">
-          <p class="eyebrow">Etape 1</p>
-          <h2>Classez vos priorites</h2>
-          <p class="subtitle">Glissez les cartes pour les ordonner de la plus importante (1) a la moins importante (4).</p>
+          <p class="eyebrow">Étape 1</p>
+          <h2>Classez vos priorités</h2>
+          <p class="subtitle">Glissez les cartes pour les ordonner de la plus importante (1) à la moins importante (4).</p>
 
-          <div class="preset-wrap" role="group" aria-label="Prereglages priorites">
-            <button id="preset-balanced-btn" class="btn btn-secondary preset-btn" type="button">Profil equilibre</button>
-            <button id="preset-career-btn" class="btn btn-secondary preset-btn" type="button">Priorite carriere</button>
-            <button id="preset-wellbeing-btn" class="btn btn-secondary preset-btn" type="button">Priorite bien-etre</button>
-            <button id="preset-impact-btn" class="btn btn-secondary preset-btn" type="button">Priorite impact</button>
+          <div class="preset-wrap" role="group" aria-label="Préréglages priorités">
+            <button id="preset-balanced-btn" class="btn btn-secondary preset-btn" type="button">Profil équilibré</button>
+            <button id="preset-career-btn" class="btn btn-secondary preset-btn" type="button">Priorité carrière</button>
+            <button id="preset-wellbeing-btn" class="btn btn-secondary preset-btn" type="button">Priorité bien-être</button>
+            <button id="preset-impact-btn" class="btn btn-secondary preset-btn" type="button">Priorité impact</button>
           </div>
 
           <ul id="priority-list" class="priority-list">
@@ -63,15 +63,15 @@
               <p class="priority-rank">1</p>
               <div class="priority-content">
                 <p class="priority-title">Sens du travail</p>
-                <p class="priority-desc">L'utilite et l'impact de ce que je fais</p>
+                <p class="priority-desc">L'utilité et l'impact de ce que je fais</p>
               </div>
               <span class="material-symbols-outlined priority-icon">volunteer_activism</span>
             </li>
             <li class="priority-card" data-dimension="Growth">
               <p class="priority-rank">2</p>
               <div class="priority-content">
-                <p class="priority-title">Evolution</p>
-                <p class="priority-desc">Apprendre, progresser et developper ma carriere</p>
+                <p class="priority-title">Évolution</p>
+                <p class="priority-desc">Apprendre, progresser et développer ma carrière</p>
               </div>
               <span class="material-symbols-outlined priority-icon">trending_up</span>
             </li>
@@ -79,7 +79,7 @@
               <p class="priority-rank">3</p>
               <div class="priority-content">
                 <p class="priority-title">Reconnaissance</p>
-                <p class="priority-desc">Etre valorise pour mon travail et mes resultats</p>
+                <p class="priority-desc">Être valorisé pour mon travail et mes résultats</p>
               </div>
               <span class="material-symbols-outlined priority-icon">workspace_premium</span>
             </li>
@@ -87,13 +87,13 @@
               <p class="priority-rank">4</p>
               <div class="priority-content">
                 <p class="priority-title">Environnement</p>
-                <p class="priority-desc">Travailler dans une bonne equipe et un cadre sain</p>
+                <p class="priority-desc">Travailler dans une bonne équipe et un cadre sain</p>
               </div>
               <span class="material-symbols-outlined priority-icon">groups</span>
             </li>
           </ul>
 
-          <button id="weights-reset-btn" class="btn btn-secondary inline-btn" type="button">Reinitialiser l'ordre</button>
+          <button id="weights-reset-btn" class="btn btn-secondary inline-btn" type="button">Réinitialiser l'ordre</button>
         </article>
       </div>
       <footer class="screen-footer">
@@ -240,80 +240,76 @@
       </header>
 
       <div class="results-main">
-        <article class="card score-card">
-          <p class="eyebrow">Indice de Santé de Carrière</p>
-          <div class="gauge-wrap">
-            <div id="chiGauge" class="chi-gauge">
-              <div class="gauge-hole">
-                <p id="chiScore" class="chi-score">0 / 100</p>
+        <article class="card score-card hero-score-card">
+          <p class="eyebrow">Votre Indice de Sant&eacute; de Carri&egrave;re</p>
+          <div class="hero-score-top">
+            <div class="gauge-wrap">
+              <div id="chiGauge" class="chi-gauge">
+                <div class="gauge-hole">
+                  <p id="chiScore" class="chi-score">0 / 100</p>
+                </div>
               </div>
             </div>
+            <div class="hero-score-meta">
+              <p id="chiLabel" class="chi-label">🌱 En progression</p>
+              <p id="chiSummary" class="subtitle">Votre situation professionnelle est globalement positive, avec encore quelques points &agrave; renforcer.</p>
+            </div>
           </div>
-          <p id="chiLabel" class="chi-label">Sain</p>
-            <p id="chiSummary" class="subtitle">Votre situation professionnelle est globalement saine.</p>
-          <div class="score-zones" aria-hidden="true">
-            <span id="zoneFragile" class="zone zone-warn">Fragile</span>
-            <span id="zoneStagnation" class="zone zone-warn">Stagnation</span>
-            <span id="zoneSain" class="zone zone-good">Sain</span>
-            <span id="zoneExcellent" class="zone zone-good">Excellent</span>
+          <div class="hero-progress-wrap" aria-hidden="true">
+            <div class="hero-progress-track"><div id="heroProgressFill" class="hero-progress-fill"></div></div>
+            <div class="hero-progress-scale"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
           </div>
           <div class="calc-box">
             <p class="calc-title"><span class="material-symbols-outlined">calculate</span>Transparence du calcul</p>
-            <p id="calcFormula" class="calc-note">ISC personnalisé selon vos priorités.</p>
+            <p id="calcFormula" class="calc-note">ISC personnalis&eacute; selon vos priorit&eacute;s.</p>
             <p id="result-date" class="calc-note"></p>
           </div>
         </article>
 
         <article class="card career-profile-card">
-          <p class="eyebrow">Votre Profil de Carri&egrave;re</p>
+          <h3>Votre profil carri&egrave;re</h3>
           <div class="career-profile-head">
             <div id="careerProfileIcon" class="career-profile-icon" aria-hidden="true">*</div>
             <div>
-              <h3 id="careerProfileName" class="career-profile-name">Explorateur</h3>
-              <p id="careerStateLabel" class="career-state-label">En progression</p>
+              <p id="careerProfileName" class="career-profile-name">Explorateur</p>
+              <p id="careerStateLabel" class="career-state-label">🌱 En progression</p>
+              <p id="careerISCScore" class="career-isc-score">ISC: 0 / 100</p>
             </div>
           </div>
-          <p id="careerISCScore" class="career-isc-score">ISC: 0 / 100</p>
           <p id="careerProfileDescription" class="subtitle">Votre profil de carri&egrave;re sera affich&eacute; ici.</p>
-
           <div class="career-dimensions">
-            <p><strong>Dimension dominante:</strong> <span id="careerStrongestDimension">-</span></p>
-            <p id="careerSecondRow"><strong>Seconde dimension:</strong> <span id="careerSecondDimension">-</span></p>
-            <p><strong>Dimension la plus faible:</strong> <span id="careerWeakestDimension">-</span></p>
-          </div>
-
-          <p id="careerShareLine" class="career-share-line">Mon profil carri&egrave;re : Explorateur - ISC 0</p>
-        </article>
-
-        <article class="card">
-          <h3>Répartition</h3>
-          <p class="calc-note">Ces scores proviennent directement de vos réponses par dimension (0 à 100).</p>
-          <div class="metric-row">
-            <div class="metric-head"><span>Sens</span><span><span id="valMeaning">0</span> - <span id="lvlMeaning" class="dimension-level">-</span></span></div>
-            <div class="bar-track"><div id="barMeaning" class="bar-fill"></div></div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-head"><span>Évolution</span><span><span id="valGrowth">0</span> - <span id="lvlGrowth" class="dimension-level">-</span></span></div>
-            <div class="bar-track"><div id="barGrowth" class="bar-fill"></div></div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-head"><span>Reconnaissance</span><span><span id="valRecognition">0</span> - <span id="lvlRecognition" class="dimension-level">-</span></span></div>
-            <div class="bar-track"><div id="barRecognition" class="bar-fill"></div></div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-head"><span>Environnement</span><span><span id="valEnvironment">0</span> - <span id="lvlEnvironment" class="dimension-level">-</span></span></div>
-            <div class="bar-track"><div id="barEnvironment" class="bar-fill"></div></div>
+            <p><strong>Votre moteur principal :</strong> <span id="careerStrongestDimension">-</span></p>
+            <p id="careerSecondRow"><strong>Seconde dimension cl&eacute; :</strong> <span id="careerSecondDimension">-</span></p>
+            <p><strong>Point de vigilance :</strong> <span id="careerWeakestDimension">-</span></p>
           </div>
         </article>
 
         <article class="card">
-          <h3>Préconisations pour votre domaine</h3>
+          <h3>Votre &eacute;quilibre professionnel</h3>
+          <div class="metric-row"><div class="metric-head"><span>Sens</span><span id="valMeaning">0</span></div><div class="bar-track"><div id="barMeaning" class="bar-fill"></div></div></div>
+          <div class="metric-row"><div class="metric-head"><span>Evolution</span><span id="valGrowth">0</span></div><div class="bar-track"><div id="barGrowth" class="bar-fill"></div></div></div>
+          <div class="metric-row"><div class="metric-head"><span>Reconnaissance</span><span id="valRecognition">0</span></div><div class="bar-track"><div id="barRecognition" class="bar-fill"></div></div></div>
+          <div class="metric-row"><div class="metric-head"><span>Environnement</span><span id="valEnvironment">0</span></div><div class="bar-track"><div id="barEnvironment" class="bar-fill"></div></div></div>
+          <p id="dimensionSummary" class="calc-note"></p>
+        </article>
+
+        <article class="card">
+          <h3>Analyse personnalis&eacute;e</h3>
+          <p id="analysisText" class="analysis-text">Votre analyse personnalis&eacute;e appara&icirc;tra ici.</p>
           <p id="recommendationContext" class="calc-note"></p>
-          <p id="priorityAction" class="priority-action"></p>
-          <ul id="actionsList" class="recommendation-list"></ul>
+        </article>
+
+        <article class="card">
+          <h3>Recommandations</h3>
+          <ol id="actionsList" class="action-steps"></ol>
+        </article>
+
+        <article class="card share-card">
+          <h3>Partager votre r&eacute;sultat</h3>
+          <p id="careerShareLine" class="career-share-line">Mon profil carri&egrave;re : Explorateur &mdash; ISC 0</p>
+          <div class="share-buttons"><button id="copy-summary-btn" class="btn btn-secondary" type="button">Copier le r&eacute;sum&eacute;</button></div>
         </article>
       </div>
-
       <footer class="screen-footer results-actions">
         <button id="restart-btn" class="btn btn-primary">Refaire le test</button>
         <button id="share-btn" class="btn btn-secondary">Partager mon ISC</button>
