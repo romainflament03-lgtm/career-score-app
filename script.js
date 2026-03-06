@@ -69,14 +69,41 @@ const careerProfiles = {
 };
 
 const profileImages = {
+  "Le Stratège": "assets/profiles/strategiste.png",
+  "Stratège": "assets/profiles/strategiste.png",
+  "L'Architecte": "assets/profiles/architecte.png",
+  "Architecte": "assets/profiles/architecte.png",
+  "L'Explorateur": "assets/profiles/explorateur.png",
+  "Explorateur": "assets/profiles/explorateur.png",
+  "Le Stabilisateur": "assets/profiles/stabilisateur.png",
+  "Stabilisateur": "assets/profiles/stabilisateur.png",
+  "Le Challenger": "assets/profiles/challenger.png",
+  "Challenger": "assets/profiles/challenger.png",
+  "L'Ambitieux": "assets/profiles/ambitieux.png",
+  "Ambitieux reconnu": "assets/profiles/ambitieux.png",
+  "Le Pilier": "assets/profiles/pilier.png",
+  "Pilier": "assets/profiles/pilier.png",
+  "Le Désengagé": "assets/profiles/desengage.png",
+  "Désengagé latent": "assets/profiles/desengage.png"
+};
+
+const legacyProfileImages = {
   "Le Stratège": "Asset/Profiles/strategiste.png",
+  "Stratège": "Asset/Profiles/strategiste.png",
   "L'Architecte": "Asset/Profiles/architecte.png",
+  "Architecte": "Asset/Profiles/architecte.png",
   "L'Explorateur": "Asset/Profiles/explorateur.png",
+  "Explorateur": "Asset/Profiles/explorateur.png",
   "Le Stabilisateur": "Asset/Profiles/stabilisateur.png",
+  "Stabilisateur": "Asset/Profiles/stabilisateur.png",
   "Le Challenger": "Asset/Profiles/challenger.png",
+  "Challenger": "Asset/Profiles/challenger.png",
   "L'Ambitieux": "Asset/Profiles/ambitieux.png",
+  "Ambitieux reconnu": "Asset/Profiles/ambitieux.png",
   "Le Pilier": "Asset/Profiles/pilier.png",
-  "Le Désengagé": "Asset/Profiles/desengage.png"
+  "Pilier": "Asset/Profiles/pilier.png",
+  "Le Désengagé": "Asset/Profiles/desengage.png",
+  "Désengagé latent": "Asset/Profiles/desengage.png"
 };
 
 const profileNameAliases = {
@@ -878,17 +905,28 @@ function renderRecommendations(target, items) {
 function renderCareerProfile(careerProfile, isc) {
   const canonicalProfileName = profileNameAliases[careerProfile.profileName] || careerProfile.profileName;
   const profileImage = profileImages[canonicalProfileName] || "";
+  const legacyProfileImage = legacyProfileImages[canonicalProfileName] || "";
   if (ui.profileImage && ui.profileImageFallback) {
     if (profileImage) {
-      ui.profileImage.src = profileImage;
-      ui.profileImage.alt = `Illustration du profil ${careerProfile.profileName}`;
-      ui.profileImage.hidden = false;
-      ui.profileImageFallback.hidden = true;
       ui.profileImage.onerror = () => {
+        if (legacyProfileImage && ui.profileImage.dataset.legacyTried !== "1") {
+          ui.profileImage.dataset.legacyTried = "1";
+          ui.profileImage.src = legacyProfileImage;
+          return;
+        }
         ui.profileImage.hidden = true;
         ui.profileImageFallback.hidden = false;
         ui.profileImage.alt = "Illustration indisponible";
       };
+      ui.profileImage.onload = () => {
+        ui.profileImage.hidden = false;
+        ui.profileImageFallback.hidden = true;
+      };
+      ui.profileImage.dataset.legacyTried = "0";
+      ui.profileImage.src = profileImage;
+      ui.profileImage.alt = `Illustration du profil ${careerProfile.profileName}`;
+      ui.profileImage.hidden = false;
+      ui.profileImageFallback.hidden = true;
     } else {
       ui.profileImage.src = "";
       ui.profileImage.alt = "Illustration indisponible";
