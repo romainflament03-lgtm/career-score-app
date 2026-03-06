@@ -197,6 +197,88 @@ h3 {
   text-align: left;
 }
 
+.preset-wrap {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.preset-btn {
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  border-radius: 12px;
+}
+
+.priority-list {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+
+.priority-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid #dbe7ff;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+  cursor: grab;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.priority-card:hover {
+  transform: translateY(-1px);
+  border-color: #bfdbfe;
+}
+
+.priority-card.dragging {
+  opacity: 0.8;
+  transform: scale(0.98);
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+  border-color: #93c5fd;
+}
+
+.priority-rank {
+  margin: 0;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1e3a8a;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.priority-title {
+  margin: 0;
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.priority-desc {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.priority-icon {
+  font-size: 20px;
+  color: #2563eb;
+}
+
 .weight-row {
   display: flex;
   justify-content: space-between;
@@ -402,6 +484,78 @@ input[type="range"]::-moz-range-thumb {
   color: var(--muted);
 }
 
+.career-profile-card {
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(160deg, #eff6ff 0%, #ffffff 45%, #ecfeff 100%);
+}
+
+.career-profile-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.career-profile-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12);
+}
+
+.career-profile-name {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.career-state-label {
+  margin: 4px 0 0;
+  color: #1e3a8a;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.career-isc-score {
+  margin: 14px 0 0;
+  display: inline-block;
+  border: 1px solid #bfdbfe;
+  background: #ffffff;
+  color: #1e40af;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.career-dimensions {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #dbeafe;
+  display: grid;
+  gap: 6px;
+}
+
+.career-dimensions p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.career-share-line {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed #bfdbfe;
+  font-size: 0.8rem;
+  color: #334155;
+  word-break: break-word;
+}
+
 .metric-row + .metric-row { margin-top: 10px; }
 
 .metric-head {
@@ -553,6 +707,9 @@ li {
   .screen-main, .results-main { padding-left: 28px; padding-right: 28px; }
   .results-main { grid-template-columns: 1fr 1fr; }
   .score-card, .results-main > .card:last-child { grid-column: 1 / -1; }
+  .preset-wrap {
+    grid-template-columns: repeat(4, 1fr);
+  }
   .results-actions {
     grid-template-columns: 1fr 1fr;
     padding-left: 28px;

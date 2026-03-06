@@ -48,24 +48,52 @@
       <div class="screen-main">
         <article class="card card-center">
           <p class="eyebrow">Etape 1</p>
-          <h2>Ce qui compte le plus pour vous</h2>
-          <p class="subtitle">Réglez chaque curseur de 1 à 5. Les pourcentages sont calculés automatiquement (total 100%).</p>
+          <h2>Classez vos priorites</h2>
+          <p class="subtitle">Glissez les cartes pour les ordonner de la plus importante (1) a la moins importante (4).</p>
 
-          <div class="weights-wrap">
-            <label class="weight-row" for="weight-meaning"><span>Sens</span><span id="weightPctMeaning">25%</span></label>
-            <input id="weight-meaning" class="weight-input" type="range" min="1" max="5" step="1" value="3">
-
-            <label class="weight-row" for="weight-growth"><span>Évolution</span><span id="weightPctGrowth">25%</span></label>
-            <input id="weight-growth" class="weight-input" type="range" min="1" max="5" step="1" value="3">
-
-            <label class="weight-row" for="weight-recognition"><span>Reconnaissance</span><span id="weightPctRecognition">25%</span></label>
-            <input id="weight-recognition" class="weight-input" type="range" min="1" max="5" step="1" value="3">
-
-            <label class="weight-row" for="weight-environment"><span>Environnement</span><span id="weightPctEnvironment">25%</span></label>
-            <input id="weight-environment" class="weight-input" type="range" min="1" max="5" step="1" value="3">
+          <div class="preset-wrap" role="group" aria-label="Prereglages priorites">
+            <button id="preset-balanced-btn" class="btn btn-secondary preset-btn" type="button">Profil equilibre</button>
+            <button id="preset-career-btn" class="btn btn-secondary preset-btn" type="button">Priorite carriere</button>
+            <button id="preset-wellbeing-btn" class="btn btn-secondary preset-btn" type="button">Priorite bien-etre</button>
+            <button id="preset-impact-btn" class="btn btn-secondary preset-btn" type="button">Priorite impact</button>
           </div>
 
-          <button id="weights-reset-btn" class="btn btn-secondary inline-btn" type="button">Réinitialiser (équilibre)</button>
+          <ul id="priority-list" class="priority-list">
+            <li class="priority-card" data-dimension="Meaning">
+              <p class="priority-rank">1</p>
+              <div class="priority-content">
+                <p class="priority-title">Sens du travail</p>
+                <p class="priority-desc">L'utilite et l'impact de ce que je fais</p>
+              </div>
+              <span class="material-symbols-outlined priority-icon">volunteer_activism</span>
+            </li>
+            <li class="priority-card" data-dimension="Growth">
+              <p class="priority-rank">2</p>
+              <div class="priority-content">
+                <p class="priority-title">Evolution</p>
+                <p class="priority-desc">Apprendre, progresser et developper ma carriere</p>
+              </div>
+              <span class="material-symbols-outlined priority-icon">trending_up</span>
+            </li>
+            <li class="priority-card" data-dimension="Recognition">
+              <p class="priority-rank">3</p>
+              <div class="priority-content">
+                <p class="priority-title">Reconnaissance</p>
+                <p class="priority-desc">Etre valorise pour mon travail et mes resultats</p>
+              </div>
+              <span class="material-symbols-outlined priority-icon">workspace_premium</span>
+            </li>
+            <li class="priority-card" data-dimension="Environment">
+              <p class="priority-rank">4</p>
+              <div class="priority-content">
+                <p class="priority-title">Environnement</p>
+                <p class="priority-desc">Travailler dans une bonne equipe et un cadre sain</p>
+              </div>
+              <span class="material-symbols-outlined priority-icon">groups</span>
+            </li>
+          </ul>
+
+          <button id="weights-reset-btn" class="btn btn-secondary inline-btn" type="button">Reinitialiser l'ordre</button>
         </article>
       </div>
       <footer class="screen-footer">
@@ -112,100 +140,92 @@
       <header class="screen-header">
         <div class="brand">
           <span class="material-symbols-outlined brand-icon">business_center</span>
-          <p class="brand-name">Contexte professionnel</p>
+          <p class="brand-name">Situation professionnelle</p>
         </div>
       </header>
       <div class="screen-main">
         <article class="card card-center">
           <p class="eyebrow">Etape finale</p>
-          <h2>Votre contexte en entreprise</h2>
-          <p class="subtitle">Ces informations servent à rendre les préconisations plus pertinentes.</p>
+          <h2>Votre situation professionnelle</h2>
+          <p class="subtitle">Ces informations permettent de contextualiser votre score et d'affiner les recommandations.</p>
           <div class="profile-form">
-            <label class="profile-label" for="domain-select">Domaine d'activité</label>
+            <label class="profile-label" for="domain-select">Domaine d'activit&eacute;</label>
             <select id="domain-select" class="profile-select">
-              <option value="tech" selected>Numerique / Tech</option>
-              <option value="finance">Finance / Assurance</option>
-              <option value="industrie">Industrie / Production</option>
-              <option value="commerce">Commerce / Distribution</option>
-              <option value="sante">Santé / Médico-social</option>
-              <option value="education">Éducation / Formation</option>
-              <option value="public">Administration / Service public</option>
-              <option value="transport">Transport / Logistique</option>
-              <option value="conseil">Conseil / Services aux entreprises</option>
-              <option value="autre">Autre domaine</option>
+              <option value="tech_it" selected>Technologie / IT</option>
+              <option value="finance_banking_insurance">Finance / Banque / Assurance</option>
+              <option value="industry_engineering">Industrie / Ing&eacute;nierie</option>
+              <option value="health_pharma">Sant&eacute; / Pharmaceutique</option>
+              <option value="consulting_audit">Conseil / Audit</option>
+              <option value="marketing_communication">Marketing / Communication</option>
+              <option value="commerce_distribution">Commerce / Distribution</option>
+              <option value="education_research">&Eacute;ducation / Recherche</option>
+              <option value="public_admin">Administration / Secteur public</option>
+              <option value="construction_real_estate">Construction / Immobilier</option>
+              <option value="transport_logistics">Transport / Logistique</option>
+              <option value="energy_environment">&Eacute;nergie / Environnement</option>
+              <option value="media_creation">M&eacute;dias / Cr&eacute;ation</option>
+              <option value="hospitality_tourism">H&ocirc;tellerie / Tourisme</option>
+              <option value="other_domain">Autre</option>
             </select>
 
-            <label class="profile-label" for="job-select">Métier</label>
-            <p class="field-note">Le métier est sélectionné indépendamment du domaine d'activité.</p>
-            <select id="job-select" class="profile-select">
-              <optgroup label="Conseil / Gestion de projet">
-                <option value="consultant" selected>Consultant</option>
-                <option value="manager_conseil">Manager conseil</option>
-                <option value="project_manager">Chef de projet</option>
-                <option value="pmo">PMO</option>
-                <option value="program_manager">Program manager</option>
-              </optgroup>
-              <optgroup label="Tech / Produit">
-                <option value="dev">Développeur / Ingénieur logiciel</option>
-                <option value="data">Data / BI / IA</option>
-                <option value="product">Product manager / Product owner</option>
-                <option value="it_ops">Infra / SRE / Support IT</option>
-              </optgroup>
-              <optgroup label="Business / Commerce">
-                <option value="commercial_conseil">Commercial / Avant-vente</option>
-                <option value="vente">Vente / Business development</option>
-                <option value="marketing">Marketing / CRM / E-commerce</option>
-                <option value="achat">Achats / Category management</option>
-              </optgroup>
-              <optgroup label="Finance / Administratif">
-                <option value="compta">Comptabilité / Contrôle de gestion</option>
-                <option value="audit">Audit / Risque / Conformité</option>
-                <option value="administratif_sante">Administratif / Coordination santé</option>
-                <option value="administratif_edu">Administratif éducation</option>
-                <option value="agent_public">Agent administratif public</option>
-              </optgroup>
-              <optgroup label="Operations / Terrain">
-                <option value="production">Production / Atelier</option>
-                <option value="maintenance">Maintenance / Méthode</option>
-                <option value="qualite">Qualité / HSE</option>
-                <option value="supply">Supply chain / Planification</option>
-                <option value="logistique">Logistique / Entrepot</option>
-                <option value="exploitation">Exploitation transport</option>
-                <option value="conducteur">Conduite / Livraison</option>
-              </optgroup>
-              <optgroup label="Santé / Éducation / Public">
-                <option value="soignant">Soignant / Paramédical</option>
-                <option value="medecin">Médecin / Praticien</option>
-                <option value="medico_social">Médico-social / Accompagnement</option>
-                <option value="enseignant">Enseignant / Formateur</option>
-                <option value="direction_edu">Direction / Pilotage pédagogique</option>
-                <option value="cadre_public">Cadre public / Encadrement</option>
-                <option value="territorial">Collectivité territoriale</option>
-                <option value="etat">Administration d'État</option>
-              </optgroup>
-              <optgroup label="Autres">
-                <option value="retail">Magasin / Management de rayon</option>
-                <option value="banque">Banque / Relation client</option>
-                <option value="assurance">Assurance / Sinistres / Souscription</option>
-                <option value="support_edu">Support numérique / vie scolaire</option>
-                <option value="planif_transport">Planification / Affretement</option>
-                <option value="backoffice_conseil">Back-office / Opérations</option>
-                <option value="autre_metier">Autre métier</option>
-              </optgroup>
+            <label class="profile-label" for="function-select">Fonction</label>
+            <select id="function-select" class="profile-select">
+              <option value="direction_leadership">Direction / Leadership</option>
+              <option value="team_management">Management d'&eacute;quipe</option>
+              <option value="engineering_technical">Ing&eacute;nierie / Technique</option>
+              <option value="it_data_product" selected>IT / Data / Produit</option>
+              <option value="finance_accounting">Finance / Comptabilit&eacute;</option>
+              <option value="marketing_communication">Marketing / Communication</option>
+              <option value="sales_business_dev">Commercial / Business Development</option>
+              <option value="operations_production">Op&eacute;rations / Production</option>
+              <option value="support_admin">Support / Administration</option>
+              <option value="human_resources">Ressources Humaines</option>
+              <option value="research_expertise">Recherche / Expertise</option>
+              <option value="other_function">Autre</option>
             </select>
 
-            <label class="profile-label" for="tenure-select">Ancienneté sur le poste</label>
+            <label class="profile-label" for="company-size-select">Taille de l'entreprise</label>
+            <select id="company-size-select" class="profile-select">
+              <option value="freelance">Freelance / Ind&eacute;pendant</option>
+              <option value="startup" selected>Startup (&lt;50)</option>
+              <option value="sme">PME (50-250)</option>
+              <option value="mid_cap">ETI (250-1000)</option>
+              <option value="large_company">Grande entreprise (1000+)</option>
+              <option value="global_group">Groupe international</option>
+            </select>
+
+            <label class="profile-label" for="tenure-select">Anciennet&eacute; dans l'entreprise</label>
             <select id="tenure-select" class="profile-select">
               <option value="lt6">&lt; 6 mois</option>
-              <option value="6to24" selected>6-24 mois</option>
-              <option value="gt24">&gt; 24 mois</option>
+              <option value="6m_2y" selected>6 mois - 2 ans</option>
+              <option value="2_5y">2 - 5 ans</option>
+              <option value="5_10y">5 - 10 ans</option>
+              <option value="10_20y">10 - 20 ans</option>
+              <option value="20plus">20+ ans</option>
+            </select>
+
+            <label class="profile-label" for="hierarchy-select">Niveau hi&eacute;rarchique</label>
+            <select id="hierarchy-select" class="profile-select">
+              <option value="individual_contributor" selected>Contributeur individuel</option>
+              <option value="team_manager">Manager d'&eacute;quipe</option>
+              <option value="manager_of_managers">Manager de managers</option>
+              <option value="executive">Direction / ex&eacute;cutif</option>
+            </select>
+
+            <label class="profile-label" for="offer-select">Si vous recevez une offre int&eacute;ressante demain</label>
+            <select id="offer-select" class="profile-select">
+              <option value="" selected>S&eacute;lectionnez une option (facultatif)</option>
+              <option value="leave_immediately">Je partirais imm&eacute;diatement</option>
+              <option value="consider_seriously">Je r&eacute;fl&eacute;chirais s&eacute;rieusement</option>
+              <option value="likely_stay">Je resterais probablement</option>
+              <option value="would_not_leave">Je ne partirais pas</option>
             </select>
           </div>
         </article>
       </div>
       <footer class="screen-footer">
         <button id="profile-next-btn" class="btn btn-primary">
-          <span>Voir mon résultat ISC</span>
+          <span>Voir mon r&eacute;sultat ISC</span>
           <span class="material-symbols-outlined">arrow_forward</span>
         </button>
       </footer>
@@ -242,6 +262,27 @@
             <p id="calcFormula" class="calc-note">ISC personnalisé selon vos priorités.</p>
             <p id="result-date" class="calc-note"></p>
           </div>
+        </article>
+
+        <article class="card career-profile-card">
+          <p class="eyebrow">Votre Profil de Carri&egrave;re</p>
+          <div class="career-profile-head">
+            <div id="careerProfileIcon" class="career-profile-icon" aria-hidden="true">*</div>
+            <div>
+              <h3 id="careerProfileName" class="career-profile-name">Explorateur</h3>
+              <p id="careerStateLabel" class="career-state-label">En progression</p>
+            </div>
+          </div>
+          <p id="careerISCScore" class="career-isc-score">ISC: 0 / 100</p>
+          <p id="careerProfileDescription" class="subtitle">Votre profil de carri&egrave;re sera affich&eacute; ici.</p>
+
+          <div class="career-dimensions">
+            <p><strong>Dimension dominante:</strong> <span id="careerStrongestDimension">-</span></p>
+            <p id="careerSecondRow"><strong>Seconde dimension:</strong> <span id="careerSecondDimension">-</span></p>
+            <p><strong>Dimension la plus faible:</strong> <span id="careerWeakestDimension">-</span></p>
+          </div>
+
+          <p id="careerShareLine" class="career-share-line">Mon profil carri&egrave;re : Explorateur - ISC 0</p>
         </article>
 
         <article class="card">

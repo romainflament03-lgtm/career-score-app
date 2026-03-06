@@ -25,6 +25,49 @@ const dimensionLabelFr = {
   Environment: "Environnement"
 };
 
+const careerProfiles = {
+  explorateur: {
+    profileName: "Explorateur",
+    icon: "\uD83E\uDDED",
+    description: "You are driven by growth, learning, and new opportunities. You need momentum to stay engaged."
+  },
+  architecte: {
+    profileName: "Architecte",
+    icon: "\uD83C\uDFD7\uFE0F",
+    description: "You are motivated by purpose and meaningful contribution. Your work needs to feel useful and coherent."
+  },
+  stabilisateur: {
+    profileName: "Stabilisateur",
+    icon: "\uD83D\uDEE1\uFE0F",
+    description: "Your engagement strongly depends on a healthy work environment, team quality, and stability."
+  },
+  ambitieux_reconnu: {
+    profileName: "Ambitieux reconnu",
+    icon: "\uD83C\uDFC6",
+    description: "You are motivated when your work is visible, valued, and recognized."
+  },
+  stratege: {
+    profileName: "Strat\u00E8ge",
+    icon: "\u265F\uFE0F",
+    description: "You seek both impact and progression. You want to grow in the right direction, not just move fast."
+  },
+  pilier: {
+    profileName: "Pilier",
+    icon: "\uD83E\uDDF1",
+    description: "You thrive when you can contribute to something useful in a healthy and trustworthy environment."
+  },
+  challenger: {
+    profileName: "Challenger",
+    icon: "\u26A1",
+    description: "You are energized by progress, challenge, and visible recognition of your results."
+  },
+  desengage_latent: {
+    profileName: "D\u00E9sengag\u00E9 latent",
+    icon: "\uD83D\uDD25",
+    description: "Several aspects of your current work situation may no longer match your expectations."
+  }
+};
+
 const domainLabelFr = {
   tech: "Numérique / Tech",
   finance: "Finance / Assurance",
@@ -220,14 +263,11 @@ const ui = {
   startBtn: document.getElementById("start-btn"),
   weightsNextBtn: document.getElementById("weights-next-btn"),
   weightsResetBtn: document.getElementById("weights-reset-btn"),
-  weightMeaning: document.getElementById("weight-meaning"),
-  weightGrowth: document.getElementById("weight-growth"),
-  weightRecognition: document.getElementById("weight-recognition"),
-  weightEnvironment: document.getElementById("weight-environment"),
-  weightPctMeaning: document.getElementById("weightPctMeaning"),
-  weightPctGrowth: document.getElementById("weightPctGrowth"),
-  weightPctRecognition: document.getElementById("weightPctRecognition"),
-  weightPctEnvironment: document.getElementById("weightPctEnvironment"),
+  priorityList: document.getElementById("priority-list"),
+  presetBalancedBtn: document.getElementById("preset-balanced-btn"),
+  presetCareerBtn: document.getElementById("preset-career-btn"),
+  presetWellbeingBtn: document.getElementById("preset-wellbeing-btn"),
+  presetImpactBtn: document.getElementById("preset-impact-btn"),
   questionCount: document.getElementById("question-count"),
   remainingTime: document.getElementById("remaining-time"),
   progressFill: document.getElementById("progress-fill"),
@@ -237,8 +277,11 @@ const ui = {
   answerValue: document.getElementById("answer-value"),
   nextBtn: document.getElementById("next-btn"),
   domainSelect: document.getElementById("domain-select"),
-  jobSelect: document.getElementById("job-select"),
+  functionSelect: document.getElementById("function-select"),
+  companySizeSelect: document.getElementById("company-size-select"),
   tenureSelect: document.getElementById("tenure-select"),
+  hierarchySelect: document.getElementById("hierarchy-select"),
+  offerSelect: document.getElementById("offer-select"),
   profileNextBtn: document.getElementById("profile-next-btn"),
   restartBtn: document.getElementById("restart-btn"),
   shareBtn: document.getElementById("share-btn"),
@@ -266,15 +309,42 @@ const ui = {
   zoneFragile: document.getElementById("zoneFragile"),
   zoneStagnation: document.getElementById("zoneStagnation"),
   zoneSain: document.getElementById("zoneSain"),
-  zoneExcellent: document.getElementById("zoneExcellent")
+  zoneExcellent: document.getElementById("zoneExcellent"),
+  careerProfileIcon: document.getElementById("careerProfileIcon"),
+  careerProfileName: document.getElementById("careerProfileName"),
+  careerStateLabel: document.getElementById("careerStateLabel"),
+  careerISCScore: document.getElementById("careerISCScore"),
+  careerProfileDescription: document.getElementById("careerProfileDescription"),
+  careerStrongestDimension: document.getElementById("careerStrongestDimension"),
+  careerSecondRow: document.getElementById("careerSecondRow"),
+  careerSecondDimension: document.getElementById("careerSecondDimension"),
+  careerWeakestDimension: document.getElementById("careerWeakestDimension"),
+  careerShareLine: document.getElementById("careerShareLine")
 };
 
 let currentQuestionIndex = 0;
 let answers = new Array(questions.length).fill(null);
-let customWeights = { Meaning: 0.25, Growth: 0.25, Recognition: 0.25, Environment: 0.25 };
+let customWeights = { Meaning: 0.4, Growth: 0.3, Recognition: 0.2, Environment: 0.1 };
 let latestResult = null;
-const profile = { domain: "tech", tenure: "6to24" };
-profile.job = "consultant";
+const profile = {
+  domainInput: "tech_it",
+  functionInput: "it_data_product",
+  companySize: "startup",
+  tenureInput: "6m_2y",
+  hierarchy: "individual_contributor",
+  offerIntent: "",
+  domain: "tech",
+  job: "data",
+  tenure: "6to24"
+};
+const rankToWeight = [0.4, 0.3, 0.2, 0.1];
+const defaultRanking = ["Meaning", "Growth", "Recognition", "Environment"];
+const rankingPresets = {
+  balanced: ["Meaning", "Growth", "Recognition", "Environment"],
+  career: ["Growth", "Recognition", "Meaning", "Environment"],
+  wellbeing: ["Environment", "Meaning", "Recognition", "Growth"],
+  impact: ["Meaning", "Growth", "Environment", "Recognition"]
+};
 
 function showScreen(key) {
   Object.values(screens).forEach((screen) => screen.classList.remove("active"));
@@ -283,36 +353,147 @@ function showScreen(key) {
   if (key === "results") ui.progressFill.style.width = "100%";
 }
 
-function normalizeWeights(raw) {
-  const total = raw.Meaning + raw.Growth + raw.Recognition + raw.Environment;
-  return {
-    Meaning: raw.Meaning / total,
-    Growth: raw.Growth / total,
-    Recognition: raw.Recognition / total,
-    Environment: raw.Environment / total
-  };
+function getRankingFromDOM() {
+  return [...ui.priorityList.querySelectorAll(".priority-card")].map((node) => node.dataset.dimension);
 }
 
-function updateWeightPreview() {
-  const raw = {
-    Meaning: Number(ui.weightMeaning.value),
-    Growth: Number(ui.weightGrowth.value),
-    Recognition: Number(ui.weightRecognition.value),
-    Environment: Number(ui.weightEnvironment.value)
-  };
-  customWeights = normalizeWeights(raw);
-  ui.weightPctMeaning.textContent = `${Math.round(customWeights.Meaning * 100)}%`;
-  ui.weightPctGrowth.textContent = `${Math.round(customWeights.Growth * 100)}%`;
-  ui.weightPctRecognition.textContent = `${Math.round(customWeights.Recognition * 100)}%`;
-  ui.weightPctEnvironment.textContent = `${Math.round(customWeights.Environment * 100)}%`;
+function rankingToWeights(ranking) {
+  const weights = { Meaning: 0, Growth: 0, Recognition: 0, Environment: 0 };
+  ranking.forEach((dimensionKey, index) => {
+    weights[dimensionKey] = rankToWeight[index];
+  });
+  return weights;
+}
+
+function updateRankingBadges() {
+  [...ui.priorityList.querySelectorAll(".priority-card")].forEach((node, index) => {
+    const badge = node.querySelector(".priority-rank");
+    if (badge) badge.textContent = String(index + 1);
+  });
+}
+
+function applyRanking(ranking) {
+  ranking.forEach((dimensionKey) => {
+    const card = ui.priorityList.querySelector(`.priority-card[data-dimension="${dimensionKey}"]`);
+    if (card) ui.priorityList.appendChild(card);
+  });
+  updateRankingBadges();
+  customWeights = rankingToWeights(getRankingFromDOM());
 }
 
 function resetWeights() {
-  ui.weightMeaning.value = "3";
-  ui.weightGrowth.value = "3";
-  ui.weightRecognition.value = "3";
-  ui.weightEnvironment.value = "3";
-  updateWeightPreview();
+  applyRanking(defaultRanking);
+}
+
+function setupPriorityDragAndDrop() {
+  let draggingCard = null;
+
+  const cards = [...ui.priorityList.querySelectorAll(".priority-card")];
+  cards.forEach((card) => {
+    card.draggable = true;
+  });
+
+  ui.priorityList.addEventListener("dragstart", (event) => {
+    const card = event.target.closest(".priority-card");
+    if (!card) return;
+    draggingCard = card;
+    card.classList.add("dragging");
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
+  });
+
+  ui.priorityList.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    const overCard = event.target.closest(".priority-card");
+    if (!draggingCard || !overCard || overCard === draggingCard) return;
+    const overRect = overCard.getBoundingClientRect();
+    const insertAfter = event.clientY > overRect.top + overRect.height / 2;
+    if (insertAfter) overCard.after(draggingCard);
+    else overCard.before(draggingCard);
+  });
+
+  ui.priorityList.addEventListener("dragend", () => {
+    if (!draggingCard) return;
+    draggingCard.classList.remove("dragging");
+    draggingCard = null;
+    updateRankingBadges();
+    customWeights = rankingToWeights(getRankingFromDOM());
+  });
+}
+
+function setupPriorityTouchReorder() {
+  let activeCard = null;
+
+  ui.priorityList.addEventListener("touchstart", (event) => {
+    const card = event.target.closest(".priority-card");
+    if (!card) return;
+    activeCard = card;
+    activeCard.classList.add("dragging");
+  }, { passive: true });
+
+  ui.priorityList.addEventListener("touchmove", (event) => {
+    if (!activeCard) return;
+    const touch = event.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const overCard = target ? target.closest(".priority-card") : null;
+    if (!overCard || overCard === activeCard) return;
+    const overRect = overCard.getBoundingClientRect();
+    const insertAfter = touch.clientY > overRect.top + overRect.height / 2;
+    if (insertAfter) overCard.after(activeCard);
+    else overCard.before(activeCard);
+    event.preventDefault();
+  }, { passive: false });
+
+  ui.priorityList.addEventListener("touchend", () => {
+    if (!activeCard) return;
+    activeCard.classList.remove("dragging");
+    activeCard = null;
+    updateRankingBadges();
+    customWeights = rankingToWeights(getRankingFromDOM());
+  });
+}
+
+function mapDomainToLegacy(domainInput) {
+  switch (domainInput) {
+    case "tech_it": return "tech";
+    case "finance_banking_insurance": return "finance";
+    case "industry_engineering":
+    case "construction_real_estate":
+    case "energy_environment": return "industrie";
+    case "health_pharma": return "sante";
+    case "consulting_audit": return "conseil";
+    case "marketing_communication":
+    case "media_creation": return "commerce";
+    case "commerce_distribution":
+    case "hospitality_tourism": return "commerce";
+    case "education_research": return "education";
+    case "public_admin": return "public";
+    case "transport_logistics": return "transport";
+    default: return "autre";
+  }
+}
+
+function mapFunctionToLegacy(functionInput) {
+  switch (functionInput) {
+    case "direction_leadership": return "manager_conseil";
+    case "team_management":
+    case "manager_of_managers": return "project_manager";
+    case "engineering_technical": return "dev";
+    case "it_data_product": return "data";
+    case "finance_accounting": return "compta";
+    case "marketing_communication": return "marketing";
+    case "sales_business_dev": return "vente";
+    case "operations_production": return "production";
+    case "support_admin":
+    case "human_resources": return "backoffice_conseil";
+    case "research_expertise": return "consultant";
+    default: return "autre_metier";
+  }
+}
+
+function mapTenureToLegacy(tenureInput) {
+  if (tenureInput === "lt6") return "lt6";
+  if (tenureInput === "6m_2y") return "6to24";
+  return "gt24";
 }
 
 function startQuestions() {
@@ -361,6 +542,63 @@ function getInterpretation(isc) {
   if (isc < 60) return { label: "Zone de stagnation", summary: "La situation est mitigée et peut se débloquer avec les bons leviers.", tone: "warn", band: "Stagnation" };
   if (isc < 80) return { label: "Sain", summary: "La situation est globalement saine avec quelques optimisations utiles.", tone: "good", band: "Sain" };
   return { label: "Excellent", summary: "La dynamique est très favorable, consolidez vos leviers de progression.", tone: "good", band: "Excellent" };
+}
+
+function getCareerStateLabel(iscScore) {
+  if (iscScore >= 80) return "\uD83D\uDE80 Align\u00E9";
+  if (iscScore >= 65) return "\uD83C\uDF31 En progression";
+  if (iscScore >= 50) return "\u26A0\uFE0F D\u00E9salignement";
+  return "\uD83D\uDD25 Risque de rupture";
+}
+
+function getCareerProfile({ iscScore, sensScore, evolutionScore, reconnaissanceScore, environnementScore }) {
+  const dimensionScores = {
+    Meaning: sensScore,
+    Growth: evolutionScore,
+    Recognition: reconnaissanceScore,
+    Environment: environnementScore
+  };
+
+  const ranked = rankDimensions(dimensionScores);
+  const strongestKey = ranked[0][0];
+  const secondKey = ranked[1][0];
+  const weakestKey = ranked[ranked.length - 1][0];
+  const topDiff = ranked[0][1] - ranked[1][1];
+  const stateLabel = getCareerStateLabel(iscScore);
+
+  let profileKey = "explorateur";
+  let secondDimension = null;
+
+  if (iscScore < 50) {
+    profileKey = "desengage_latent";
+  } else if (topDiff <= 5) {
+    const topPair = [strongestKey, secondKey].sort().join("|");
+    if (topPair === "Growth|Meaning") profileKey = "stratege";
+    else if (topPair === "Environment|Meaning") profileKey = "pilier";
+    else if (topPair === "Growth|Recognition") profileKey = "challenger";
+  }
+
+  if (profileKey === "explorateur") {
+    if (strongestKey === "Meaning") profileKey = "architecte";
+    else if (strongestKey === "Environment") profileKey = "stabilisateur";
+    else if (strongestKey === "Recognition") profileKey = "ambitieux_reconnu";
+  }
+
+  if (profileKey === "stratege" || profileKey === "pilier" || profileKey === "challenger") {
+    secondDimension = dimensionLabelFr[secondKey];
+  }
+
+  const profileData = careerProfiles[profileKey];
+  return {
+    profileKey,
+    profileName: profileData.profileName,
+    icon: profileData.icon,
+    stateLabel,
+    description: profileData.description,
+    strongestDimension: dimensionLabelFr[strongestKey],
+    secondDimension,
+    weakestDimension: dimensionLabelFr[weakestKey]
+  };
 }
 
 function rankDimensions(dimensions) {
@@ -458,7 +696,7 @@ function tenureIndicator(tenure) {
   return "décision de trajectoire interne/externe éclairée par des critères objectifs";
 }
 
-function buildRecommendations(weakestDims, band, domain, job, tenure) {
+function buildRecommendations(weakestDims, band, domain, job, tenure, contextData) {
   const [first, second] = weakestDims;
   const indicative = indicativeByBand[band];
   const candidates = [
@@ -519,7 +757,7 @@ function buildRecommendations(weakestDims, band, domain, job, tenure) {
   });
 
   return {
-    context: `Domaine: ${domainLabelFr[domain]} - Métier: ${ui.jobSelect.options[ui.jobSelect.selectedIndex]?.text || "N/A"} - Ancienneté: ${tenure === "lt6" ? "< 6 mois" : tenure === "6to24" ? "6-24 mois" : "> 24 mois"}`,
+    context: `Domaine: ${contextData.domainLabel} - Fonction: ${contextData.functionLabel} - Taille: ${contextData.companySizeLabel} - Anciennete: ${contextData.tenureLabel} - Niveau: ${contextData.hierarchyLabel}${contextData.offerLabel ? ` - Mobilite: ${contextData.offerLabel}` : ""}`,
     priority: bandPriority[band],
     actions: unique.slice(0, 3)
   };
@@ -572,17 +810,58 @@ function renderRecommendations(target, items) {
   });
 }
 
+function renderCareerProfile(careerProfile, isc) {
+  ui.careerProfileIcon.textContent = careerProfile.icon;
+  ui.careerProfileName.textContent = careerProfile.profileName;
+  ui.careerStateLabel.textContent = careerProfile.stateLabel;
+  ui.careerISCScore.textContent = `ISC: ${isc} / 100`;
+  ui.careerProfileDescription.textContent = careerProfile.description;
+  ui.careerStrongestDimension.textContent = careerProfile.strongestDimension;
+  ui.careerWeakestDimension.textContent = careerProfile.weakestDimension;
+
+  if (careerProfile.secondDimension) {
+    ui.careerSecondRow.hidden = false;
+    ui.careerSecondDimension.textContent = careerProfile.secondDimension;
+  } else {
+    ui.careerSecondRow.hidden = true;
+  }
+
+  ui.careerShareLine.textContent = `Mon profil carri\u00E8re : ${careerProfile.profileName} \u2014 ISC ${isc}`;
+}
+
 function computeAndShowResults() {
   const dimensions = computeDimensions();
   const isc = computeISC(dimensions, customWeights);
   const interpretation = getInterpretation(isc);
+  const careerProfile = getCareerProfile({
+    iscScore: isc,
+    sensScore: dimensions.Meaning,
+    evolutionScore: dimensions.Growth,
+    reconnaissanceScore: dimensions.Recognition,
+    environnementScore: dimensions.Environment
+  });
   const ranked = rankDimensions(dimensions);
   const weakKeys = ranked.slice(-2).map((d) => d[0]);
-  const recommendations = buildRecommendations(weakKeys, interpretation.band, profile.domain, profile.job, profile.tenure);
+  const recommendations = buildRecommendations(
+    weakKeys,
+    interpretation.band,
+    profile.domain,
+    profile.job,
+    profile.tenure,
+    {
+      domainLabel: ui.domainSelect.options[ui.domainSelect.selectedIndex]?.text || "N/A",
+      functionLabel: ui.functionSelect.options[ui.functionSelect.selectedIndex]?.text || "N/A",
+      companySizeLabel: ui.companySizeSelect.options[ui.companySizeSelect.selectedIndex]?.text || "N/A",
+      tenureLabel: ui.tenureSelect.options[ui.tenureSelect.selectedIndex]?.text || "N/A",
+      hierarchyLabel: ui.hierarchySelect.options[ui.hierarchySelect.selectedIndex]?.text || "N/A",
+      offerLabel: ui.offerSelect.value ? (ui.offerSelect.options[ui.offerSelect.selectedIndex]?.text || "") : ""
+    }
+  );
 
   latestResult = {
     isc,
     dimensions,
+    careerProfile,
     profile: { ...profile },
     weights: { ...customWeights },
     generatedAt: new Date().toISOString()
@@ -598,6 +877,7 @@ function computeAndShowResults() {
   updateGauge(isc);
   activateZone(isc);
   renderDimensionBars(dimensions);
+  renderCareerProfile(careerProfile, isc);
   ui.recommendationContext.textContent = recommendations.context;
   ui.priorityAction.textContent = recommendations.priority;
   renderRecommendations(ui.actionsList, recommendations.actions);
@@ -607,7 +887,8 @@ function computeAndShowResults() {
 async function shareISC() {
   if (!latestResult) return;
   const interpretation = getInterpretation(latestResult.isc);
-  const text = `Mon indice de santé de carrière (ISC) est ${latestResult.isc}/100 (${interpretation.label}).`;
+  const profileName = latestResult.careerProfile?.profileName || "Non d\u00E9fini";
+  const text = `Mon indice de sant\u00E9 de carri\u00E8re (ISC) est ${latestResult.isc}/100 (${interpretation.label}). Mon profil carri\u00E8re : ${profileName} \u2014 ISC ${latestResult.isc}`;
 
   if (navigator.share) {
     try {
@@ -637,9 +918,10 @@ ui.startBtn.addEventListener("click", () => {
 
 ui.weightsNextBtn.addEventListener("click", startQuestions);
 ui.weightsResetBtn.addEventListener("click", resetWeights);
-[ui.weightMeaning, ui.weightGrowth, ui.weightRecognition, ui.weightEnvironment].forEach((input) => {
-  input.addEventListener("input", updateWeightPreview);
-});
+ui.presetBalancedBtn.addEventListener("click", () => applyRanking(rankingPresets.balanced));
+ui.presetCareerBtn.addEventListener("click", () => applyRanking(rankingPresets.career));
+ui.presetWellbeingBtn.addEventListener("click", () => applyRanking(rankingPresets.wellbeing));
+ui.presetImpactBtn.addEventListener("click", () => applyRanking(rankingPresets.impact));
 
 ui.answerRange.addEventListener("input", () => {
   const value = Number(ui.answerRange.value);
@@ -663,11 +945,20 @@ ui.nextBtn.addEventListener("click", () => {
 });
 
 ui.profileNextBtn.addEventListener("click", () => {
-  profile.domain = ui.domainSelect.value;
-  profile.job = ui.jobSelect.value;
-  profile.tenure = ui.tenureSelect.value;
+  profile.domainInput = ui.domainSelect.value;
+  profile.functionInput = ui.functionSelect.value;
+  profile.companySize = ui.companySizeSelect.value;
+  profile.tenureInput = ui.tenureSelect.value;
+  profile.hierarchy = ui.hierarchySelect.value;
+  profile.offerIntent = ui.offerSelect.value;
+  profile.domain = mapDomainToLegacy(profile.domainInput);
+  profile.job = mapFunctionToLegacy(profile.functionInput);
+  profile.tenure = mapTenureToLegacy(profile.tenureInput);
   computeAndShowResults();
 });
 
 ui.restartBtn.addEventListener("click", () => showScreen("landing"));
 ui.shareBtn.addEventListener("click", shareISC);
+setupPriorityDragAndDrop();
+setupPriorityTouchReorder();
+resetWeights();
