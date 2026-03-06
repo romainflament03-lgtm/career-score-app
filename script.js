@@ -87,6 +87,17 @@ const profileImages = {
   "Désengagé latent": "assets/profiles/desengage.png"
 };
 
+const profileImagesByKey = {
+  stratege: "assets/profiles/strategiste.png",
+  architecte: "assets/profiles/architecte.png",
+  explorateur: "assets/profiles/explorateur.png",
+  stabilisateur: "assets/profiles/stabilisateur.png",
+  challenger: "assets/profiles/challenger.png",
+  ambitieux_reconnu: "assets/profiles/ambitieux.png",
+  pilier: "assets/profiles/pilier.png",
+  desengage_latent: "assets/profiles/desengage.png"
+};
+
 const legacyProfileImages = {
   "Le Stratège": "Asset/Profiles/strategiste.png",
   "Stratège": "Asset/Profiles/strategiste.png",
@@ -104,6 +115,17 @@ const legacyProfileImages = {
   "Pilier": "Asset/Profiles/pilier.png",
   "Le Désengagé": "Asset/Profiles/desengage.png",
   "Désengagé latent": "Asset/Profiles/desengage.png"
+};
+
+const legacyProfileImagesByKey = {
+  stratege: "Asset/Profiles/strategiste.png",
+  architecte: "Asset/Profiles/architecte.png",
+  explorateur: "Asset/Profiles/explorateur.png",
+  stabilisateur: "Asset/Profiles/stabilisateur.png",
+  challenger: "Asset/Profiles/challenger.png",
+  ambitieux_reconnu: "Asset/Profiles/ambitieux.png",
+  pilier: "Asset/Profiles/pilier.png",
+  desengage_latent: "Asset/Profiles/desengage.png"
 };
 
 const profileNameAliases = {
@@ -904,14 +926,23 @@ function renderRecommendations(target, items) {
 
 function renderCareerProfile(careerProfile, isc) {
   const canonicalProfileName = profileNameAliases[careerProfile.profileName] || careerProfile.profileName;
-  const profileImage = profileImages[canonicalProfileName] || "";
-  const legacyProfileImage = legacyProfileImages[canonicalProfileName] || "";
+  const profileImage =
+    profileImagesByKey[careerProfile.profileKey] ||
+    profileImages[canonicalProfileName] ||
+    "";
+  const legacyProfileImage =
+    legacyProfileImagesByKey[careerProfile.profileKey] ||
+    legacyProfileImages[canonicalProfileName] ||
+    "";
   if (ui.profileImage && ui.profileImageFallback) {
     if (profileImage) {
+      const resolvedMain = new URL(profileImage, document.baseURI).href;
+      const resolvedLegacy = legacyProfileImage ? new URL(legacyProfileImage, document.baseURI).href : "";
+      const cacheBuster = "v=20260306-2";
       ui.profileImage.onerror = () => {
-        if (legacyProfileImage && ui.profileImage.dataset.legacyTried !== "1") {
+        if (resolvedLegacy && ui.profileImage.dataset.legacyTried !== "1") {
           ui.profileImage.dataset.legacyTried = "1";
-          ui.profileImage.src = legacyProfileImage;
+          ui.profileImage.src = `${resolvedLegacy}${resolvedLegacy.includes("?") ? "&" : "?"}${cacheBuster}`;
           return;
         }
         ui.profileImage.hidden = true;
@@ -923,7 +954,7 @@ function renderCareerProfile(careerProfile, isc) {
         ui.profileImageFallback.hidden = true;
       };
       ui.profileImage.dataset.legacyTried = "0";
-      ui.profileImage.src = profileImage;
+      ui.profileImage.src = `${resolvedMain}${resolvedMain.includes("?") ? "&" : "?"}${cacheBuster}`;
       ui.profileImage.alt = `Illustration du profil ${careerProfile.profileName}`;
       ui.profileImage.hidden = false;
       ui.profileImageFallback.hidden = true;
