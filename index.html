@@ -267,7 +267,19 @@
         <article class="card career-profile-card">
           <h3>Votre profil carri&egrave;re</h3>
           <div class="career-profile-head">
-            <div id="careerProfileIcon" class="career-profile-icon" aria-hidden="true">*</div>
+            <div class="career-profile-visual">
+              <div class="career-profile-media">
+                <img
+                  id="profileImage"
+                  src=""
+                  alt="Illustration du profil carri&egrave;re"
+                  class="career-profile-image"
+                >
+                <div id="profileImageFallback" class="career-profile-fallback" hidden>
+                  <span class="material-symbols-outlined">person</span>
+                </div>
+              </div>
+            </div>
             <div>
               <p id="careerProfileName" class="career-profile-name">Explorateur</p>
               <p id="careerStateLabel" class="career-state-label">🌱 En progression</p>

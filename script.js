@@ -68,6 +68,28 @@ const careerProfiles = {
   }
 };
 
+const profileImages = {
+  "Le Stratège": "Asset/Profiles/strategiste.png",
+  "L'Architecte": "Asset/Profiles/architecte.png",
+  "L'Explorateur": "Asset/Profiles/explorateur.png",
+  "Le Stabilisateur": "Asset/Profiles/stabilisateur.png",
+  "Le Challenger": "Asset/Profiles/challenger.png",
+  "L'Ambitieux": "Asset/Profiles/ambitieux.png",
+  "Le Pilier": "Asset/Profiles/pilier.png",
+  "Le Désengagé": "Asset/Profiles/desengage.png"
+};
+
+const profileNameAliases = {
+  "Stratège": "Le Stratège",
+  "Architecte": "L'Architecte",
+  "Explorateur": "L'Explorateur",
+  "Stabilisateur": "Le Stabilisateur",
+  "Challenger": "Le Challenger",
+  "Ambitieux reconnu": "L'Ambitieux",
+  "Pilier": "Le Pilier",
+  "Désengagé latent": "Le Désengagé"
+};
+
 const domainLabelFr = {
   tech: "Numérique / Tech",
   finance: "Finance / Assurance",
@@ -313,7 +335,8 @@ const ui = {
   shareCardStateLine: document.getElementById("shareCardStateLine"),
   shareCardStrongLine: document.getElementById("shareCardStrongLine"),
   shareCardWeakLine: document.getElementById("shareCardWeakLine"),
-  careerProfileIcon: document.getElementById("careerProfileIcon"),
+  profileImage: document.getElementById("profileImage"),
+  profileImageFallback: document.getElementById("profileImageFallback"),
   careerProfileName: document.getElementById("careerProfileName"),
   careerStateLabel: document.getElementById("careerStateLabel"),
   careerISCScore: document.getElementById("careerISCScore"),
@@ -853,7 +876,27 @@ function renderRecommendations(target, items) {
 }
 
 function renderCareerProfile(careerProfile, isc) {
-  ui.careerProfileIcon.textContent = careerProfile.icon;
+  const canonicalProfileName = profileNameAliases[careerProfile.profileName] || careerProfile.profileName;
+  const profileImage = profileImages[canonicalProfileName] || "";
+  if (ui.profileImage && ui.profileImageFallback) {
+    if (profileImage) {
+      ui.profileImage.src = profileImage;
+      ui.profileImage.alt = `Illustration du profil ${careerProfile.profileName}`;
+      ui.profileImage.hidden = false;
+      ui.profileImageFallback.hidden = true;
+      ui.profileImage.onerror = () => {
+        ui.profileImage.hidden = true;
+        ui.profileImageFallback.hidden = false;
+        ui.profileImage.alt = "Illustration indisponible";
+      };
+    } else {
+      ui.profileImage.src = "";
+      ui.profileImage.alt = "Illustration indisponible";
+      ui.profileImage.hidden = true;
+      ui.profileImageFallback.hidden = false;
+    }
+  }
+
   ui.careerProfileName.textContent = careerProfile.profileName;
   ui.careerStateLabel.textContent = careerProfile.stateLabel;
   ui.careerISCScore.textContent = `ISC: ${isc} / 100`;
