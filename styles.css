@@ -507,6 +507,13 @@ input[type="range"]::-moz-range-thumb {
   text-align: center;
 }
 
+.hero-identity {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  text-align: center;
+}
+
 .hero-score-meta .chi-label {
   margin: 0;
   font-size: 1.15rem;
@@ -693,15 +700,17 @@ input[type="range"]::-moz-range-thumb {
   line-height: 1.4;
 }
 
-.share-card .share-buttons {
+.share-buttons {
   margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: center;
 }
 
-.share-card .share-buttons .btn {
+.share-buttons .btn {
   flex: 1 1 160px;
+  max-width: 240px;
 }
 
 .balance-card {

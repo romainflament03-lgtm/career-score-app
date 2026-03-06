@@ -241,61 +241,68 @@
 
       <div class="results-main">
         <article class="card score-card hero-score-card">
-          <p class="eyebrow">Indice de Sant&eacute; de Carri&egrave;re</p>
-          <div class="hero-score-top hero-score-center">
-            <div id="chiGauge" class="chi-gauge">
-              <p class="hero-isc-label">ISC</p>
-              <p id="chiScore" class="chi-score">0</p>
-              <p class="hero-isc-denominator">/ 100</p>
-            </div>
-            <div class="hero-score-meta hero-score-meta-center">
-              <p id="chiLabel" class="chi-label">🌱 En progression</p>
-              <p id="chiSummary" class="subtitle">Votre situation professionnelle est globalement positive, mais certains facteurs peuvent &ecirc;tre am&eacute;lior&eacute;s.</p>
-            </div>
-          </div>
-          <div class="hero-progress-wrap" aria-hidden="true">
-            <div class="hero-progress-track"><div id="heroProgressFill" class="hero-progress-fill"></div></div>
-            <div class="hero-progress-scale"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
-          </div>
-          <div class="calc-box">
-            <p class="calc-title"><span class="material-symbols-outlined">calculate</span>Transparence du calcul</p>
-            <p id="calcFormula" class="calc-note">ISC personnalis&eacute; selon vos priorit&eacute;s.</p>
-            <p id="result-date" class="calc-note"></p>
-          </div>
-        </article>
-
-        <article class="card career-profile-card">
-          <h3>Votre profil carri&egrave;re</h3>
-          <div class="career-profile-head">
+          <p class="eyebrow">Votre identit&eacute; carri&egrave;re</p>
+          <div class="hero-identity">
             <div class="career-profile-visual">
               <div class="career-profile-media">
-                <img
-                  id="profileImage"
-                  src=""
-                  alt="Illustration du profil carri&egrave;re"
-                  class="career-profile-image"
-                >
+                <img id="profileImage" src="" alt="Illustration du profil carri&egrave;re" class="career-profile-image">
                 <div id="profileImageFallback" class="career-profile-fallback" hidden>
                   <span class="material-symbols-outlined">person</span>
                 </div>
               </div>
             </div>
-            <div>
-              <p id="careerProfileName" class="career-profile-name">Explorateur</p>
-              <p id="careerStateLabel" class="career-state-label">🌱 En progression</p>
-              <p id="careerISCScore" class="career-isc-score">ISC: 0 / 100</p>
+
+            <p id="careerProfileName" class="career-profile-name">Explorateur</p>
+            <div id="chiGauge" class="chi-gauge">
+              <p class="hero-isc-label">ISC</p>
+              <p id="chiScore" class="chi-score">0</p>
+              <p class="hero-isc-denominator">/ 100</p>
+              <p id="chiLabel" class="chi-label">🌱 En progression</p>
+            </div>
+            <p id="careerStateLabel" class="career-state-label">🌱 En progression</p>
+            <p id="careerProfileDescription" class="subtitle">Votre signature appara&icirc;tra ici.</p>
+
+            <div class="hero-progress-wrap" aria-hidden="true">
+              <div class="hero-progress-track"><div id="heroProgressFill" class="hero-progress-fill"></div></div>
+              <div class="hero-progress-scale"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+            </div>
+            <p id="chiSummary" class="subtitle">Votre situation professionnelle est globalement positive.</p>
+
+            <div id="shareResultCard" class="share-result-card">
+              <p class="share-card-title">Mon profil carri&egrave;re</p>
+              <p id="shareCardProfileLine" class="share-card-profile">Explorateur</p>
+              <p id="shareCardISCLine" class="share-card-isc">ISC : 0</p>
+              <p id="shareCardStateLine" class="share-card-state">🌱 En progression</p>
+              <div class="share-card-diagnostic">
+                <p id="shareCardStrongLine">Moteur : -</p>
+                <p id="shareCardWeakLine">Vigilance : -</p>
+              </div>
+              <p class="share-card-brand">jobpulse.app</p>
+            </div>
+
+            <div class="share-buttons">
+              <button id="share-btn" class="btn btn-primary" type="button">Partager mon profil</button>
+              <button id="download-card-btn" class="btn btn-secondary" type="button">T&eacute;l&eacute;charger la carte</button>
             </div>
           </div>
-          <p id="careerProfileDescription" class="subtitle">Votre profil de carri&egrave;re sera affich&eacute; ici.</p>
-          <div class="career-dimensions">
-            <p><strong>Votre moteur principal :</strong> <span id="careerStrongestDimension">-</span></p>
-            <p id="careerSecondRow"><strong>Seconde dimension cl&eacute; :</strong> <span id="careerSecondDimension">-</span></p>
-            <p><strong>Point de vigilance :</strong> <span id="careerWeakestDimension">-</span></p>
-          </div>
+
+          <p id="calcFormula" class="calc-note" hidden></p>
+          <p id="result-date" class="calc-note" hidden></p>
+          <p id="careerISCScore" class="career-isc-score" hidden>ISC: 0 / 100</p>
+          <p id="careerShareLine" class="career-share-line" hidden></p>
+          <p id="careerStrongestDimension" hidden>-</p>
+          <p id="careerWeakestDimension" hidden>-</p>
+          <p id="careerSecondRow" hidden></p>
+          <p id="careerSecondDimension" hidden>-</p>
+          <button id="copy-summary-btn" type="button" hidden>Copier</button>
         </article>
 
         <article class="card balance-card">
-          <h3>Votre &eacute;quilibre professionnel</h3>
+          <h3>Vos points cl&eacute;s</h3>
+          <div class="career-dimensions">
+            <p><strong>Moteur principal :</strong> <span id="quickStrongestDimension">-</span></p>
+            <p><strong>Point de vigilance :</strong> <span id="quickWeakestDimension">-</span></p>
+          </div>
           <div class="metric-row"><div class="metric-head"><span>Sens</span><span id="valMeaning">0</span></div><div class="bar-track"><div id="barMeaning" class="bar-fill"></div></div></div>
           <div class="metric-row"><div class="metric-head"><span>&Eacute;volution</span><span id="valGrowth">0</span></div><div class="bar-track"><div id="barGrowth" class="bar-fill"></div></div></div>
           <div class="metric-row"><div class="metric-head"><span>Reconnaissance</span><span id="valRecognition">0</span></div><div class="bar-track"><div id="barRecognition" class="bar-fill"></div></div></div>
@@ -305,39 +312,18 @@
         </article>
 
         <article class="card">
-          <h3>Analyse personnalis&eacute;e</h3>
+          <h3>Votre analyse</h3>
           <p id="analysisText" class="analysis-text">Votre analyse personnalis&eacute;e appara&icirc;tra ici.</p>
-          <p id="recommendationContext" class="calc-note"></p>
+          <p id="recommendationContext" class="calc-note" hidden></p>
         </article>
 
         <article class="card">
-          <h3>Recommandations</h3>
+          <h3>Votre prochain move</h3>
           <ol id="actionsList" class="action-steps"></ol>
-        </article>
-
-        <article class="card share-card">
-          <h3>Partager votre r&eacute;sultat</h3>
-          <div id="shareResultCard" class="share-result-card">
-            <p class="share-card-title">Mon profil carri&egrave;re</p>
-            <p id="shareCardProfileLine" class="share-card-profile">🌱 En progression</p>
-            <p id="shareCardISCLine" class="share-card-isc">ISC : 0</p>
-            <p id="shareCardStateLine" class="share-card-state">🌱 En progression</p>
-            <div class="share-card-diagnostic">
-              <p id="shareCardStrongLine">Moteur : -</p>
-              <p id="shareCardWeakLine">Vigilance : -</p>
-            </div>
-            <p class="share-card-brand">JobPulse</p>
-          </div>
-          <p id="careerShareLine" class="career-share-line">Mon profil carri&egrave;re : Explorateur<br>ISC : 0</p>
-          <div class="share-buttons">
-            <button id="copy-summary-btn" class="btn btn-secondary" type="button">Copier le r&eacute;sum&eacute;</button>
-            <button id="download-card-btn" class="btn btn-secondary" type="button">T&eacute;l&eacute;charger l'image</button>
-          </div>
         </article>
       </div>
       <footer class="screen-footer results-actions">
         <button id="restart-btn" class="btn btn-primary">Refaire le test</button>
-        <button id="share-btn" class="btn btn-secondary">Partager mon ISC</button>
       </footer>
     </section>
   </main>
