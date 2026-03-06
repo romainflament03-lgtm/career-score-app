@@ -68,45 +68,15 @@ const careerProfiles = {
   }
 };
 
-const profileImages = {
-  "Le Stratège": "assets/profiles/strategiste.png",
-  "Stratège": "assets/profiles/strategiste.png",
-  "L'Architecte": "assets/profiles/architecte.png",
-  "Architecte": "assets/profiles/architecte.png",
-  "L'Explorateur": "assets/profiles/explorateur.png",
-  "Explorateur": "assets/profiles/explorateur.png",
-  "Le Stabilisateur": "assets/profiles/stabilisateur.png",
-  "Stabilisateur": "assets/profiles/stabilisateur.png",
-  "Le Challenger": "assets/profiles/challenger.png",
-  "Challenger": "assets/profiles/challenger.png",
-  "L'Ambitieux": "assets/profiles/ambitieux.png",
-  "Ambitieux reconnu": "assets/profiles/ambitieux.png",
-  "Le Pilier": "assets/profiles/pilier.png",
-  "Pilier": "assets/profiles/pilier.png",
-  "Le Désengagé": "assets/profiles/desengage.png",
-  "Désengagé latent": "assets/profiles/desengage.png"
-};
-
-const profileImagesByKey = {
-  stratege: "assets/profiles/strategiste.png",
-  architecte: "assets/profiles/architecte.png",
-  explorateur: "assets/profiles/explorateur.png",
-  stabilisateur: "assets/profiles/stabilisateur.png",
-  challenger: "assets/profiles/challenger.png",
-  ambitieux_reconnu: "assets/profiles/ambitieux.png",
-  pilier: "assets/profiles/pilier.png",
-  desengage_latent: "assets/profiles/desengage.png"
-};
-
-const profileNameAliases = {
-  "Stratège": "Le Stratège",
-  "Architecte": "L'Architecte",
-  "Explorateur": "L'Explorateur",
-  "Stabilisateur": "Le Stabilisateur",
-  "Challenger": "Le Challenger",
-  "Ambitieux reconnu": "L'Ambitieux",
-  "Pilier": "Le Pilier",
-  "Désengagé latent": "Le Désengagé"
+const profileImageFileByKey = {
+  stratege: "strategiste.png",
+  architecte: "architecte.png",
+  explorateur: "explorateur.png",
+  stabilisateur: "stabilisateur.png",
+  challenger: "challenger.png",
+  ambitieux_reconnu: "ambitieux.png",
+  pilier: "pilier.png",
+  desengage_latent: "desengage.png"
 };
 
 const domainLabelFr = {
@@ -895,15 +865,11 @@ function renderRecommendations(target, items) {
 }
 
 function renderCareerProfile(careerProfile, isc) {
-  const canonicalProfileName = profileNameAliases[careerProfile.profileName] || careerProfile.profileName;
-  const profileImage =
-    profileImagesByKey[careerProfile.profileKey] ||
-    profileImages[canonicalProfileName] ||
-    "";
+  const imageFile = profileImageFileByKey[careerProfile.profileKey] || "";
+  const profileImage = imageFile ? new URL(`assets/profiles/${imageFile}`, document.baseURI).href : "";
   if (ui.profileImage && ui.profileImageFallback) {
     if (profileImage) {
-      const resolvedMain = new URL(profileImage, document.baseURI).href;
-      const cacheBuster = "v=20260306-3";
+      const cacheBuster = "v=20260306-4";
       ui.profileImage.onerror = () => {
         ui.profileImage.hidden = true;
         ui.profileImageFallback.hidden = false;
@@ -913,7 +879,7 @@ function renderCareerProfile(careerProfile, isc) {
         ui.profileImage.hidden = false;
         ui.profileImageFallback.hidden = true;
       };
-      ui.profileImage.src = `${resolvedMain}${resolvedMain.includes("?") ? "&" : "?"}${cacheBuster}`;
+      ui.profileImage.src = `${profileImage}${profileImage.includes("?") ? "&" : "?"}${cacheBuster}`;
       ui.profileImage.alt = `Illustration du profil ${careerProfile.profileName}`;
       ui.profileImage.hidden = false;
       ui.profileImageFallback.hidden = true;
