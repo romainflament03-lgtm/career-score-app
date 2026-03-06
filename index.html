@@ -241,18 +241,16 @@
 
       <div class="results-main">
         <article class="card score-card hero-score-card">
-          <p class="eyebrow">Votre Indice de Sant&eacute; de Carri&egrave;re</p>
-          <div class="hero-score-top">
-            <div class="gauge-wrap">
-              <div id="chiGauge" class="chi-gauge">
-                <div class="gauge-hole">
-                  <p id="chiScore" class="chi-score">0 / 100</p>
-                </div>
-              </div>
+          <p class="eyebrow">Indice de Sant&eacute; de Carri&egrave;re</p>
+          <div class="hero-score-top hero-score-center">
+            <div id="chiGauge" class="chi-gauge">
+              <p class="hero-isc-label">ISC</p>
+              <p id="chiScore" class="chi-score">0</p>
+              <p class="hero-isc-denominator">/ 100</p>
             </div>
-            <div class="hero-score-meta">
+            <div class="hero-score-meta hero-score-meta-center">
               <p id="chiLabel" class="chi-label">🌱 En progression</p>
-              <p id="chiSummary" class="subtitle">Votre situation professionnelle est globalement positive, avec encore quelques points &agrave; renforcer.</p>
+              <p id="chiSummary" class="subtitle">Votre situation professionnelle est globalement positive, mais certains facteurs peuvent &ecirc;tre am&eacute;lior&eacute;s.</p>
             </div>
           </div>
           <div class="hero-progress-wrap" aria-hidden="true">
@@ -286,11 +284,8 @@
 
         <article class="card balance-card">
           <h3>Votre &eacute;quilibre professionnel</h3>
-          <div class="radar-wrap">
-            <canvas id="dimensionRadar" width="320" height="320" aria-label="Radar des dimensions de carri&egrave;re"></canvas>
-          </div>
           <div class="metric-row"><div class="metric-head"><span>Sens</span><span id="valMeaning">0</span></div><div class="bar-track"><div id="barMeaning" class="bar-fill"></div></div></div>
-          <div class="metric-row"><div class="metric-head"><span>Evolution</span><span id="valGrowth">0</span></div><div class="bar-track"><div id="barGrowth" class="bar-fill"></div></div></div>
+          <div class="metric-row"><div class="metric-head"><span>&Eacute;volution</span><span id="valGrowth">0</span></div><div class="bar-track"><div id="barGrowth" class="bar-fill"></div></div></div>
           <div class="metric-row"><div class="metric-head"><span>Reconnaissance</span><span id="valRecognition">0</span></div><div class="bar-track"><div id="barRecognition" class="bar-fill"></div></div></div>
           <div class="metric-row"><div class="metric-head"><span>Environnement</span><span id="valEnvironment">0</span></div><div class="bar-track"><div id="barEnvironment" class="bar-fill"></div></div></div>
           <p id="dimensionSummary" class="calc-note"></p>
@@ -316,16 +311,15 @@
             <p id="shareCardISCLine" class="share-card-isc">ISC : 0</p>
             <p id="shareCardStateLine" class="share-card-state">🌱 En progression</p>
             <div class="share-card-diagnostic">
-              <p id="shareCardStrongLine">Moteur principal : -</p>
-              <p id="shareCardWeakLine">Point de vigilance : -</p>
+              <p id="shareCardStrongLine">Moteur : -</p>
+              <p id="shareCardWeakLine">Vigilance : -</p>
             </div>
             <p class="share-card-brand">JobPulse</p>
           </div>
-          <p id="careerShareLine" class="career-share-line">Mon profil carri&egrave;re : Explorateur &mdash; ISC 0</p>
+          <p id="careerShareLine" class="career-share-line">Mon profil carri&egrave;re : Explorateur<br>ISC : 0</p>
           <div class="share-buttons">
             <button id="copy-summary-btn" class="btn btn-secondary" type="button">Copier le r&eacute;sum&eacute;</button>
             <button id="download-card-btn" class="btn btn-secondary" type="button">T&eacute;l&eacute;charger l'image</button>
-            <button id="share-card-btn" class="btn btn-secondary" type="button">Partager</button>
           </div>
         </article>
       </div>

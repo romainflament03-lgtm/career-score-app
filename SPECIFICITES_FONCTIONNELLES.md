@@ -59,7 +59,8 @@ Affichage :
 - score ISC visible (0-100)
 - état global carrière
 - phrase d'aide contextualisée
-- jauge circulaire + barre de progression 0-100
+- barre de progression horizontale 0-100
+- score ISC comme élément visuel principal
 
 Règles d'état (`getCareerState`) :
 - `>=80` : 🚀 Aligné
@@ -89,7 +90,6 @@ Affichage visuel des 4 dimensions :
 - Environnement
 
 Chaque dimension contient :
-- radar chart (0-100, responsive)
 - valeur
 - barre de progression
 
@@ -150,14 +150,15 @@ Affichage :
 Actions :
 - bouton de copie du résumé
 - bouton **Télécharger l'image** (export PNG)
-- bouton **Partager**
 - bouton de partage global existant (footer)
 
 Format résumé :
-`Mon profil carrière : [profileName] — ISC [iscScore]`
+`Mon profil carrière : [profileName]`
+`ISC : [iscScore]`
 
 Fallback sans profil :
-`Mon ISC : [iscScore] — [stateLabel]`
+`Mon ISC : [iscScore]`
+`[stateLabel]`
 
 ## 11. Fonctions utilitaires clés
 - `getCareerState(iscScore)`

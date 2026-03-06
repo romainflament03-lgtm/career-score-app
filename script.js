@@ -306,8 +306,6 @@ const ui = {
   actionsList: document.getElementById("actionsList"),
   copySummaryBtn: document.getElementById("copy-summary-btn"),
   downloadCardBtn: document.getElementById("download-card-btn"),
-  shareCardBtn: document.getElementById("share-card-btn"),
-  dimensionRadar: document.getElementById("dimensionRadar"),
   secondDimensionSummary: document.getElementById("secondDimensionSummary"),
   shareResultCard: document.getElementById("shareResultCard"),
   shareCardProfileLine: document.getElementById("shareCardProfileLine"),
@@ -822,7 +820,7 @@ function buildRecommendations(data) {
 
 function updateGauge(isc) {
   const angle = Math.round((isc / 100) * 360);
-  ui.chiGauge.style.setProperty("--gauge-angle", `${angle}deg`);
+  if (ui.chiGauge) ui.chiGauge.style.setProperty("--gauge-angle", `${angle}deg`);
   if (ui.heroProgressFill) ui.heroProgressFill.style.width = `${isc}%`;
 }
 
@@ -839,86 +837,6 @@ function renderDimensionBars(dimensions) {
   ui.barGrowth.style.width = `${dimensions.Growth}%`;
   ui.barRecognition.style.width = `${dimensions.Recognition}%`;
   ui.barEnvironment.style.width = `${dimensions.Environment}%`;
-}
-
-function renderRadarChart(dimensions) {
-  if (!ui.dimensionRadar) return;
-  const canvas = ui.dimensionRadar;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  const size = Math.min(canvas.clientWidth || 320, 360);
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.round(size * dpr);
-  canvas.height = Math.round(size * dpr);
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, size, size);
-
-  const labels = ["Sens", "Évolution", "Reconnaissance", "Environnement"];
-  const values = [dimensions.Meaning, dimensions.Growth, dimensions.Recognition, dimensions.Environment];
-  const center = size / 2;
-  const radius = size * 0.34;
-  const axisCount = 4;
-
-  ctx.strokeStyle = "#dbeafe";
-  ctx.lineWidth = 1;
-  for (let level = 1; level <= 4; level += 1) {
-    const r = (radius / 4) * level;
-    ctx.beginPath();
-    for (let i = 0; i < axisCount; i += 1) {
-      const angle = (-Math.PI / 2) + ((Math.PI * 2 * i) / axisCount);
-      const x = center + Math.cos(angle) * r;
-      const y = center + Math.sin(angle) * r;
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.stroke();
-  }
-
-  for (let i = 0; i < axisCount; i += 1) {
-    const angle = (-Math.PI / 2) + ((Math.PI * 2 * i) / axisCount);
-    const x = center + Math.cos(angle) * radius;
-    const y = center + Math.sin(angle) * radius;
-    ctx.beginPath();
-    ctx.moveTo(center, center);
-    ctx.lineTo(x, y);
-    ctx.strokeStyle = "#cbd5e1";
-    ctx.stroke();
-
-    const labelOffset = radius + 22;
-    const lx = center + Math.cos(angle) * labelOffset;
-    const ly = center + Math.sin(angle) * labelOffset;
-    ctx.font = "600 12px Inter, system-ui, sans-serif";
-    ctx.fillStyle = "#334155";
-    ctx.textAlign = i === 1 ? "left" : i === 3 ? "right" : "center";
-    ctx.fillText(labels[i], lx, ly);
-  }
-
-  ctx.beginPath();
-  values.forEach((value, i) => {
-    const normalized = Math.max(0, Math.min(100, value)) / 100;
-    const angle = (-Math.PI / 2) + ((Math.PI * 2 * i) / axisCount);
-    const x = center + Math.cos(angle) * radius * normalized;
-    const y = center + Math.sin(angle) * radius * normalized;
-    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-  });
-  ctx.closePath();
-  ctx.fillStyle = "rgba(37, 99, 235, 0.22)";
-  ctx.strokeStyle = "#2563eb";
-  ctx.lineWidth = 2;
-  ctx.fill();
-  ctx.stroke();
-
-  values.forEach((value, i) => {
-    const normalized = Math.max(0, Math.min(100, value)) / 100;
-    const angle = (-Math.PI / 2) + ((Math.PI * 2 * i) / axisCount);
-    const x = center + Math.cos(angle) * radius * normalized;
-    const y = center + Math.sin(angle) * radius * normalized;
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = "#1d4ed8";
-    ctx.fill();
-  });
 }
 
 function renderRecommendations(target, items) {
@@ -950,14 +868,14 @@ function renderCareerProfile(careerProfile, isc) {
     ui.careerSecondRow.hidden = true;
   }
 
-  ui.careerShareLine.textContent = `Mon profil carri\u00E8re : ${careerProfile.profileName} \u2014 ISC ${isc}`;
+  ui.careerShareLine.textContent = `Mon profil carrière : ${careerProfile.profileName}\nISC : ${isc}`;
 }
 
 function buildShareSummary(result) {
   if (!result) return "";
   const profileName = result.careerProfile?.profileName;
-  if (profileName) return `Mon profil carrière : ${profileName} — ISC ${result.isc}`;
-  return `Mon ISC : ${result.isc} — ${result.state?.label || "Résultat ISC"}`;
+  if (profileName) return `Mon profil carrière : ${profileName}\nISC : ${result.isc}`;
+  return `Mon ISC : ${result.isc}\n${result.state?.label || "Résultat ISC"}`;
 }
 
 function renderShareCard(result, strongestKey, weakestKey) {
@@ -967,8 +885,8 @@ function renderShareCard(result, strongestKey, weakestKey) {
   ui.shareCardProfileLine.textContent = profileName ? `${profileIcon} ${profileName}`.trim() : "Mon résultat carrière";
   ui.shareCardISCLine.textContent = `ISC : ${result.isc}`;
   ui.shareCardStateLine.textContent = result.state.label;
-  ui.shareCardStrongLine.textContent = `Moteur principal : ${friendlyDimension(strongestKey)}`;
-  ui.shareCardWeakLine.textContent = `Point de vigilance : ${friendlyDimension(weakestKey)}`;
+  ui.shareCardStrongLine.textContent = `Moteur : ${friendlyDimension(strongestKey)}`;
+  ui.shareCardWeakLine.textContent = `Vigilance : ${friendlyDimension(weakestKey)}`;
 }
 
 function roundedRect(ctx, x, y, w, h, r) {
@@ -1111,16 +1029,15 @@ function computeAndShowResults() {
     generatedAt: new Date().toISOString()
   };
 
-  ui.chiScore.textContent = `${isc} / 100`;
+  ui.chiScore.textContent = `${isc}`;
   ui.chiLabel.textContent = state.label;
   ui.chiSummary.textContent = state.helper;
   ui.calcFormula.textContent = `ISC = Sens*${customWeights.Meaning.toFixed(2)} + Evolution*${customWeights.Growth.toFixed(2)} + Reconnaissance*${customWeights.Recognition.toFixed(2)} + Environnement*${customWeights.Environment.toFixed(2)}`;
   ui.resultDate.textContent = `Généré le ${new Date(latestResult.generatedAt).toLocaleString("fr-FR")}`;
   updateGauge(isc);
   renderDimensionBars(dimensions);
-  renderRadarChart(dimensions);
   renderCareerProfile(careerProfile, isc);
-  ui.dimensionSummary.textContent = `Dimension forte : ${friendlyDimension(strongestKey)} - Point de vigilance : ${friendlyDimension(weakestKey)}`;
+  ui.dimensionSummary.textContent = `Dimension forte : ${friendlyDimension(strongestKey)}\nPoint de vigilance : ${friendlyDimension(weakestKey)}`;
   if (ui.secondDimensionSummary) {
     if (Math.abs(strongestValue - secondStrongestValue) <= 8) {
       ui.secondDimensionSummary.hidden = false;
@@ -1226,10 +1143,6 @@ if (ui.copySummaryBtn) {
   });
 }
 if (ui.downloadCardBtn) ui.downloadCardBtn.addEventListener("click", exportShareCard);
-if (ui.shareCardBtn) ui.shareCardBtn.addEventListener("click", shareISC);
-window.addEventListener("resize", () => {
-  if (latestResult?.dimensions) renderRadarChart(latestResult.dimensions);
-});
 setupPriorityDragAndDrop();
 setupPriorityTouchReorder();
 resetWeights();

@@ -103,7 +103,7 @@ body::after {
   flex: 1;
   padding: 12px 16px 24px;
   display: grid;
-  gap: 12px;
+  gap: 20px;
   align-content: start;
 }
 
@@ -181,7 +181,7 @@ h2 {
 
 h3 {
   margin: 0 0 12px;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
 }
 
 .subtitle {
@@ -384,41 +384,40 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .chi-gauge {
-  width: 176px;
-  height: 176px;
-  border-radius: 999px;
-  background: conic-gradient(#f97316 0deg 144deg, #f59e0b 144deg 216deg, #86efac 216deg 288deg, #22c55e 288deg 360deg);
+  width: min(100%, 320px);
+  margin-inline: auto;
+  padding: 18px 14px 12px;
+  border-radius: 22px;
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
   display: grid;
   place-items: center;
-  position: relative;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
 }
 
-.chi-gauge::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  background: conic-gradient(from -90deg, #0f172a var(--gauge-angle, 0deg), #e5e7eb 0deg);
-  mask: radial-gradient(circle at center, transparent 59%, black 60%);
-  -webkit-mask: radial-gradient(circle at center, transparent 59%, black 60%);
-}
-
-.gauge-hole {
-  width: 124px;
-  height: 124px;
-  border-radius: 999px;
-  background: #fff;
-  display: grid;
-  place-items: center;
-  z-index: 1;
+.hero-isc-label {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
 }
 
 .chi-score {
-  margin: 0;
-  font-size: 1.7rem;
+  margin: 2px 0 0;
+  font-size: clamp(3rem, 11vw, 4.6rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  text-align: center;
+  line-height: 1;
+  color: #0f172a;
+}
+
+.hero-isc-denominator {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
 }
 
 .chi-label {
@@ -484,9 +483,17 @@ input[type="range"]::-moz-range-thumb {
   color: var(--muted);
 }
 
+#dimensionSummary {
+  white-space: pre-line;
+  font-weight: 700;
+  color: #1f2937;
+}
+
 .hero-score-card {
   border: 1px solid #c7d2fe;
   background: linear-gradient(165deg, #eef2ff 0%, #ffffff 48%, #ecfeff 100%);
+  padding: 28px;
+  box-shadow: 0 20px 40px rgba(30, 64, 175, 0.15);
 }
 
 .hero-score-top {
@@ -495,9 +502,19 @@ input[type="range"]::-moz-range-thumb {
   align-items: center;
 }
 
+.hero-score-center {
+  justify-items: center;
+  text-align: center;
+}
+
 .hero-score-meta .chi-label {
   margin: 0;
   font-size: 1.15rem;
+}
+
+.hero-score-meta-center .subtitle {
+  margin: 8px auto 0;
+  max-width: 56ch;
 }
 
 .hero-progress-wrap {
@@ -591,12 +608,19 @@ input[type="range"]::-moz-range-thumb {
   color: #334155;
 }
 
+.career-dimensions p:first-child,
+.career-dimensions p:last-child {
+  font-weight: 700;
+  color: #0f172a;
+}
+
 .career-share-line {
   margin: 12px 0 0;
   padding-top: 10px;
   border-top: 1px dashed #bfdbfe;
   font-size: 0.8rem;
   color: #334155;
+  white-space: pre-line;
   word-break: break-word;
 }
 
@@ -652,22 +676,6 @@ input[type="range"]::-moz-range-thumb {
   background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
 }
 
-.radar-wrap {
-  margin: 6px auto 14px;
-  width: min(100%, 360px);
-  aspect-ratio: 1 / 1;
-  border-radius: 16px;
-  border: 1px solid #dbeafe;
-  background: radial-gradient(circle at 50% 38%, #f0f9ff 0%, #ffffff 70%);
-  padding: 10px;
-}
-
-#dimensionRadar {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
 .share-result-card {
   width: min(100%, 360px);
   margin: 4px auto 0;
@@ -721,8 +729,9 @@ input[type="range"]::-moz-range-thumb {
 
 .share-card-diagnostic p {
   margin: 0;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
   color: #334155;
+  font-weight: 700;
 }
 
 .share-card-diagnostic p + p {
@@ -888,9 +897,6 @@ li {
   .screen-main, .results-main { padding-left: 28px; padding-right: 28px; }
   .results-main { grid-template-columns: 1fr 1fr; }
   .results-main > .card { grid-column: 1 / -1; }
-  .hero-score-top {
-    grid-template-columns: 200px 1fr;
-  }
   .preset-wrap {
     grid-template-columns: repeat(4, 1fr);
   }
