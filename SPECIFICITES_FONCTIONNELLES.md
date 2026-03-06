@@ -84,17 +84,19 @@ Titre : **Votre équilibre professionnel**
 
 Affichage visuel des 4 dimensions :
 - Sens
-- Evolution
+- Évolution
 - Reconnaissance
 - Environnement
 
 Chaque dimension contient :
+- radar chart (0-100, responsive)
 - valeur
 - barre de progression
 
 Résumé bas de section :
 - dimension forte
 - point de vigilance
+- seconde dimension clé (si l'écart avec la dimension forte est faible)
 
 ## 8. Analyse personnalisée
 Titre : **Analyse personnalisée**
@@ -141,21 +143,33 @@ Contraintes :
 Titre : **Partager votre résultat**
 
 Affichage :
+- carte visuelle partageable (quasi carrée)
 - résumé compact (profil + ISC)
+- moteur principal + point de vigilance
 
 Actions :
 - bouton de copie du résumé
+- bouton **Télécharger l'image** (export PNG)
+- bouton **Partager**
 - bouton de partage global existant (footer)
 
 Format résumé :
 `Mon profil carrière : [profileName] — ISC [iscScore]`
 
+Fallback sans profil :
+`Mon ISC : [iscScore] — [stateLabel]`
+
 ## 11. Fonctions utilitaires clés
 - `getCareerState(iscScore)`
 - `getDimensionRanking(scores)`
+- `getStrongestDimension(scores)`
+- `getWeakestDimension(scores)`
+- `getSecondStrongestDimension(scores)`
 - `getTopPriority(weights)`
 - `buildPersonalizedAnalysis(data)`
 - `buildRecommendations(data)`
+- `buildShareSummary(result)`
+- `exportShareCard()`
 
 ## 12. Contraintes UX/UI
 - structure claire et séquentielle

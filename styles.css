@@ -638,6 +638,103 @@ input[type="range"]::-moz-range-thumb {
 
 .share-card .share-buttons {
   margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.share-card .share-buttons .btn {
+  flex: 1 1 160px;
+}
+
+.balance-card {
+  border: 1px solid #dbeafe;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.radar-wrap {
+  margin: 6px auto 14px;
+  width: min(100%, 360px);
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  border: 1px solid #dbeafe;
+  background: radial-gradient(circle at 50% 38%, #f0f9ff 0%, #ffffff 70%);
+  padding: 10px;
+}
+
+#dimensionRadar {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.share-result-card {
+  width: min(100%, 360px);
+  margin: 4px auto 0;
+  border-radius: 18px;
+  border: 1px solid #bfdbfe;
+  padding: 18px;
+  background: linear-gradient(165deg, #dbeafe 0%, #ffffff 42%, #ecfeff 100%);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+.share-card-title {
+  margin: 0;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #334155;
+}
+
+.share-card-profile {
+  margin: 12px 0 0;
+  font-size: 1.38rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.share-card-isc {
+  margin: 6px 0 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.share-card-state {
+  margin: 6px 0 0;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #bfdbfe;
+  background: #ffffff;
+  padding: 6px 10px;
+  font-size: 0.84rem;
+  color: #1e3a8a;
+  font-weight: 700;
+}
+
+.share-card-diagnostic {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed #93c5fd;
+}
+
+.share-card-diagnostic p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #334155;
+}
+
+.share-card-diagnostic p + p {
+  margin-top: 8px;
+}
+
+.share-card-brand {
+  margin: 14px 0 0;
+  font-size: 0.78rem;
+  color: #475569;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .metric-row + .metric-row { margin-top: 10px; }
@@ -790,7 +887,7 @@ li {
   .screen-header { padding: 26px 28px 12px; }
   .screen-main, .results-main { padding-left: 28px; padding-right: 28px; }
   .results-main { grid-template-columns: 1fr 1fr; }
-  .score-card, .career-profile-card, .results-main > .card:last-child { grid-column: 1 / -1; }
+  .results-main > .card { grid-column: 1 / -1; }
   .hero-score-top {
     grid-template-columns: 200px 1fr;
   }

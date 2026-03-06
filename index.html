@@ -284,13 +284,17 @@
           </div>
         </article>
 
-        <article class="card">
+        <article class="card balance-card">
           <h3>Votre &eacute;quilibre professionnel</h3>
+          <div class="radar-wrap">
+            <canvas id="dimensionRadar" width="320" height="320" aria-label="Radar des dimensions de carri&egrave;re"></canvas>
+          </div>
           <div class="metric-row"><div class="metric-head"><span>Sens</span><span id="valMeaning">0</span></div><div class="bar-track"><div id="barMeaning" class="bar-fill"></div></div></div>
           <div class="metric-row"><div class="metric-head"><span>Evolution</span><span id="valGrowth">0</span></div><div class="bar-track"><div id="barGrowth" class="bar-fill"></div></div></div>
           <div class="metric-row"><div class="metric-head"><span>Reconnaissance</span><span id="valRecognition">0</span></div><div class="bar-track"><div id="barRecognition" class="bar-fill"></div></div></div>
           <div class="metric-row"><div class="metric-head"><span>Environnement</span><span id="valEnvironment">0</span></div><div class="bar-track"><div id="barEnvironment" class="bar-fill"></div></div></div>
           <p id="dimensionSummary" class="calc-note"></p>
+          <p id="secondDimensionSummary" class="calc-note" hidden></p>
         </article>
 
         <article class="card">
@@ -306,8 +310,23 @@
 
         <article class="card share-card">
           <h3>Partager votre r&eacute;sultat</h3>
+          <div id="shareResultCard" class="share-result-card">
+            <p class="share-card-title">Mon profil carri&egrave;re</p>
+            <p id="shareCardProfileLine" class="share-card-profile">🌱 En progression</p>
+            <p id="shareCardISCLine" class="share-card-isc">ISC : 0</p>
+            <p id="shareCardStateLine" class="share-card-state">🌱 En progression</p>
+            <div class="share-card-diagnostic">
+              <p id="shareCardStrongLine">Moteur principal : -</p>
+              <p id="shareCardWeakLine">Point de vigilance : -</p>
+            </div>
+            <p class="share-card-brand">JobPulse</p>
+          </div>
           <p id="careerShareLine" class="career-share-line">Mon profil carri&egrave;re : Explorateur &mdash; ISC 0</p>
-          <div class="share-buttons"><button id="copy-summary-btn" class="btn btn-secondary" type="button">Copier le r&eacute;sum&eacute;</button></div>
+          <div class="share-buttons">
+            <button id="copy-summary-btn" class="btn btn-secondary" type="button">Copier le r&eacute;sum&eacute;</button>
+            <button id="download-card-btn" class="btn btn-secondary" type="button">T&eacute;l&eacute;charger l'image</button>
+            <button id="share-card-btn" class="btn btn-secondary" type="button">Partager</button>
+          </div>
         </article>
       </div>
       <footer class="screen-footer results-actions">

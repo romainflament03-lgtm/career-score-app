@@ -305,6 +305,16 @@ const ui = {
   recommendationContext: document.getElementById("recommendationContext"),
   actionsList: document.getElementById("actionsList"),
   copySummaryBtn: document.getElementById("copy-summary-btn"),
+  downloadCardBtn: document.getElementById("download-card-btn"),
+  shareCardBtn: document.getElementById("share-card-btn"),
+  dimensionRadar: document.getElementById("dimensionRadar"),
+  secondDimensionSummary: document.getElementById("secondDimensionSummary"),
+  shareResultCard: document.getElementById("shareResultCard"),
+  shareCardProfileLine: document.getElementById("shareCardProfileLine"),
+  shareCardISCLine: document.getElementById("shareCardISCLine"),
+  shareCardStateLine: document.getElementById("shareCardStateLine"),
+  shareCardStrongLine: document.getElementById("shareCardStrongLine"),
+  shareCardWeakLine: document.getElementById("shareCardWeakLine"),
   careerProfileIcon: document.getElementById("careerProfileIcon"),
   careerProfileName: document.getElementById("careerProfileName"),
   careerStateLabel: document.getElementById("careerStateLabel"),
@@ -702,6 +712,19 @@ function getDimensionRanking(scores) {
   return Object.entries(scores).sort((a, b) => b[1] - a[1]);
 }
 
+function getStrongestDimension(scores) {
+  return getDimensionRanking(scores)[0][0];
+}
+
+function getWeakestDimension(scores) {
+  const ranking = getDimensionRanking(scores);
+  return ranking[ranking.length - 1][0];
+}
+
+function getSecondStrongestDimension(scores) {
+  return getDimensionRanking(scores)[1][0];
+}
+
 function getTopPriority(weights) {
   return Object.entries(weights).sort((a, b) => b[1] - a[1])[0][0];
 }
@@ -818,6 +841,86 @@ function renderDimensionBars(dimensions) {
   ui.barEnvironment.style.width = `${dimensions.Environment}%`;
 }
 
+function renderRadarChart(dimensions) {
+  if (!ui.dimensionRadar) return;
+  const canvas = ui.dimensionRadar;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const size = Math.min(canvas.clientWidth || 320, 360);
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(size * dpr);
+  canvas.height = Math.round(size * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, size, size);
+
+  const labels = ["Sens", "Évolution", "Reconnaissance", "Environnement"];
+  const values = [dimensions.Meaning, dimensions.Growth, dimensions.Recognition, dimensions.Environment];
+  const center = size / 2;
+  const radius = size * 0.34;
+  const axisCount = 4;
+
+  ctx.strokeStyle = "#dbeafe";
+  ctx.lineWidth = 1;
+  for (let level = 1; level <= 4; level += 1) {
+    const r = (radius / 4) * level;
+    ctx.beginPath();
+    for (let i = 0; i < axisCount; i += 1) {
+      const angle = (-Math.PI / 2) + ((Math.PI * 2 * i) / axisCount);
+      const x = center + Math.cos(angle) * r;
+      const y = center + Math.sin(angle) * r;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  for (let i = 0; i < axisCount; i += 1) {
+    const angle = (-Math.PI / 2) + ((Math.PI * 2 * i) / axisCount);
+    const x = center + Math.cos(angle) * radius;
+    const y = center + Math.sin(angle) * radius;
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.stroke();
+
+    const labelOffset = radius + 22;
+    const lx = center + Math.cos(angle) * labelOffset;
+    const ly = center + Math.sin(angle) * labelOffset;
+    ctx.font = "600 12px Inter, system-ui, sans-serif";
+    ctx.fillStyle = "#334155";
+    ctx.textAlign = i === 1 ? "left" : i === 3 ? "right" : "center";
+    ctx.fillText(labels[i], lx, ly);
+  }
+
+  ctx.beginPath();
+  values.forEach((value, i) => {
+    const normalized = Math.max(0, Math.min(100, value)) / 100;
+    const angle = (-Math.PI / 2) + ((Math.PI * 2 * i) / axisCount);
+    const x = center + Math.cos(angle) * radius * normalized;
+    const y = center + Math.sin(angle) * radius * normalized;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = "rgba(37, 99, 235, 0.22)";
+  ctx.strokeStyle = "#2563eb";
+  ctx.lineWidth = 2;
+  ctx.fill();
+  ctx.stroke();
+
+  values.forEach((value, i) => {
+    const normalized = Math.max(0, Math.min(100, value)) / 100;
+    const angle = (-Math.PI / 2) + ((Math.PI * 2 * i) / axisCount);
+    const x = center + Math.cos(angle) * radius * normalized;
+    const y = center + Math.sin(angle) * radius * normalized;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = "#1d4ed8";
+    ctx.fill();
+  });
+}
+
 function renderRecommendations(target, items) {
   target.innerHTML = "";
   items.forEach((item, index) => {
@@ -850,16 +953,120 @@ function renderCareerProfile(careerProfile, isc) {
   ui.careerShareLine.textContent = `Mon profil carri\u00E8re : ${careerProfile.profileName} \u2014 ISC ${isc}`;
 }
 
+function buildShareSummary(result) {
+  if (!result) return "";
+  const profileName = result.careerProfile?.profileName;
+  if (profileName) return `Mon profil carrière : ${profileName} — ISC ${result.isc}`;
+  return `Mon ISC : ${result.isc} — ${result.state?.label || "Résultat ISC"}`;
+}
+
+function renderShareCard(result, strongestKey, weakestKey) {
+  if (!ui.shareResultCard) return;
+  const profileName = result.careerProfile?.profileName;
+  const profileIcon = result.careerProfile?.icon || "";
+  ui.shareCardProfileLine.textContent = profileName ? `${profileIcon} ${profileName}`.trim() : "Mon résultat carrière";
+  ui.shareCardISCLine.textContent = `ISC : ${result.isc}`;
+  ui.shareCardStateLine.textContent = result.state.label;
+  ui.shareCardStrongLine.textContent = `Moteur principal : ${friendlyDimension(strongestKey)}`;
+  ui.shareCardWeakLine.textContent = `Point de vigilance : ${friendlyDimension(weakestKey)}`;
+}
+
+function roundedRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function exportShareCard() {
+  if (!latestResult) return;
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080;
+  canvas.height = 1080;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const gradient = ctx.createLinearGradient(0, 0, 1080, 1080);
+  gradient.addColorStop(0, "#dbeafe");
+  gradient.addColorStop(0.45, "#ffffff");
+  gradient.addColorStop(1, "#ecfeff");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  roundedRect(ctx, 70, 70, 940, 940, 42);
+  ctx.fillStyle = "rgba(255,255,255,0.88)";
+  ctx.fill();
+  ctx.strokeStyle = "#bfdbfe";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  const summary = buildShareSummary(latestResult);
+  ctx.fillStyle = "#334155";
+  ctx.font = "700 34px Inter, Arial, sans-serif";
+  ctx.fillText("Mon profil carrière", 130, 165);
+
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "800 62px Inter, Arial, sans-serif";
+  const profileLine = ui.shareCardProfileLine?.textContent || "Mon résultat carrière";
+  ctx.fillText(profileLine, 130, 265);
+
+  ctx.font = "800 50px Inter, Arial, sans-serif";
+  ctx.fillText(ui.shareCardISCLine?.textContent || `ISC : ${latestResult.isc}`, 130, 345);
+
+  roundedRect(ctx, 130, 376, 460, 74, 37);
+  ctx.fillStyle = "#ffffff";
+  ctx.fill();
+  ctx.strokeStyle = "#bfdbfe";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = "#1e3a8a";
+  ctx.font = "700 34px Inter, Arial, sans-serif";
+  ctx.fillText(ui.shareCardStateLine?.textContent || latestResult.state.label, 156, 423);
+
+  ctx.fillStyle = "#334155";
+  ctx.font = "600 36px Inter, Arial, sans-serif";
+  ctx.fillText(ui.shareCardStrongLine?.textContent || "", 130, 545);
+  ctx.fillText(ui.shareCardWeakLine?.textContent || "", 130, 615);
+
+  ctx.strokeStyle = "#93c5fd";
+  ctx.setLineDash([10, 10]);
+  ctx.beginPath();
+  ctx.moveTo(130, 680);
+  ctx.lineTo(950, 680);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = "#64748b";
+  ctx.font = "600 28px Inter, Arial, sans-serif";
+  ctx.fillText(summary, 130, 760);
+  ctx.fillStyle = "#475569";
+  ctx.font = "700 30px Inter, Arial, sans-serif";
+  ctx.fillText("JobPulse", 130, 900);
+
+  const link = document.createElement("a");
+  link.href = canvas.toDataURL("image/png");
+  link.download = `jobpulse-isc-${latestResult.isc}.png`;
+  link.click();
+}
+
 function computeAndShowResults() {
   const dimensions = computeDimensions();
   const isc = computeISC(dimensions, customWeights);
   const state = getCareerState(isc);
   const dimensionRanking = getDimensionRanking(dimensions);
-  const strongestKey = dimensionRanking[0][0];
-  const secondStrongestKey = dimensionRanking[1][0];
-  const weakestKey = dimensionRanking[dimensionRanking.length - 1][0];
-  const strongestValue = dimensionRanking[0][1];
-  const weakestValue = dimensionRanking[dimensionRanking.length - 1][1];
+  const strongestKey = getStrongestDimension(dimensions);
+  const secondStrongestKey = getSecondStrongestDimension(dimensions);
+  const weakestKey = getWeakestDimension(dimensions);
+  const strongestValue = dimensions[strongestKey];
+  const weakestValue = dimensions[weakestKey];
+  const secondStrongestValue = dimensions[secondStrongestKey];
   const topPriorityKey = getTopPriority(customWeights);
   const topPriorityValue = dimensions[topPriorityKey];
   const careerProfile = getCareerProfile({
@@ -908,22 +1115,32 @@ function computeAndShowResults() {
   ui.chiLabel.textContent = state.label;
   ui.chiSummary.textContent = state.helper;
   ui.calcFormula.textContent = `ISC = Sens*${customWeights.Meaning.toFixed(2)} + Evolution*${customWeights.Growth.toFixed(2)} + Reconnaissance*${customWeights.Recognition.toFixed(2)} + Environnement*${customWeights.Environment.toFixed(2)}`;
-  ui.resultDate.textContent = `Genere le ${new Date(latestResult.generatedAt).toLocaleString("fr-FR")}`;
+  ui.resultDate.textContent = `Généré le ${new Date(latestResult.generatedAt).toLocaleString("fr-FR")}`;
   updateGauge(isc);
   renderDimensionBars(dimensions);
+  renderRadarChart(dimensions);
   renderCareerProfile(careerProfile, isc);
   ui.dimensionSummary.textContent = `Dimension forte : ${friendlyDimension(strongestKey)} - Point de vigilance : ${friendlyDimension(weakestKey)}`;
+  if (ui.secondDimensionSummary) {
+    if (Math.abs(strongestValue - secondStrongestValue) <= 8) {
+      ui.secondDimensionSummary.hidden = false;
+      ui.secondDimensionSummary.textContent = `Seconde dimension clé : ${friendlyDimension(secondStrongestKey)}`;
+    } else {
+      ui.secondDimensionSummary.hidden = true;
+      ui.secondDimensionSummary.textContent = "";
+    }
+  }
   ui.analysisText.textContent = analysis;
   ui.recommendationContext.textContent = `Contexte : ${contextData.domainLabel} | ${contextData.functionLabel} | ${contextData.companySizeLabel} | ${contextData.tenureLabel} | ${contextData.hierarchyLabel}${contextData.offerLabel ? ` | ${contextData.offerLabel}` : ""}`;
   renderRecommendations(ui.actionsList, recommendations);
+  renderShareCard(latestResult, strongestKey, weakestKey);
+  ui.careerShareLine.textContent = buildShareSummary(latestResult);
   showScreen("results");
 }
 
 async function shareISC() {
   if (!latestResult) return;
-  const state = getCareerState(latestResult.isc);
-  const profileName = latestResult.careerProfile?.profileName || "Non d\u00E9fini";
-  const text = `Mon profil carrière : ${profileName} — ISC ${latestResult.isc} (${state.label})`;
+  const text = buildShareSummary(latestResult);
 
   if (navigator.share) {
     try {
@@ -997,7 +1214,7 @@ ui.shareBtn.addEventListener("click", shareISC);
 if (ui.copySummaryBtn) {
   ui.copySummaryBtn.addEventListener("click", async () => {
     if (!latestResult || !navigator.clipboard?.writeText) return;
-    const summary = `Mon profil carrière : ${latestResult.careerProfile.profileName} — ISC ${latestResult.isc}`;
+    const summary = buildShareSummary(latestResult);
     try {
       await navigator.clipboard.writeText(summary);
       ui.copySummaryBtn.textContent = "Résumé copié";
@@ -1008,6 +1225,11 @@ if (ui.copySummaryBtn) {
     }
   });
 }
+if (ui.downloadCardBtn) ui.downloadCardBtn.addEventListener("click", exportShareCard);
+if (ui.shareCardBtn) ui.shareCardBtn.addEventListener("click", shareISC);
+window.addEventListener("resize", () => {
+  if (latestResult?.dimensions) renderRadarChart(latestResult.dimensions);
+});
 setupPriorityDragAndDrop();
 setupPriorityTouchReorder();
 resetWeights();
