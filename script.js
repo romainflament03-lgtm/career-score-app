@@ -68,15 +68,23 @@ const careerProfiles = {
   }
 };
 
-const profileImageFileByKey = {
-  stratege: "strategiste.png",
-  architecte: "architecte.png",
-  explorateur: "explorateur.png",
-  stabilisateur: "stabilisateur.png",
-  challenger: "challenger.png",
-  ambitieux_reconnu: "ambitieux.png",
-  pilier: "pilier.png",
-  desengage_latent: "desengage.png"
+const profileImages = {
+  "Le Stratège": "assets/profiles/strategiste.png",
+  "L'Architecte": "assets/profiles/architecte.png",
+  "L'Explorateur": "assets/profiles/explorateur.png",
+  "Le Stabilisateur": "assets/profiles/stabilisateur.png",
+  "Le Challenger": "assets/profiles/challenger.png",
+  "L'Ambitieux": "assets/profiles/ambitieux.png",
+  "Le Pilier": "assets/profiles/pilier.png",
+  "Le Désengagé": "assets/profiles/desengage.png",
+  "Stratège": "assets/profiles/strategiste.png",
+  "Architecte": "assets/profiles/architecte.png",
+  "Explorateur": "assets/profiles/explorateur.png",
+  "Stabilisateur": "assets/profiles/stabilisateur.png",
+  "Challenger": "assets/profiles/challenger.png",
+  "Ambitieux reconnu": "assets/profiles/ambitieux.png",
+  "Pilier": "assets/profiles/pilier.png",
+  "Désengagé latent": "assets/profiles/desengage.png"
 };
 
 const domainLabelFr = {
@@ -866,7 +874,11 @@ function renderRecommendations(target, items) {
 
 function renderCareerProfile(careerProfile, isc) {
   if (ui.profileImage && ui.profileImageFallback) {
-    const fixedProfileImage = new URL("assets/profiles/strategiste.png", document.baseURI).href;
+    const profileName = careerProfile?.profileName?.trim();
+    const selectedImage = profileName ? profileImages[profileName] : "";
+    console.log("Detected profile:", profileName);
+    console.log("Selected image:", selectedImage || "(fallback)");
+
     ui.profileImage.onerror = () => {
       ui.profileImage.hidden = true;
       ui.profileImageFallback.hidden = false;
@@ -876,10 +888,18 @@ function renderCareerProfile(careerProfile, isc) {
       ui.profileImage.hidden = false;
       ui.profileImageFallback.hidden = true;
     };
-    ui.profileImage.src = `${fixedProfileImage}${fixedProfileImage.includes("?") ? "&" : "?"}v=20260306-fixed`;
-    ui.profileImage.alt = "Illustration du profil carrière";
-    ui.profileImage.hidden = false;
-    ui.profileImageFallback.hidden = true;
+
+    if (selectedImage) {
+      ui.profileImage.src = selectedImage;
+      ui.profileImage.alt = `Illustration du profil ${profileName}`;
+      ui.profileImage.hidden = false;
+      ui.profileImageFallback.hidden = true;
+    } else {
+      ui.profileImage.src = "";
+      ui.profileImage.alt = "Illustration indisponible";
+      ui.profileImage.hidden = true;
+      ui.profileImageFallback.hidden = false;
+    }
   }
 
   ui.careerProfileName.textContent = careerProfile.profileName;

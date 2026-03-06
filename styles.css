@@ -593,6 +593,10 @@ input[type="range"]::-moz-range-thumb {
   background: #f1f5f9;
 }
 
+.career-profile-fallback[hidden] {
+  display: none !important;
+}
+
 .career-profile-fallback .material-symbols-outlined {
   font-size: 52px;
 }
