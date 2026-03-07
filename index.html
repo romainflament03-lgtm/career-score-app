@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JobPulse - ISC (Indice de Santé de Carrière)</title>
+  <title>JobPulse - ISC (Indice de Sant&eacute; de Carri&egrave;re)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -25,9 +25,9 @@
       </header>
       <div class="screen-main">
         <article class="card card-center">
-          <p class="eyebrow">Diagnostic express</p>
-          <h1>Êtes-vous heureux dans votre travail ?</h1>
-          <p class="subtitle">Un test simple pour obtenir votre ISC et des recommandations utiles.</p>
+          <p class="eyebrow">Diagnostic carri&egrave;re express</p>
+          <h1>&Eacute;valuez votre alignement professionnel</h1>
+          <p class="subtitle">10 questions, 3 minutes, 3 actions concr&egrave;tes.</p>
         </article>
       </div>
       <footer class="screen-footer">
@@ -42,20 +42,20 @@
       <header class="screen-header">
         <div class="brand">
           <span class="material-symbols-outlined brand-icon">tune</span>
-          <p class="brand-name">Pondération personnalisée</p>
+          <p class="brand-name">Vos priorit&eacute;s</p>
         </div>
       </header>
       <div class="screen-main">
         <article class="card card-center">
-          <p class="eyebrow">Étape 1</p>
-          <h2>Classez vos priorités</h2>
-          <p class="subtitle">Glissez les cartes pour les ordonner de la plus importante (1) à la moins importante (4).</p>
+          <p class="eyebrow">&Eacute;tape 1 sur 3</p>
+          <h2>Ce qui compte le plus pour vous</h2>
+          <p class="subtitle">Classez ces 4 dimensions de la plus importante (1) &agrave; la moins importante (4).</p>
 
-          <div class="preset-wrap" role="group" aria-label="Préréglages priorités">
-            <button id="preset-balanced-btn" class="btn btn-secondary preset-btn" type="button">Profil équilibré</button>
-            <button id="preset-career-btn" class="btn btn-secondary preset-btn" type="button">Priorité carrière</button>
-            <button id="preset-wellbeing-btn" class="btn btn-secondary preset-btn" type="button">Priorité bien-être</button>
-            <button id="preset-impact-btn" class="btn btn-secondary preset-btn" type="button">Priorité impact</button>
+          <div class="preset-wrap" role="group" aria-label="Pr&eacute;r&eacute;glages priorit&eacute;s">
+            <button id="preset-balanced-btn" class="btn btn-secondary preset-btn" type="button">&Eacute;quilibr&eacute;</button>
+            <button id="preset-career-btn" class="btn btn-secondary preset-btn" type="button">Carri&egrave;re</button>
+            <button id="preset-wellbeing-btn" class="btn btn-secondary preset-btn" type="button">Bien-&ecirc;tre</button>
+            <button id="preset-impact-btn" class="btn btn-secondary preset-btn" type="button">Impact</button>
           </div>
 
           <ul id="priority-list" class="priority-list">
@@ -63,15 +63,15 @@
               <p class="priority-rank">1</p>
               <div class="priority-content">
                 <p class="priority-title">Sens du travail</p>
-                <p class="priority-desc">L'utilité et l'impact de ce que je fais</p>
+                <p class="priority-desc">L'utilit&eacute; et l'impact de ce que je fais</p>
               </div>
               <span class="material-symbols-outlined priority-icon">volunteer_activism</span>
             </li>
             <li class="priority-card" data-dimension="Growth">
               <p class="priority-rank">2</p>
               <div class="priority-content">
-                <p class="priority-title">Évolution</p>
-                <p class="priority-desc">Apprendre, progresser et développer ma carrière</p>
+                <p class="priority-title">&Eacute;volution</p>
+                <p class="priority-desc">Apprendre, progresser et d&eacute;velopper ma carri&egrave;re</p>
               </div>
               <span class="material-symbols-outlined priority-icon">trending_up</span>
             </li>
@@ -79,7 +79,7 @@
               <p class="priority-rank">3</p>
               <div class="priority-content">
                 <p class="priority-title">Reconnaissance</p>
-                <p class="priority-desc">Être valorisé pour mon travail et mes résultats</p>
+                <p class="priority-desc">&Ecirc;tre valoris&eacute; pour mon travail et mes r&eacute;sultats</p>
               </div>
               <span class="material-symbols-outlined priority-icon">workspace_premium</span>
             </li>
@@ -87,18 +87,18 @@
               <p class="priority-rank">4</p>
               <div class="priority-content">
                 <p class="priority-title">Environnement</p>
-                <p class="priority-desc">Travailler dans une bonne équipe et un cadre sain</p>
+                <p class="priority-desc">Travailler dans une bonne &eacute;quipe et un cadre sain</p>
               </div>
               <span class="material-symbols-outlined priority-icon">groups</span>
             </li>
           </ul>
 
-          <button id="weights-reset-btn" class="btn btn-secondary inline-btn" type="button">Réinitialiser l'ordre</button>
+          <button id="weights-reset-btn" class="btn btn-secondary inline-btn" type="button">R&eacute;initialiser l'ordre</button>
         </article>
       </div>
       <footer class="screen-footer">
         <button id="weights-next-btn" class="btn btn-primary">
-          <span>Lancer le test</span>
+          <span>Continuer</span>
           <span class="material-symbols-outlined">arrow_forward</span>
         </button>
       </footer>
@@ -123,7 +123,7 @@
             <div class="slider-labels">
               <span>1 - Pas du tout</span>
               <span id="answer-value">3</span>
-              <span>5 - Tout à fait</span>
+              <span>5 - Tout &agrave; fait</span>
             </div>
           </div>
         </article>
@@ -145,9 +145,9 @@
       </header>
       <div class="screen-main">
         <article class="card card-center">
-          <p class="eyebrow">Etape finale</p>
-          <h2>Votre situation professionnelle</h2>
-          <p class="subtitle">Ces informations permettent de contextualiser votre score et d'affiner les recommandations.</p>
+          <p class="eyebrow">&Eacute;tape 3 sur 3</p>
+          <h2>Votre contexte professionnel</h2>
+          <p class="subtitle">Ces informations restent priv&eacute;es et servent uniquement &agrave; personnaliser vos recommandations.</p>
           <div class="profile-form">
             <label class="profile-label" for="domain-select">Domaine d'activit&eacute;</label>
             <select id="domain-select" class="profile-select">
@@ -212,7 +212,7 @@
               <option value="executive">Direction / ex&eacute;cutif</option>
             </select>
 
-            <label class="profile-label" for="offer-select">Si vous recevez une offre int&eacute;ressante demain</label>
+            <label class="profile-label" for="offer-select">Si vous recevez une offre int&eacute;ressante demain (facultatif)</label>
             <select id="offer-select" class="profile-select">
               <option value="" selected>S&eacute;lectionnez une option (facultatif)</option>
               <option value="leave_immediately">Je partirais imm&eacute;diatement</option>
@@ -225,7 +225,7 @@
       </div>
       <footer class="screen-footer">
         <button id="profile-next-btn" class="btn btn-primary">
-          <span>Voir mon r&eacute;sultat ISC</span>
+          <span>Voir mes r&eacute;sultats</span>
           <span class="material-symbols-outlined">arrow_forward</span>
         </button>
       </footer>
@@ -235,14 +235,16 @@
       <header class="screen-header">
         <div class="brand">
           <span class="material-symbols-outlined brand-icon">pulse_alert</span>
-          <p class="brand-name">Résultat ISC</p>
+          <p class="brand-name">Votre r&eacute;sultat</p>
         </div>
       </header>
 
       <div class="results-main">
         <article class="card score-card hero-score-card">
-          <p class="eyebrow">Votre identit&eacute; carri&egrave;re</p>
           <div class="hero-identity">
+            <p class="identity-kicker">Votre profil carri&egrave;re est :</p>
+            <p id="careerProfileName" class="identity-name">Strat&egrave;ge</p>
+
             <div class="career-profile-visual">
               <div class="career-profile-media">
                 <img id="profileImage" src="" alt="Illustration du profil carri&egrave;re" class="career-profile-image">
@@ -252,42 +254,51 @@
               </div>
             </div>
 
-            <p id="careerProfileName" class="career-profile-name">Explorateur</p>
-            <div id="chiGauge" class="chi-gauge">
-              <p class="hero-isc-label">ISC</p>
-              <p id="chiScore" class="chi-score">0</p>
-              <p class="hero-isc-denominator">/ 100</p>
-              <p id="chiLabel" class="chi-label">🌱 En progression</p>
-            </div>
-            <p id="careerStateLabel" class="career-state-label">🌱 En progression</p>
-            <p id="careerProfileDescription" class="subtitle">Votre signature appara&icirc;tra ici.</p>
+            <p id="careerProfileDescription" class="identity-signature">Vous avancez lorsque votre travail combine impact et progression.</p>
 
-            <div class="hero-progress-wrap" aria-hidden="true">
-              <div class="hero-progress-track"><div id="heroProgressFill" class="hero-progress-fill"></div></div>
-              <div class="hero-progress-scale"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+            <div id="chiGauge" class="hero-score-panel">
+              <p class="hero-isc-line"><span class="hero-isc-prefix">ISC</span><span id="chiScore" class="chi-score">0</span></p>
+              <div class="isc-progress-track" aria-hidden="true">
+                <div id="heroProgressFill" class="isc-progress-fill"></div>
+              </div>
+              <p id="chiLabel" class="chi-label">En progression</p>
+              <p id="socialComparisonLine" class="social-comparison">Vous faites partie des 22% de profils Strat&egrave;ge.</p>
             </div>
-            <p id="chiSummary" class="subtitle">Votre situation professionnelle est globalement positive.</p>
 
-            <div id="shareResultCard" class="share-result-card">
-              <p class="share-card-title">Mon profil carri&egrave;re</p>
-              <p id="shareCardProfileLine" class="share-card-profile">Explorateur</p>
+            <div class="quick-diagnostic">
+              <div class="diag-card">
+                <p class="diag-label">&#128293; Ce qui vous motive</p>
+                <p id="quickStrongestDimension" class="diag-value">-</p>
+              </div>
+              <div class="diag-card">
+                <p class="diag-label">&#9888; Ce qui peut vous freiner</p>
+                <p id="quickWeakestDimension" class="diag-value">-</p>
+              </div>
+            </div>
+
+            <p id="chiSummary" class="hero-summary">Votre situation est globalement positive mais certains leviers peuvent encore &ecirc;tre renforc&eacute;s.</p>
+
+            <div class="share-buttons">
+              <button id="share-btn" class="btn btn-primary" type="button">Partager mon profil carri&egrave;re</button>
+              <button id="download-card-btn" class="btn btn-secondary" type="button">T&eacute;l&eacute;charger ma carte</button>
+            </div>
+
+            <div id="shareResultCard" class="share-result-card" hidden>
+              <p class="share-card-title">R&eacute;sum&eacute; partageable</p>
+              <p id="shareCardProfileLine" class="share-card-profile">Strat&egrave;ge</p>
               <p id="shareCardISCLine" class="share-card-isc">ISC : 0</p>
-              <p id="shareCardStateLine" class="share-card-state">🌱 En progression</p>
+              <p id="shareCardStateLine" class="share-card-state">En progression</p>
               <div class="share-card-diagnostic">
                 <p id="shareCardStrongLine">Moteur : -</p>
                 <p id="shareCardWeakLine">Vigilance : -</p>
               </div>
               <p class="share-card-brand">jobpulse.app</p>
             </div>
-
-            <div class="share-buttons">
-              <button id="share-btn" class="btn btn-primary" type="button">Partager mon profil</button>
-              <button id="download-card-btn" class="btn btn-secondary" type="button">T&eacute;l&eacute;charger la carte</button>
-            </div>
           </div>
 
           <p id="calcFormula" class="calc-note" hidden></p>
           <p id="result-date" class="calc-note" hidden></p>
+          <p id="careerStateLabel" class="career-state-label" hidden>En progression</p>
           <p id="careerISCScore" class="career-isc-score" hidden>ISC: 0 / 100</p>
           <p id="careerShareLine" class="career-share-line" hidden></p>
           <p id="careerStrongestDimension" hidden>-</p>
@@ -297,33 +308,33 @@
           <button id="copy-summary-btn" type="button" hidden>Copier</button>
         </article>
 
-        <article class="card balance-card">
-          <h3>Vos points cl&eacute;s</h3>
-          <div class="career-dimensions">
-            <p><strong>Moteur principal :</strong> <span id="quickStrongestDimension">-</span></p>
-            <p><strong>Point de vigilance :</strong> <span id="quickWeakestDimension">-</span></p>
-          </div>
-          <div class="metric-row"><div class="metric-head"><span>Sens</span><span id="valMeaning">0</span></div><div class="bar-track"><div id="barMeaning" class="bar-fill"></div></div></div>
-          <div class="metric-row"><div class="metric-head"><span>&Eacute;volution</span><span id="valGrowth">0</span></div><div class="bar-track"><div id="barGrowth" class="bar-fill"></div></div></div>
-          <div class="metric-row"><div class="metric-head"><span>Reconnaissance</span><span id="valRecognition">0</span></div><div class="bar-track"><div id="barRecognition" class="bar-fill"></div></div></div>
-          <div class="metric-row"><div class="metric-head"><span>Environnement</span><span id="valEnvironment">0</span></div><div class="bar-track"><div id="barEnvironment" class="bar-fill"></div></div></div>
-          <p id="dimensionSummary" class="calc-note"></p>
-          <p id="secondDimensionSummary" class="calc-note" hidden></p>
-        </article>
-
         <article class="card">
-          <h3>Votre analyse</h3>
-          <p id="analysisText" class="analysis-text">Votre analyse personnalis&eacute;e appara&icirc;tra ici.</p>
-          <p id="recommendationContext" class="calc-note" hidden></p>
-        </article>
-
-        <article class="card">
-          <h3>Votre prochain move</h3>
+          <h3>Vos 3 actions prioritaires</h3>
           <ol id="actionsList" class="action-steps"></ol>
         </article>
+
+        <details class="card details-card balance-card">
+          <summary>Votre &eacute;quilibre professionnel</summary>
+          <div class="details-content">
+            <div class="radar-wrap">
+              <canvas id="radarChart" class="radar-chart" width="320" height="320" aria-label="Graphique radar des 4 dimensions"></canvas>
+              <p class="radar-context-note">Votre score ISC se construit &agrave; partir de 4 dimensions cl&eacute;s de votre exp&eacute;rience professionnelle.</p>
+            </div>
+            <p id="dimensionSummary" class="calc-note"></p>
+            <p id="secondDimensionSummary" class="calc-note" hidden></p>
+          </div>
+        </details>
+
+        <details class="card details-card">
+          <summary>Comprendre le diagnostic</summary>
+          <div class="details-content">
+            <p id="analysisText" class="analysis-text">Votre analyse personnalis&eacute;e appara&icirc;tra ici.</p>
+            <p id="recommendationContext" class="calc-note" hidden></p>
+          </div>
+        </details>
       </div>
       <footer class="screen-footer results-actions">
-        <button id="restart-btn" class="btn btn-primary">Refaire le test</button>
+        <button id="restart-btn" class="btn btn-primary">Refaire le diagnostic</button>
       </footer>
     </section>
   </main>
@@ -331,3 +342,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+

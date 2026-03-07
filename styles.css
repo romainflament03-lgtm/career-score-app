@@ -103,8 +103,12 @@ body::after {
   flex: 1;
   padding: 12px 16px 24px;
   display: grid;
-  gap: 20px;
+  gap: 12px;
   align-content: start;
+}
+
+body.results-screen .progress-top {
+  display: none;
 }
 
 .brand {
@@ -386,7 +390,7 @@ input[type="range"]::-moz-range-thumb {
 .chi-gauge {
   width: min(100%, 320px);
   margin-inline: auto;
-  padding: 18px 14px 12px;
+  padding: 12px 12px 10px;
   border-radius: 22px;
   border: 1px solid #bfdbfe;
   background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
@@ -406,7 +410,7 @@ input[type="range"]::-moz-range-thumb {
 
 .chi-score {
   margin: 2px 0 0;
-  font-size: clamp(3rem, 11vw, 4.6rem);
+  font-size: clamp(2.4rem, 9vw, 3.4rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -492,7 +496,7 @@ input[type="range"]::-moz-range-thumb {
 .hero-score-card {
   border: 1px solid #c7d2fe;
   background: linear-gradient(165deg, #eef2ff 0%, #ffffff 48%, #ecfeff 100%);
-  padding: 28px;
+  padding: 18px;
   box-shadow: 0 20px 40px rgba(30, 64, 175, 0.15);
 }
 
@@ -509,7 +513,7 @@ input[type="range"]::-moz-range-thumb {
 
 .hero-identity {
   display: grid;
-  gap: 14px;
+  gap: 10px;
   justify-items: center;
   text-align: center;
 }
@@ -575,8 +579,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .career-profile-media {
-  width: 140px;
-  height: 140px;
+  width: 92px;
+  height: 92px;
   border-radius: 18px;
   overflow: hidden;
   background: #f1f5f9;
@@ -666,8 +670,8 @@ input[type="range"]::-moz-range-thumb {
 
 .analysis-text {
   margin: 0;
-  font-size: 0.93rem;
-  line-height: 1.52;
+  font-size: 0.9rem;
+  line-height: 1.45;
   color: #1f2937;
 }
 
@@ -683,7 +687,7 @@ input[type="range"]::-moz-range-thumb {
   border: 1px solid #dbe7ff;
   background: #f8fbff;
   border-radius: 14px;
-  padding: 12px;
+  padding: 10px;
 }
 
 .action-step-title {
@@ -701,7 +705,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .share-buttons {
-  margin-top: 10px;
+  margin-top: 2px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -716,6 +720,68 @@ input[type="range"]::-moz-range-thumb {
 .balance-card {
   border: 1px solid #dbeafe;
   background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.details-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.details-card summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.details-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.details-card summary::after {
+  content: "expand_more";
+  font-family: "Material Symbols Outlined";
+  font-size: 20px;
+  color: #475569;
+}
+
+.details-card[open] summary::after {
+  content: "expand_less";
+}
+
+.details-content {
+  padding: 0 16px 14px;
+}
+
+.details-content .career-dimensions {
+  margin-top: 0;
+}
+
+.radar-wrap {
+  margin-top: 10px;
+  display: grid;
+  place-items: center;
+}
+
+.radar-chart {
+  width: min(100%, 460px);
+  height: auto;
+  display: block;
+}
+
+.radar-context-note {
+  margin: 8px 0 0;
+  max-width: 52ch;
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: #51637b;
+  font-weight: 600;
 }
 
 .share-result-card {
@@ -910,6 +976,10 @@ li {
 
 .btn {
   width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border-radius: 14px;
   border: none;
   padding: 14px 16px;
@@ -917,6 +987,11 @@ li {
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.btn .material-symbols-outlined {
+  font-size: 20px;
+  line-height: 1;
 }
 
 .btn-primary {
@@ -946,5 +1021,378 @@ li {
     grid-template-columns: 1fr 1fr;
     padding-left: 28px;
     padding-right: 28px;
+  }
+}
+
+/* UI polish overrides */
+:root {
+  --bg: #f3f7ff;
+  --text: #0b1220;
+  --muted: #5b6475;
+  --line: #dbe4f3;
+  --primary: #0b1220;
+  --primary-soft: #2f6ef6;
+  --surface: #ffffff;
+  --surface-soft: #f8fbff;
+}
+
+body {
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(900px 520px at -10% -10%, rgba(47, 110, 246, 0.14), transparent 62%),
+    radial-gradient(760px 460px at 115% 102%, rgba(15, 185, 129, 0.11), transparent 58%),
+    linear-gradient(180deg, #eef4ff 0%, #f7fbff 50%, #ffffff 100%);
+}
+
+body::before,
+body::after {
+  display: none;
+}
+
+.app {
+  max-width: 920px;
+}
+
+.screen-header {
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(243, 247, 255, 0.92) 0%, rgba(243, 247, 255, 0.72) 72%, rgba(243, 247, 255, 0) 100%);
+}
+
+.brand-icon {
+  color: #2458ce;
+  padding: 6px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #e5eeff 0%, #dce9ff 100%);
+  border: 1px solid #c8dafd;
+}
+
+.brand-name {
+  font-family: "Sora", "Manrope", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+h1, h2, h3 {
+  font-family: "Sora", "Manrope", sans-serif;
+  letter-spacing: -0.02em;
+  color: #0d1525;
+}
+
+h1 {
+  font-size: clamp(2rem, 7vw, 2.9rem);
+}
+
+.subtitle {
+  color: #556074;
+  font-size: 0.98rem;
+}
+
+.card {
+  border: 1px solid #dde8f7;
+  border-radius: 22px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 14px 34px rgba(19, 34, 64, 0.08);
+}
+
+.btn {
+  border-radius: 13px;
+  font-weight: 700;
+  letter-spacing: 0.005em;
+}
+
+.btn-primary {
+  background: linear-gradient(145deg, #101a2f 0%, #15223e 55%, #1b2a4b 100%);
+  box-shadow: 0 14px 26px rgba(10, 18, 36, 0.26);
+}
+
+.btn-secondary {
+  border: 1px solid #d3e0f5;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
+  color: #1d2a42;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.preset-btn {
+  border-radius: 11px;
+  font-weight: 700;
+}
+
+.priority-card {
+  border-radius: 13px;
+  border: 1px solid #d5e4fb;
+  background: linear-gradient(180deg, #f5f9ff 0%, #ffffff 100%);
+}
+
+.priority-card:hover {
+  border-color: #aac7ff;
+  box-shadow: 0 12px 24px rgba(35, 88, 177, 0.12);
+}
+
+.profile-select {
+  border-radius: 11px;
+  border: 1px solid #d7e3f5;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.profile-select:focus {
+  outline: none;
+  border-color: #8bb3ff;
+  box-shadow: 0 0 0 4px rgba(47, 110, 246, 0.14);
+}
+
+#screen-results .hero-score-card {
+  border: 1px solid #ccdbf7;
+  background: linear-gradient(165deg, #edf3ff 0%, #ffffff 52%, #eef9ff 100%);
+  border-radius: 24px;
+  padding: 24px;
+}
+
+#screen-results .hero-identity {
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+  text-align: center;
+}
+
+#screen-results .identity-kicker {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  color: #335582;
+}
+
+#screen-results .identity-name {
+  margin: 0;
+  font-family: "Sora", "Manrope", sans-serif;
+  font-size: clamp(2.9rem, 8.8vw, 4.6rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: #0b2147;
+  text-transform: uppercase;
+}
+
+#screen-results .career-profile-visual {
+  padding: 10px;
+  border-radius: 26px;
+  border: 1px solid #d4e3ff;
+  background: linear-gradient(180deg, #f7faff 0%, #edf4ff 100%);
+  box-shadow: 0 10px 26px rgba(22, 56, 112, 0.16);
+}
+
+#screen-results .career-profile-media {
+  width: 152px;
+  height: 152px;
+  border-radius: 22px;
+  background: #e8eefc;
+  overflow: hidden;
+}
+
+#screen-results .career-profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: none;
+}
+
+#screen-results .identity-signature {
+  margin: 0;
+  max-width: 58ch;
+  color: #37577f;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+#screen-results .hero-score-panel {
+  width: min(100%, 520px);
+  border: 1px solid #b7d0ff;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f6ff 100%);
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+#screen-results .hero-isc-line {
+  margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+#screen-results .hero-isc-prefix {
+  font-size: 1.2rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #587092;
+}
+
+#screen-results .chi-score {
+  margin: 0;
+  font-size: clamp(2.5rem, 7vw, 3.8rem);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #0f1d3c;
+}
+
+#screen-results .isc-progress-track {
+  width: min(100%, 390px);
+  height: 12px;
+  border-radius: 999px;
+  background: #dbe4f3;
+  overflow: hidden;
+}
+
+#screen-results .isc-progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f97316 0%, #f59e0b 38%, #22c55e 100%);
+  transition: width 220ms ease-out;
+}
+
+#screen-results .chi-label {
+  margin: 0;
+  font-size: 1.04rem;
+  font-weight: 800;
+}
+
+#screen-results .chi-label.state-risk { color: #b91c1c; }
+#screen-results .chi-label.state-misaligned { color: #b45309; }
+#screen-results .chi-label.state-progress { color: #1d4ed8; }
+#screen-results .chi-label.state-aligned { color: #166534; }
+
+#screen-results .social-comparison {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #567199;
+  font-weight: 700;
+}
+
+#screen-results .quick-diagnostic {
+  width: min(100%, 680px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+#screen-results .diag-card {
+  border: 1px solid #d8e6ff;
+  border-radius: 14px;
+  background: #f7faff;
+  padding: 12px;
+  text-align: left;
+}
+
+#screen-results .diag-label {
+  margin: 0;
+  font-size: 0.79rem;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  color: #4a668f;
+}
+
+#screen-results .diag-value {
+  margin: 6px 0 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #102447;
+}
+
+#screen-results .hero-summary {
+  margin: 0;
+  max-width: 64ch;
+  color: #2f4d76;
+  line-height: 1.42;
+  font-size: 0.96rem;
+}
+
+#screen-results .share-buttons {
+  margin-top: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+#screen-results .share-buttons .btn {
+  min-height: 52px;
+  padding: 12px 20px;
+  border-radius: 16px;
+}
+
+#screen-results #share-btn {
+  min-width: 260px;
+}
+
+#screen-results #download-card-btn {
+  min-width: 220px;
+}
+
+#screen-results [hidden] {
+  display: none !important;
+}
+
+.details-card summary {
+  padding: 15px 16px;
+  font-family: "Sora", "Manrope", sans-serif;
+  font-size: 0.88rem;
+}
+
+.details-content {
+  padding-bottom: 16px;
+}
+
+.action-step {
+  border: 1px solid #d5e3fb;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f6faff 0%, #ffffff 100%);
+}
+
+.action-step-title {
+  color: #14213a;
+}
+
+.results-actions {
+  background: linear-gradient(180deg, rgba(243, 247, 255, 0) 0%, rgba(243, 247, 255, 0.96) 38%, rgba(243, 247, 255, 1) 100%);
+}
+
+@media (min-width: 768px) {
+  #screen-results .career-profile-media {
+    width: 168px;
+    height: 168px;
+  }
+
+  #screen-results .hero-score-panel {
+    padding: 18px 22px;
+  }
+}
+
+@media (max-width: 680px) {
+  #screen-results .quick-diagnostic {
+    grid-template-columns: 1fr;
+  }
+
+  #screen-results .share-buttons {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  #screen-results #share-btn,
+  #screen-results #download-card-btn {
+    min-width: 0;
+    width: 100%;
   }
 }

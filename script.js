@@ -29,42 +29,42 @@ const careerProfiles = {
   explorateur: {
     profileName: "Explorateur",
     icon: "\uD83E\uDDED",
-    description: "Vous \u00eates motiv\u00e9 par l'apprentissage, la progression et les nouvelles opportunit\u00e9s."
+    description: "Vous \u00eates motiv\u00e9 par l\u2019apprentissage, les nouvelles opportunit\u00e9s et la progression."
   },
   architecte: {
     profileName: "Architecte",
     icon: "\uD83C\uDFD7\uFE0F",
-    description: "Vous \u00eates engag\u00e9 quand votre travail a du sens et une utilit\u00e9 concr\u00e8te."
+    description: "Vous avez besoin que votre travail ait du sens et une utilit\u00e9 concr\u00e8te."
   },
   stabilisateur: {
     profileName: "Stabilisateur",
     icon: "\uD83D\uDEE1\uFE0F",
-    description: "Votre engagement d\u00e9pend fortement d'un environnement sain, d'une bonne \u00e9quipe et de stabilit\u00e9."
+    description: "Vous vous \u00e9panouissez dans un environnement stable avec une \u00e9quipe solide."
   },
   ambitieux_reconnu: {
     profileName: "Ambitieux reconnu",
     icon: "\uD83C\uDFC6",
-    description: "Vous \u00eates motiv\u00e9 quand votre travail est visible, valoris\u00e9 et reconnu."
+    description: "Vous \u00eates motiv\u00e9 lorsque votre travail est reconnu et valoris\u00e9."
   },
   stratege: {
     profileName: "Strat\u00E8ge",
     icon: "\u265F\uFE0F",
-    description: "Vous recherchez \u00e0 la fois impact et progression, avec une trajectoire coh\u00e9rente."
+    description: "Vous avancez lorsque votre travail combine impact et progression."
   },
   pilier: {
     profileName: "Pilier",
     icon: "\uD83E\uDDF1",
-    description: "Vous vous \u00e9panouissez en contribuant \u00e0 quelque chose d'utile dans un cadre de confiance."
+    description: "Vous contribuez avec engagement lorsque votre travail est utile et reconnu."
   },
   challenger: {
     profileName: "Challenger",
     icon: "\u26A1",
-    description: "Vous \u00eates stimul\u00e9 par le challenge, le progr\u00e8s et la reconnaissance de vos r\u00e9sultats."
+    description: "Vous \u00eates stimul\u00e9 par les d\u00e9fis et la progression rapide."
   },
   desengage_latent: {
     profileName: "D\u00E9sengag\u00E9 latent",
     icon: "\uD83D\uDD25",
-    description: "Plusieurs aspects de votre situation professionnelle actuelle ne correspondent plus \u00e0 vos attentes."
+    description: "Plusieurs aspects de votre situation actuelle ne correspondent plus \u00e0 vos attentes."
   }
 };
 
@@ -310,9 +310,11 @@ const ui = {
   valGrowth: document.getElementById("valGrowth"),
   valRecognition: document.getElementById("valRecognition"),
   valEnvironment: document.getElementById("valEnvironment"),
+  radarChart: document.getElementById("radarChart"),
   quickStrongestDimension: document.getElementById("quickStrongestDimension"),
   quickWeakestDimension: document.getElementById("quickWeakestDimension"),
   heroProgressFill: document.getElementById("heroProgressFill"),
+  socialComparisonLine: document.getElementById("socialComparisonLine"),
   dimensionSummary: document.getElementById("dimensionSummary"),
   analysisText: document.getElementById("analysisText"),
   recommendationContext: document.getElementById("recommendationContext"),
@@ -366,6 +368,7 @@ const rankingPresets = {
 function showScreen(key) {
   Object.values(screens).forEach((screen) => screen.classList.remove("active"));
   screens[key].classList.add("active");
+  document.body.classList.toggle("results-screen", key === "results");
   if (key === "landing") ui.progressFill.style.width = "0%";
   if (key === "results") ui.progressFill.style.width = "100%";
 }
@@ -714,10 +717,26 @@ function tenureIndicator(tenure) {
 }
 
 function getCareerState(iscScore) {
-  if (iscScore >= 80) return { label: "\uD83D\uDE80 Align\u00e9", key: "aligned", helper: "Votre situation professionnelle semble globalement tr\u00e8s align\u00e9e avec vos attentes." };
-  if (iscScore >= 65) return { label: "\uD83C\uDF31 En progression", key: "progress", helper: "Votre situation professionnelle est globalement positive, avec encore quelques points \u00e0 renforcer." };
-  if (iscScore >= 50) return { label: "\u26A0\uFE0F D\u00e9salignement", key: "misaligned", helper: "Certains aspects de votre travail semblent en d\u00e9calage avec vos attentes." };
-  return { label: "\uD83D\uDD25 Risque de rupture", key: "risk", helper: "Votre r\u00e9sultat sugg\u00e8re un risque de d\u00e9sengagement ou un besoin de r\u00e9ajustement professionnel." };
+  if (iscScore >= 80) return { label: "\uD83D\uDE80 Align\u00e9", key: "aligned", helper: "Votre situation professionnelle est bien align\u00e9e avec ce qui vous motive aujourd\u2019hui." };
+  if (iscScore >= 65) return { label: "\uD83C\uDF31 En progression", key: "progress", helper: "Votre situation est globalement positive mais certains leviers peuvent encore \u00eatre renforc\u00e9s." };
+  if (iscScore >= 50) return { label: "\u26A0\uFE0F D\u00e9salignement", key: "misaligned", helper: "Certains aspects de votre travail ne correspondent pas totalement \u00e0 vos attentes." };
+  return { label: "\uD83D\uDD25 Risque de rupture", key: "risk", helper: "Votre situation actuelle pourrait conduire \u00e0 un d\u00e9sengagement si rien ne change." };
+}
+
+function getSocialComparisonPercent(profileKey, isc) {
+  const profileBias = {
+    stratege: 0,
+    architecte: 2,
+    explorateur: -1,
+    stabilisateur: 3,
+    challenger: -2,
+    ambitieux_reconnu: 1,
+    pilier: 2,
+    desengage_latent: 5
+  };
+  const bias = profileBias[profileKey] ?? 0;
+  const raw = 58 - (isc * 0.6) + bias;
+  return Math.max(8, Math.min(58, Math.round(raw)));
 }
 
 function getDimensionRanking(scores) {
@@ -742,96 +761,73 @@ function getTopPriority(weights) {
 }
 
 function friendlyDimension(key) {
-  return key === "Meaning" ? "Sens" : key === "Growth" ? "Evolution" : key === "Recognition" ? "Reconnaissance" : "Environnement";
+  return key === "Meaning" ? "Sens" : key === "Growth" ? "\u00c9volution" : key === "Recognition" ? "Reconnaissance" : "Environnement";
 }
 
 function buildPersonalizedAnalysis(data) {
-  const lines = [];
-  if (data.state.key === "aligned") lines.push("Votre score indique une situation professionnelle actuellement bien alignée avec vos attentes.");
-  else if (data.state.key === "progress") lines.push("Votre score montre une base globalement positive, avec des ajustements utiles pour consolider votre équilibre.");
-  else if (data.state.key === "misaligned") lines.push("Votre score révèle un décalage partiel entre ce que vous attendez de votre travail et ce que vous vivez aujourd'hui.");
-  else lines.push("Votre score signale un risque de désengagement qui mérite une action rapide et structurée.");
+  const strongest = friendlyDimension(data.strongestKey);
+  const weakest = friendlyDimension(data.weakestKey);
 
-  if (data.strongestValue > 75) lines.push(`${friendlyDimension(data.strongestKey)} est un vrai moteur de motivation dans votre situation actuelle.`);
-  if (data.weakestValue < 60) {
-    if (data.weakestKey === "Recognition") lines.push("La reconnaissance semble aujourd'hui insuffisante et peut générer de la frustration.");
-    else if (data.weakestKey === "Environment") lines.push("L'environnement de travail paraît être une source de tension ou d'usure.");
-    else if (data.weakestKey === "Meaning") lines.push("Le sens perçu de votre travail paraît fragile, ce qui peut réduire l'engagement.");
-    else lines.push("L'évolution semble freinée, ce qui peut alimenter un sentiment de stagnation.");
+  let stateLine = "Votre résultat montre un besoin de réalignement progressif.";
+  if (data.state.key === "aligned") stateLine = "Votre resultat montre une situation actuellement bien alignee avec vos attentes.";
+  else if (data.state.key === "progress") stateLine = "Votre resultat montre une base solide avec une marge de progression ciblee.";
+  else if (data.state.key === "misaligned") stateLine = "Votre resultat montre un decalage entre vos attentes et votre experience actuelle.";
+
+  const priorityLine = data.topPriorityValue < 60
+    ? `Votre priorite principale est ${friendlyDimension(data.topPriorityKey)}, mais cet axe est aujourd'hui en retrait.`
+    : `Votre moteur principal est ${strongest}, avec un point de vigilance sur ${weakest.toLowerCase()}.`;
+
+  let actionLine = "Action immediate : formalisez une action visible et mesurable dans les 30 prochains jours.";
+  if (data.profile.offerIntent === "leave_immediately" || data.profile.offerIntent === "consider_seriously") {
+    actionLine = "Action immediate : comparez objectivement votre option interne et une option externe avant decision.";
+  } else if (data.weakestKey === "Recognition") {
+    actionLine = "Action immediate : alignez des criteres de reconnaissance ecrits avec votre manager.";
+  } else if (data.weakestKey === "Growth") {
+    actionLine = "Action immediate : obtenez une nouvelle responsabilite avec objectif clair et date de revue.";
+  } else if (data.weakestKey === "Meaning") {
+    actionLine = "Action immediate : reallouez du temps vers des missions plus utiles et plus visibles.";
+  } else if (data.weakestKey === "Environment") {
+    actionLine = "Action immediate : mettez en place un rituel hebdomadaire de priorisation avec votre manager.";
   }
 
-  if (data.topPriorityValue < 60) lines.push(`Votre priorité principale est ${friendlyDimension(data.topPriorityKey)}, mais cette dimension apparaît moins satisfaite aujourd'hui.`);
-  else if (data.topPriorityValue > 75) lines.push(`Votre priorité principale (${friendlyDimension(data.topPriorityKey)}) est bien alimentée actuellement.`);
-
-  if (data.careerProfile.profileKey === "stratege") lines.push("Votre profil Stratège confirme un besoin d'impact et de progression cohérents dans la durée.");
-  else if (data.careerProfile.profileKey === "explorateur") lines.push("Votre profil Explorateur se nourrit d'apprentissage et de mouvement.");
-  else if (data.careerProfile.profileKey === "architecte") lines.push("Votre profil Architecte reste sensible au sens et à l'utilité concrète de vos missions.");
-  else if (data.careerProfile.profileKey === "stabilisateur") lines.push("Votre profil Stabilisateur dépend fortement d'un cadre de travail fiable et sain.");
-  else if (data.careerProfile.profileKey === "ambitieux_reconnu") lines.push("Votre profil Ambitieux reconnu nécessite de la visibilité et des signes clairs de valorisation.");
-  else if (data.careerProfile.profileKey === "pilier") lines.push("Votre profil Pilier cherche un équilibre entre contribution utile et environnement de confiance.");
-  else if (data.careerProfile.profileKey === "challenger") lines.push("Votre profil Challenger a besoin de challenge, de progression et de reconnaissance visible.");
-
-  if (["5_10y", "10_20y", "20plus"].includes(data.profile.tenureInput)) {
-    lines.push("Après plusieurs années dans la même entreprise, les besoins de progression et de reconnaissance deviennent souvent plus structurants.");
-  } else if (["lt6", "6m_2y"].includes(data.profile.tenureInput)) {
-    lines.push("Votre phase d'intégration peut encore influencer la perception globale de votre poste.");
-  }
-
-  if (["team_manager", "manager_of_managers", "executive"].includes(data.profile.hierarchy)) {
-    lines.push("Les responsabilités de leadership peuvent amplifier la sensibilité à la charge, à la reconnaissance et au climat d'équipe.");
-  }
-
-  if (data.profile.offerIntent === "leave_immediately") lines.push("Votre ouverture immédiate à une opportunité externe suggère une urgence de réalignement.");
-  else if (data.profile.offerIntent === "consider_seriously") lines.push("Vous semblez réellement ouvert à un changement, ce qui confirme un besoin d'arbitrage de trajectoire.");
-  else if (data.profile.offerIntent === "likely_stay") lines.push("Vous semblez plutôt orienté vers une amélioration dans votre cadre actuel.");
-  else if (data.profile.offerIntent === "would_not_leave") lines.push("Votre faible intention de départ suggère un socle d'attachement à préserver.");
-
-  if (data.profile.companySize === "large_company" || data.profile.companySize === "global_group") lines.push("Dans les grandes structures, la progression peut nécessiter plus de visibilité et de sponsoring interne.");
-  if (data.profile.companySize === "startup") lines.push("Le contexte startup peut accélérer l'apprentissage mais aussi renforcer l'intensité quotidienne.");
-  if (data.profile.functionInput === "team_management" || data.profile.functionInput === "direction_leadership") lines.push("Dans un rôle d'encadrement, la qualité de l'environnement et la reconnaissance ont souvent un impact direct sur l'engagement.");
-  if (data.profile.domainInput === "consulting_audit" || data.profile.domainInput === "tech_it") lines.push("Dans votre secteur, le rythme et les attentes de performance peuvent accentuer rapidement les écarts de perception.");
-  if (data.careerProfile.profileKey === "desengage_latent") lines.push("Votre profil indique un affaiblissement global de l'alignement, ce qui justifie des décisions de réajustement à court terme.");
-
-  return lines.slice(0, 4).join(" ");
+  return `${stateLine} ${priorityLine} ${actionLine}`;
 }
-
 function buildRecommendations(data) {
   const items = [];
-  const profileHint = data.careerProfile?.profileName ? `Coh\u00e9rent avec votre profil ${data.careerProfile.profileName},` : "";
+  const profileHint = data.careerProfile?.profileName ? `Coherent avec votre profil ${data.careerProfile.profileName}, ` : "";
 
   if (data.weakestKey === "Recognition") {
-    items.push({ title: "Rendre vos contributions visibles", desc: "Planifiez un point mensuel avec preuves concr\u00e8tes de vos r\u00e9sultats et impacts." });
+    items.push({ title: "Rendre vos contributions visibles", desc: "Planifiez un point mensuel avec preuves concretes de vos resultats et impacts." });
   } else if (data.weakestKey === "Growth") {
-    items.push({ title: "N\u00e9gocier une prochaine \u00e9tape", desc: "Demandez une responsabilit\u00e9 additionnelle avec objectifs, p\u00e9rim\u00e8tre et date de revue." });
+    items.push({ title: "Negocier une prochaine etape", desc: "Demandez une responsabilite additionnelle avec objectifs, perimetre et date de revue." });
   } else if (data.weakestKey === "Meaning") {
-    items.push({ title: "Reconnecter votre r\u00f4le \u00e0 l'impact", desc: "R\u00e9allouez du temps vers des missions utiles et visibles pour renforcer le sens au quotidien." });
+    items.push({ title: "Reconnecter votre role a l'impact", desc: "Reallouez du temps vers des missions utiles et visibles pour renforcer le sens au quotidien." });
   } else {
-    items.push({ title: "Stabiliser votre environnement", desc: "Isolez un irritant majeur d'\u00e9quipe et traitez-le via un rituel d'alignement hebdomadaire." });
+    items.push({ title: "Stabiliser votre environnement", desc: "Isolez un irritant majeur d'equipe et traitez-le via un rituel d'alignement hebdomadaire." });
   }
 
   if (data.topPriorityKey === "Growth") {
-    items.push({ title: "Prioriser votre progression", desc: `${profileHint} formalisez un plan 90 jours orient\u00e9 comp\u00e9tences et mobilit\u00e9 interne.`.trim() });
+    items.push({ title: "Prioriser votre progression", desc: `${profileHint}formalisez un plan 90 jours oriente competences et mobilite interne.`.trim() });
   } else if (data.topPriorityKey === "Meaning") {
-    items.push({ title: "Renforcer l'utilit\u00e9 de vos missions", desc: `${profileHint} n\u00e9gociez un ajustement de p\u00e9rim\u00e8tre autour des sujets \u00e0 plus fort impact.`.trim() });
+    items.push({ title: "Renforcer l'utilite de vos missions", desc: `${profileHint}negociez un ajustement de perimetre autour des sujets a plus fort impact.`.trim() });
   } else if (data.topPriorityKey === "Recognition") {
-    items.push({ title: "Clarifier vos crit\u00e8res de reconnaissance", desc: `${profileHint} alignez avec votre manager les attentes explicites de visibilit\u00e9, contribution et progression.`.trim() });
+    items.push({ title: "Clarifier vos criteres de reconnaissance", desc: `${profileHint}alignez avec votre manager les attentes explicites de visibilite, contribution et progression.`.trim() });
   } else {
-    items.push({ title: "Am\u00e9liorer vos conditions d'ex\u00e9cution", desc: `${profileHint} clarifiez charge, priorit\u00e9s et mode de collaboration pour fiabiliser le cadre de travail.`.trim() });
+    items.push({ title: "Ameliorer vos conditions d'execution", desc: `${profileHint}clarifiez charge, priorites et mode de collaboration pour fiabiliser le cadre de travail.`.trim() });
   }
 
-  if (["5_10y", "10_20y", "20plus"].includes(data.profile.tenureInput)) {
-    items.push({ title: "Relancer votre trajectoire", desc: "Apr\u00e8s une anciennet\u00e9 longue, cadrer une \u00e9tape de repositionnement est souvent d\u00e9cisif." });
-  } else if (data.profile.offerIntent === "leave_immediately" || data.profile.offerIntent === "consider_seriously") {
-    items.push({ title: "Arbitrer votre option de mobilit\u00e9", desc: "Comparez votre poste actuel \u00e0 2 opportunit\u00e9s externes avec une grille factuelle." });
-  } else if (data.careerProfile.profileName === "Stabilisateur" || data.careerProfile.profileName === "Pilier") {
-    items.push({ title: "Consolider la stabilit\u00e9 interne", desc: "Priorisez une am\u00e9lioration relationnelle ou organisationnelle durable dans l'\u00e9quipe actuelle." });
+  if (data.profile.offerIntent === "leave_immediately" || data.profile.offerIntent === "consider_seriously") {
+    items.push({ title: "Arbitrer votre option de mobilite", desc: "Comparez votre poste actuel a 2 options externes avec une grille factuelle." });
+  } else if (["5_10y", "10_20y", "20plus"].includes(data.profile.tenureInput)) {
+    items.push({ title: "Relancer votre trajectoire", desc: "Apres une anciennete longue, cadrez une etape de repositionnement sur 90 jours." });
   } else {
-    items.push({ title: "Ancrer une action visible rapide", desc: "D\u00e9ployez une action mesurable dans les 30 jours, coh\u00e9rente avec votre profil carri\u00e8re." });
+    const jobTip = jobActions[data.profile.job] || jobActions.autre_metier;
+    const domainTip = domainActions[data.profile.domain] || domainActions.autre;
+    items.push({ title: "Adapter l'action a votre contexte", desc: `${jobTip} ${domainTip}` });
   }
 
   return items.slice(0, 3);
 }
-
 function updateGauge(isc) {
   const angle = Math.round((isc / 100) * 360);
   if (ui.chiGauge) ui.chiGauge.style.setProperty("--gauge-angle", `${angle}deg`);
@@ -842,15 +838,190 @@ function activateZone(isc) {
   return isc;
 }
 
+function drawRadarChart(dimensions) {
+  if (!ui.radarChart) return;
+  const canvas = ui.radarChart;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const size = Math.max(320, Math.floor(rect.width || 360));
+  const dpr = window.devicePixelRatio || 1;
+  const pixelSize = Math.floor(size * dpr);
+  if (canvas.width !== pixelSize || canvas.height !== pixelSize) {
+    canvas.width = pixelSize;
+    canvas.height = pixelSize;
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, size, size);
+
+  const center = size / 2;
+  const keys = ["Meaning", "Growth", "Recognition", "Environment"];
+  const labels = ["Sens", "Evolution", "Reconnaissance", "Environnement"];
+  const values = keys.map((key) => Math.max(0, Math.min(100, Number(dimensions[key] || 0))));
+  const angles = keys.map((_, i) => (-Math.PI / 2) + (i * 2 * Math.PI / keys.length));
+  const overallScore = Number.isFinite(latestResult?.isc)
+    ? latestResult.isc
+    : Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+
+  // Three strictly separated radial layers:
+  // polygon points (inner) < value bubbles (middle ring) < axis labels (outer ring).
+  const labelFontSize = size >= 420 ? 12 : 11;
+  ctx.font = `700 ${labelFontSize}px Manrope, sans-serif`;
+  const maxLabelWidth = Math.max(...labels.map((label) => ctx.measureText(label).width));
+
+  const outerPadding = 10;
+  const polygonToBubbleGap = 16;
+  const bubbleToLabelGap = 20;
+  const labelSideOffset = 6;
+  const maxLabelRingBySide = center - outerPadding - maxLabelWidth - labelSideOffset;
+  const maxLabelRingByVertical = center - outerPadding - labelFontSize - 4;
+  const labelRingRadius = Math.max(0, Math.min(maxLabelRingBySide, maxLabelRingByVertical));
+  const bubbleRingRadius = Math.max(0, labelRingRadius - bubbleToLabelGap);
+  const polygonRadius = Math.max(0, bubbleRingRadius - polygonToBubbleGap);
+
+  const pointOnRadius = (angle, radialDistance) => ({
+    x: center + Math.cos(angle) * radialDistance,
+    y: center + Math.sin(angle) * radialDistance
+  });
+
+  const drawRoundedRect = (x, y, w, h, r) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  };
+
+  for (let level = 1; level <= 4; level += 1) {
+    const ratio = level / 4;
+    ctx.beginPath();
+    angles.forEach((angle, idx) => {
+      const p = pointOnRadius(angle, polygonRadius * ratio);
+      if (idx === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    });
+    ctx.closePath();
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.32)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  angles.forEach((angle) => {
+    const p = pointOnRadius(angle, polygonRadius);
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.lineTo(p.x, p.y);
+    ctx.strokeStyle = "rgba(100, 116, 139, 0.34)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  ctx.beginPath();
+  angles.forEach((angle, idx) => {
+    const p = pointOnRadius(angle, polygonRadius * (values[idx] / 100));
+    if (idx === 0) ctx.moveTo(p.x, p.y);
+    else ctx.lineTo(p.x, p.y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = "rgba(37, 99, 235, 0.25)";
+  ctx.strokeStyle = "#2563eb";
+  ctx.lineWidth = 2.1;
+  ctx.fill();
+  ctx.stroke();
+
+  angles.forEach((angle, idx) => {
+    const p = pointOnRadius(angle, polygonRadius * (values[idx] / 100));
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = "#1e40af";
+    ctx.fill();
+
+    const chipAnchor = pointOnRadius(angle, bubbleRingRadius);
+    const chipText = String(values[idx]);
+    ctx.font = "700 10px Manrope, sans-serif";
+    const chipHorizontalPadding = 8;
+    const chipWidth = Math.max(34, Math.ceil(ctx.measureText(chipText).width) + (chipHorizontalPadding * 2));
+    const chipHeight = 22;
+    const chipX = Math.max(6, Math.min(size - chipWidth - 6, chipAnchor.x - (chipWidth / 2)));
+    const chipY = Math.max(6, Math.min(size - chipHeight - 6, chipAnchor.y - (chipHeight / 2)));
+
+    drawRoundedRect(chipX, chipY, chipWidth, chipHeight, 9);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.strokeStyle = "#93c5fd";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.fillStyle = "#1e3a8a";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(chipText, chipX + (chipWidth / 2), chipY + (chipHeight / 2) + 0.5);
+  });
+
+  labels.forEach((label, idx) => {
+    const anchor = pointOnRadius(angles[idx], labelRingRadius);
+    ctx.font = `700 ${labelFontSize}px Manrope, sans-serif`;
+    let x = anchor.x;
+    let y = anchor.y;
+
+    // Directional offsets keep labels clearly outside bubbles on each axis.
+    if (idx === 0) { // Top
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      y -= 2;
+    } else if (idx === 1) { // Right
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      x += labelSideOffset;
+    } else if (idx === 2) { // Bottom
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      y += 2;
+    } else { // Left
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      x -= labelSideOffset;
+    }
+
+    ctx.fillStyle = "#25354b";
+    ctx.fillText(label, x, y);
+  });
+
+  ctx.beginPath();
+  ctx.arc(center, center, 31, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  ctx.fill();
+  ctx.strokeStyle = "#c7d2fe";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+
+  ctx.fillStyle = "#475569";
+  ctx.font = "700 9px Manrope, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("ISC", center, center - 5);
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "800 18px Manrope, sans-serif";
+  ctx.textBaseline = "top";
+  ctx.fillText(String(overallScore), center, center - 2);
+}
+
 function renderDimensionBars(dimensions) {
-  ui.valMeaning.textContent = `${dimensions.Meaning}`;
-  ui.valGrowth.textContent = `${dimensions.Growth}`;
-  ui.valRecognition.textContent = `${dimensions.Recognition}`;
-  ui.valEnvironment.textContent = `${dimensions.Environment}`;
-  ui.barMeaning.style.width = `${dimensions.Meaning}%`;
-  ui.barGrowth.style.width = `${dimensions.Growth}%`;
-  ui.barRecognition.style.width = `${dimensions.Recognition}%`;
-  ui.barEnvironment.style.width = `${dimensions.Environment}%`;
+  if (ui.valMeaning) ui.valMeaning.textContent = `${dimensions.Meaning}`;
+  if (ui.valGrowth) ui.valGrowth.textContent = `${dimensions.Growth}`;
+  if (ui.valRecognition) ui.valRecognition.textContent = `${dimensions.Recognition}`;
+  if (ui.valEnvironment) ui.valEnvironment.textContent = `${dimensions.Environment}`;
+  if (ui.barMeaning) ui.barMeaning.style.width = `${dimensions.Meaning}%`;
+  if (ui.barGrowth) ui.barGrowth.style.width = `${dimensions.Growth}%`;
+  if (ui.barRecognition) ui.barRecognition.style.width = `${dimensions.Recognition}%`;
+  if (ui.barEnvironment) ui.barEnvironment.style.width = `${dimensions.Environment}%`;
+  drawRadarChart(dimensions);
 }
 
 function renderRecommendations(target, items) {
@@ -868,8 +1039,9 @@ function renderRecommendations(target, items) {
 
 function renderCareerProfile(careerProfile, isc) {
   if (ui.profileImage && ui.profileImageFallback) {
-    const imageFile = profileImageFileByKey[careerProfile.profileKey];
-    const imagePath = imageFile ? `assets/profiles/${imageFile}` : null;
+    const mappedImageFile = profileImageFileByKey[careerProfile.profileKey];
+    const directImagePath = `assets/profiles/${careerProfile.profileKey}.png`;
+    const fallbackImagePath = mappedImageFile ? `assets/profiles/${mappedImageFile}` : null;
 
     // Reset before loading so fallback remains visible until image is ready.
     ui.profileImage.hidden = true;
@@ -878,6 +1050,11 @@ function renderCareerProfile(careerProfile, isc) {
     ui.profileImage.alt = "Illustration indisponible";
 
     ui.profileImage.onerror = () => {
+      if (ui.profileImage.dataset.fallbackTried !== "1" && fallbackImagePath) {
+        ui.profileImage.dataset.fallbackTried = "1";
+        ui.profileImage.src = fallbackImagePath;
+        return;
+      }
       ui.profileImage.hidden = true;
       ui.profileImageFallback.hidden = false;
       ui.profileImage.alt = "Illustration indisponible";
@@ -887,15 +1064,14 @@ function renderCareerProfile(careerProfile, isc) {
       ui.profileImageFallback.hidden = true;
     };
 
-    if (imagePath) {
-      ui.profileImage.alt = `Illustration du profil ${careerProfile.profileName}`;
-      ui.profileImage.src = imagePath;
-    }
+    ui.profileImage.dataset.fallbackTried = "0";
+    ui.profileImage.alt = `Illustration du profil ${careerProfile.profileName}`;
+    ui.profileImage.src = directImagePath;
   }
 
   ui.careerProfileName.textContent = careerProfile.profileName;
-  ui.careerStateLabel.textContent = careerProfile.stateLabel;
-  ui.careerISCScore.textContent = `ISC: ${isc} / 100`;
+  if (ui.careerStateLabel) ui.careerStateLabel.textContent = careerProfile.stateLabel;
+  if (ui.careerISCScore) ui.careerISCScore.textContent = `ISC: ${isc} / 100`;
   ui.careerProfileDescription.textContent = careerProfile.description;
   ui.careerStrongestDimension.textContent = careerProfile.strongestDimension;
   ui.careerWeakestDimension.textContent = careerProfile.weakestDimension;
@@ -912,9 +1088,20 @@ function renderCareerProfile(careerProfile, isc) {
 
 function buildShareSummary(result) {
   if (!result) return "";
-  const profileName = result.careerProfile?.profileName;
-  if (profileName) return `Mon profil carrière : ${profileName}\nISC : ${result.isc}`;
-  return `Mon ISC : ${result.isc}\n${result.state?.label || "Résultat ISC"}`;
+  const profileName = result.careerProfile?.profileName || "Profil carrière";
+  const stateLabel = result.state?.label || "Résultat ISC";
+  const lines = [
+    `Mon profil carrière : ${profileName}`,
+    `ISC : ${result.isc}/100`,
+    `État : ${stateLabel}`
+  ];
+
+  if (result.dimensions) {
+    lines.push(`Moteur principal : ${friendlyDimension(getStrongestDimension(result.dimensions))}`);
+    lines.push(`Point de vigilance : ${friendlyDimension(getWeakestDimension(result.dimensions))}`);
+  }
+
+  return lines.join("\n");
 }
 
 function renderShareCard(result, strongestKey, weakestKey) {
@@ -1070,12 +1257,21 @@ function computeAndShowResults() {
 
   ui.chiScore.textContent = `${isc}`;
   ui.chiLabel.textContent = state.label;
+  ui.chiLabel.classList.remove("state-risk", "state-misaligned", "state-progress", "state-aligned");
+  if (state.key === "risk") ui.chiLabel.classList.add("state-risk");
+  else if (state.key === "misaligned") ui.chiLabel.classList.add("state-misaligned");
+  else if (state.key === "progress") ui.chiLabel.classList.add("state-progress");
+  else ui.chiLabel.classList.add("state-aligned");
   ui.chiSummary.textContent = state.helper;
   ui.calcFormula.textContent = `ISC = Sens*${customWeights.Meaning.toFixed(2)} + Evolution*${customWeights.Growth.toFixed(2)} + Reconnaissance*${customWeights.Recognition.toFixed(2)} + Environnement*${customWeights.Environment.toFixed(2)}`;
   ui.resultDate.textContent = `Généré le ${new Date(latestResult.generatedAt).toLocaleString("fr-FR")}`;
   updateGauge(isc);
   renderDimensionBars(dimensions);
   renderCareerProfile(careerProfile, isc);
+  if (ui.socialComparisonLine) {
+    const percentile = getSocialComparisonPercent(careerProfile.profileKey, isc);
+    ui.socialComparisonLine.textContent = `Vous faites partie des ${percentile}% de profils ${careerProfile.profileName}.`;
+  }
   if (ui.quickStrongestDimension) ui.quickStrongestDimension.textContent = friendlyDimension(strongestKey);
   if (ui.quickWeakestDimension) ui.quickWeakestDimension.textContent = friendlyDimension(weakestKey);
   ui.dimensionSummary.textContent = "";
@@ -1110,10 +1306,10 @@ async function shareISC() {
     try {
       await navigator.clipboard.writeText(text);
       ui.shareBtn.textContent = "Copie";
-      setTimeout(() => { ui.shareBtn.textContent = "Partager mon ISC"; }, 1200);
+      setTimeout(() => { ui.shareBtn.textContent = "Partager mon profil carrière"; }, 1200);
     } catch {
       ui.shareBtn.textContent = "Copie impossible";
-      setTimeout(() => { ui.shareBtn.textContent = "Partager mon ISC"; }, 1200);
+      setTimeout(() => { ui.shareBtn.textContent = "Partager mon profil carrière"; }, 1200);
     }
   }
 }
@@ -1184,4 +1380,14 @@ if (ui.downloadCardBtn) ui.downloadCardBtn.addEventListener("click", exportShare
 setupPriorityDragAndDrop();
 setupPriorityTouchReorder();
 resetWeights();
+
+const scoreDetails = document.querySelector(".balance-card.details-card");
+if (scoreDetails) {
+  scoreDetails.addEventListener("toggle", () => {
+    if (scoreDetails.open && latestResult?.dimensions) drawRadarChart(latestResult.dimensions);
+  });
+}
+window.addEventListener("resize", () => {
+  if (latestResult?.dimensions) drawRadarChart(latestResult.dimensions);
+});
 
