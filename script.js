@@ -386,9 +386,16 @@ function rankingToWeights(ranking) {
 }
 
 function updateRankingBadges() {
-  [...ui.priorityList.querySelectorAll(".priority-card")].forEach((node, index) => {
+  const cards = [...ui.priorityList.querySelectorAll(".priority-card")];
+  cards.forEach((node, index) => {
     const badge = node.querySelector(".priority-rank");
     if (badge) badge.textContent = String(index + 1);
+  });
+  cards.forEach((node, index) => {
+    const upButton = node.querySelector(".priority-move-btn[data-move=\"up\"]");
+    const downButton = node.querySelector(".priority-move-btn[data-move=\"down\"]");
+    if (upButton) upButton.disabled = index === 0;
+    if (downButton) downButton.disabled = index === cards.length - 1;
   });
 }
 
@@ -721,6 +728,30 @@ function getCareerState(iscScore) {
   if (iscScore >= 65) return { label: "\uD83C\uDF31 En progression", key: "progress", helper: "Votre situation est globalement positive mais certains leviers peuvent encore \u00eatre renforc\u00e9s." };
   if (iscScore >= 50) return { label: "\u26A0\uFE0F D\u00e9salignement", key: "misaligned", helper: "Certains aspects de votre travail ne correspondent pas totalement \u00e0 vos attentes." };
   return { label: "\uD83D\uDD25 Risque de rupture", key: "risk", helper: "Votre situation actuelle pourrait conduire \u00e0 un d\u00e9sengagement si rien ne change." };
+}
+
+function movePriorityCard(card, direction) {
+  if (!card || !direction) return;
+  if (direction === "up") {
+    const previous = card.previousElementSibling;
+    if (previous?.classList.contains("priority-card")) previous.before(card);
+  } else if (direction === "down") {
+    const next = card.nextElementSibling;
+    if (next?.classList.contains("priority-card")) next.after(card);
+  }
+  updateRankingBadges();
+  customWeights = rankingToWeights(getRankingFromDOM());
+}
+
+function setupPriorityButtonReorder() {
+  ui.priorityList.addEventListener("click", (event) => {
+    const moveButton = event.target.closest(".priority-move-btn");
+    if (!moveButton) return;
+    const card = moveButton.closest(".priority-card");
+    if (!card) return;
+    const direction = moveButton.dataset.move === "up" ? "up" : "down";
+    movePriorityCard(card, direction);
+  });
 }
 
 function getSocialComparisonPercent(profileKey, isc) {
@@ -1379,6 +1410,7 @@ if (ui.copySummaryBtn) {
 if (ui.downloadCardBtn) ui.downloadCardBtn.addEventListener("click", exportShareCard);
 setupPriorityDragAndDrop();
 setupPriorityTouchReorder();
+setupPriorityButtonReorder();
 resetWeights();
 
 const scoreDetails = document.querySelector(".balance-card.details-card");
