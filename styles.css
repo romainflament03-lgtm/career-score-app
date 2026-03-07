@@ -768,10 +768,39 @@ input[type="range"]::-moz-range-thumb {
   place-items: center;
 }
 
+.radar-wrapper {
+  width: 100%;
+  max-width: 380px;
+  margin-inline: auto;
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+}
+
+.radar-chart-area {
+  display: grid;
+  place-items: center;
+}
+
 .radar-chart {
   width: min(100%, 460px);
   height: auto;
   display: block;
+}
+
+.radar-label {
+  position: absolute;
+  display: none;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: #25354b;
+  pointer-events: none;
 }
 
 .radar-context-note {
@@ -1639,15 +1668,19 @@ input[type="range"]::-moz-range-thumb {
 
 #screen-results .share-buttons {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
 }
 
 #screen-results #share-btn,
 #screen-results #download-card-btn {
-  width: 100%;
-  min-width: 0;
+  width: min(100%, 268px);
+  min-width: 240px;
+  max-width: 280px;
+  justify-content: center;
+  text-align: center;
 }
 
 #screen-results .quick-diagnosis-card {
@@ -1676,15 +1709,31 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .radar-wrap {
-  margin-top: 4px;
+  margin-top: 6px;
+  width: 100%;
+  max-width: 352px;
+  margin-inline: auto;
+  padding: 16px;
 }
 
 .radar-chart {
-  width: min(100%, 400px);
+  width: min(100%, clamp(280px, 90vw, 320px));
+  max-width: 320px;
+  height: auto;
+  display: block;
+  margin-inline: auto;
 }
 
 .radar-context-note {
+  margin-top: 10px;
+  max-width: 40ch;
   font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+#screen-results .balance-card .details-content {
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 @media (min-width: 768px) {
@@ -1740,11 +1789,130 @@ input[type="range"]::-moz-range-thumb {
 
   #screen-results .share-buttons {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
+    gap: 10px;
   }
 
   #screen-results #share-btn,
   #screen-results #download-card-btn {
     width: auto;
+    min-width: 0;
   }
+
+  .radar-wrap {
+    max-width: 380px;
+    padding: 14px;
+  }
+
+  .radar-chart {
+    width: 320px;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .radar-wrap {
+    max-width: 460px;
+    padding: 16px;
+  }
+
+  .radar-chart {
+    width: clamp(360px, 38vw, 420px);
+  }
+}
+
+@media (max-width: 768px) {
+  #screen-results .share-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #screen-results #share-btn,
+  #screen-results #download-card-btn {
+    flex: 0 1 192px;
+    width: min(46%, 198px);
+    min-width: 168px;
+    max-width: 204px;
+    min-height: 42px;
+    padding: 10px 12px;
+    font-size: 0.84rem;
+    line-height: 1.2;
+    justify-content: center;
+    text-align: center;
+  }
+
+  #screen-results .balance-card .details-content {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .radar-wrap {
+    width: 100%;
+    max-width: 320px;
+    margin-inline: auto;
+    padding: 12px 10px 16px;
+  }
+
+  .radar-wrapper {
+    width: min(100%, 320px);
+    height: 300px;
+    max-width: 320px;
+  }
+
+  .radar-chart-area {
+    width: 220px;
+    height: 220px;
+  }
+
+  .radar-chart {
+    width: 220px;
+    max-width: 220px;
+    min-width: 0;
+    margin-inline: auto;
+  }
+
+  .radar-label {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 380px) {
+  #screen-results .share-buttons {
+    gap: 10px;
+  }
+
+  #screen-results #share-btn,
+  #screen-results #download-card-btn {
+    flex-basis: 188px;
+    width: 188px;
+    min-width: 188px;
+    max-width: 188px;
+  }
+
+  .radar-wrapper {
+    height: 292px;
+  }
+
+  .radar-label {
+    font-size: 10.5px;
+  }
+}
+
+#screen-results .results-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#screen-results #restart-btn {
+  width: min(100%, 340px);
+  margin-inline: auto;
 }

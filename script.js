@@ -875,8 +875,12 @@ function drawRadarChart(dimensions) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
+  const isMobileViewport = (window.matchMedia && window.matchMedia("(max-width: 768px)").matches)
+    || window.innerWidth <= 768;
   const rect = canvas.getBoundingClientRect();
-  const size = Math.max(320, Math.floor(rect.width || 360));
+  const minCanvasSize = isMobileViewport ? 220 : 280;
+  const fallbackSize = isMobileViewport ? 300 : 320;
+  const size = Math.max(minCanvasSize, Math.min(420, Math.floor(rect.width || fallbackSize)));
   const dpr = window.devicePixelRatio || 1;
   const pixelSize = Math.floor(size * dpr);
   if (canvas.width !== pixelSize || canvas.height !== pixelSize) {
@@ -895,21 +899,75 @@ function drawRadarChart(dimensions) {
     ? latestResult.isc
     : Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
 
-  // Three strictly separated radial layers:
-  // polygon points (inner) < value bubbles (middle ring) < axis labels (outer ring).
-  const labelFontSize = size >= 420 ? 12 : 11;
-  ctx.font = `700 ${labelFontSize}px Manrope, sans-serif`;
-  const maxLabelWidth = Math.max(...labels.map((label) => ctx.measureText(label).width));
+  // Dedicated compact mobile mode:
+  // polygon (inner) < bubbles (middle) < labels (outer), with guaranteed spacing.
+  const isMobileRadar = size <= 360;
+  const useMobileTuning = isMobileViewport;
+  const labelFontSize = useMobileTuning ? 11 : (isMobileRadar ? 10 : 12);
+  const bubbleFontSize = useMobileTuning ? 10 : (isMobileRadar ? 11 : 12);
+  const chipHeight = useMobileTuning ? 22 : (isMobileRadar ? 24 : 28);
+  const chipHorizontalPadding = useMobileTuning ? 4 : (isMobileRadar ? 5 : 6);
 
-  const outerPadding = 10;
-  const polygonToBubbleGap = 16;
-  const bubbleToLabelGap = 20;
-  const labelSideOffset = 6;
-  const maxLabelRingBySide = center - outerPadding - maxLabelWidth - labelSideOffset;
-  const maxLabelRingByVertical = center - outerPadding - labelFontSize - 4;
-  const labelRingRadius = Math.max(0, Math.min(maxLabelRingBySide, maxLabelRingByVertical));
-  const bubbleRingRadius = Math.max(0, labelRingRadius - bubbleToLabelGap);
-  const polygonRadius = Math.max(0, bubbleRingRadius - polygonToBubbleGap);
+  ctx.font = `600 ${labelFontSize}px Manrope, sans-serif`;
+  const labelBlocks = labels.map((label) => ({
+    label,
+    width: ctx.measureText(label).width,
+    height: labelFontSize + 2
+  }));
+  const sideLabelHalfWidth = Math.max(labelBlocks[1].width, labelBlocks[3].width) / 2;
+  const verticalLabelHalfHeight = Math.max(labelBlocks[0].height, labelBlocks[2].height) / 2;
+
+  ctx.font = `700 ${bubbleFontSize}px Manrope, sans-serif`;
+  const maxBubbleTextWidth = Math.max(...values.map((value) => ctx.measureText(String(value)).width));
+  const maxBubbleWidth = Math.max(32, Math.ceil(maxBubbleTextWidth) + (chipHorizontalPadding * 2));
+  const bubbleHalfX = maxBubbleWidth / 2;
+  const bubbleHalfY = chipHeight / 2;
+
+  const outerPadding = useMobileTuning ? 8 : (isMobileRadar ? 8 : 12);
+  const labelToBubbleGap = useMobileTuning ? 14 : 12;
+  const bubbleLabelGap = useMobileTuning ? 24 : (isMobileRadar ? 22 : 30);
+  const polygonBubbleGap = useMobileTuning ? 10 : (isMobileRadar ? 14 : 18);
+  const maxLabelRingBySide = center - outerPadding - sideLabelHalfWidth - 2;
+  const maxLabelRingByVertical = center - outerPadding - verticalLabelHalfHeight - 2;
+  const maxLabelRing = Math.max(useMobileTuning ? 90 : 80, Math.min(maxLabelRingBySide, maxLabelRingByVertical));
+
+  let polygonRadius = useMobileTuning ? Math.min(Math.round(size * 0.31), center - 42) : (isMobileRadar ? 112 : Math.min(132, center - 60));
+  let bubbleRingRadius = polygonRadius + polygonBubbleGap;
+  let labelRingRadius = bubbleRingRadius + bubbleLabelGap;
+  if (labelRingRadius > maxLabelRing) {
+    const overflow = labelRingRadius - maxLabelRing;
+    polygonRadius -= overflow;
+    bubbleRingRadius -= overflow;
+    labelRingRadius -= overflow;
+  }
+  const minPolygonRadius = useMobileTuning ? 56 : (isMobileRadar ? 76 : 86);
+  if (polygonRadius < minPolygonRadius) {
+    polygonRadius = minPolygonRadius;
+    bubbleRingRadius = polygonRadius + polygonBubbleGap;
+    labelRingRadius = Math.min(maxLabelRing, bubbleRingRadius + bubbleLabelGap);
+    bubbleRingRadius = Math.min(bubbleRingRadius, labelRingRadius - bubbleLabelGap);
+  }
+
+  // Hard cap bubble ring by actual wrapper space so labels and bubbles cannot collide
+  // on extreme score combinations (e.g. 100/100/100/100).
+  const wrapper = canvas.closest(".radar-wrapper");
+  if (wrapper) {
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    const offsetX = canvasRect.left - wrapperRect.left;
+    const offsetY = canvasRect.top - wrapperRect.top;
+    const clampMargin = useMobileTuning ? 4 : 8;
+
+    const maxBubbleLeft = offsetX + center - (clampMargin + labelBlocks[3].width + labelToBubbleGap + bubbleHalfX);
+    const maxBubbleRight = wrapperRect.width - (offsetX + center) - (clampMargin + labelBlocks[1].width + labelToBubbleGap + bubbleHalfX);
+    const maxBubbleTop = offsetY + center - (clampMargin + labelBlocks[0].height + labelToBubbleGap + bubbleHalfY);
+    const maxBubbleBottom = wrapperRect.height - (offsetY + center) - (clampMargin + labelBlocks[2].height + labelToBubbleGap + bubbleHalfY);
+
+    const maxBubbleRingByLabels = Math.max(26, Math.min(maxBubbleLeft, maxBubbleRight, maxBubbleTop, maxBubbleBottom));
+    bubbleRingRadius = Math.min(bubbleRingRadius, maxBubbleRingByLabels);
+    polygonRadius = Math.min(polygonRadius, Math.max(36, bubbleRingRadius - polygonBubbleGap));
+    labelRingRadius = Math.max(bubbleRingRadius + bubbleLabelGap, labelRingRadius);
+  }
 
   const pointOnRadius = (angle, radialDistance) => ({
     x: center + Math.cos(angle) * radialDistance,
@@ -939,7 +997,7 @@ function drawRadarChart(dimensions) {
       else ctx.lineTo(p.x, p.y);
     });
     ctx.closePath();
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.32)";
+    ctx.strokeStyle = "rgba(203, 213, 225, 0.68)";
     ctx.lineWidth = 1;
     ctx.stroke();
   }
@@ -949,7 +1007,7 @@ function drawRadarChart(dimensions) {
     ctx.beginPath();
     ctx.moveTo(center, center);
     ctx.lineTo(p.x, p.y);
-    ctx.strokeStyle = "rgba(100, 116, 139, 0.34)";
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.44)";
     ctx.lineWidth = 1;
     ctx.stroke();
   });
@@ -963,10 +1021,11 @@ function drawRadarChart(dimensions) {
   ctx.closePath();
   ctx.fillStyle = "rgba(37, 99, 235, 0.25)";
   ctx.strokeStyle = "#2563eb";
-  ctx.lineWidth = 2.1;
+  ctx.lineWidth = 2;
   ctx.fill();
   ctx.stroke();
 
+  const bubblePoints = [];
   angles.forEach((angle, idx) => {
     const p = pointOnRadius(angle, polygonRadius * (values[idx] / 100));
     ctx.beginPath();
@@ -974,14 +1033,18 @@ function drawRadarChart(dimensions) {
     ctx.fillStyle = "#1e40af";
     ctx.fill();
 
-    const chipAnchor = pointOnRadius(angle, bubbleRingRadius);
+    const pointRadius = polygonRadius * (values[idx] / 100);
+    const minBubbleRadius = useMobileTuning ? 34 : 40;
+    const bubbleRadius = useMobileTuning
+      ? Math.min(bubbleRingRadius, Math.max(minBubbleRadius, pointRadius + 8))
+      : Math.min(bubbleRingRadius, Math.max(minBubbleRadius, pointRadius + 14));
+    const chipAnchor = pointOnRadius(angle, bubbleRadius);
+    bubblePoints[idx] = chipAnchor;
     const chipText = String(values[idx]);
-    ctx.font = "700 10px Manrope, sans-serif";
-    const chipHorizontalPadding = 8;
-    const chipWidth = Math.max(34, Math.ceil(ctx.measureText(chipText).width) + (chipHorizontalPadding * 2));
-    const chipHeight = 22;
-    const chipX = Math.max(6, Math.min(size - chipWidth - 6, chipAnchor.x - (chipWidth / 2)));
-    const chipY = Math.max(6, Math.min(size - chipHeight - 6, chipAnchor.y - (chipHeight / 2)));
+    ctx.font = `700 ${bubbleFontSize}px Manrope, sans-serif`;
+    const chipWidth = Math.max(32, Math.ceil(ctx.measureText(chipText).width) + (chipHorizontalPadding * 2));
+    const chipX = Math.max(8, Math.min(size - chipWidth - 8, chipAnchor.x - (chipWidth / 2)));
+    const chipY = Math.max(8, Math.min(size - chipHeight - 8, chipAnchor.y - (chipHeight / 2)));
 
     drawRoundedRect(chipX, chipY, chipWidth, chipHeight, 9);
     ctx.fillStyle = "#ffffff";
@@ -995,34 +1058,146 @@ function drawRadarChart(dimensions) {
     ctx.fillText(chipText, chipX + (chipWidth / 2), chipY + (chipHeight / 2) + 0.5);
   });
 
-  labels.forEach((label, idx) => {
-    const anchor = pointOnRadius(angles[idx], labelRingRadius);
-    ctx.font = `700 ${labelFontSize}px Manrope, sans-serif`;
-    let x = anchor.x;
-    let y = anchor.y;
+  const syncExternalRadarLabels = () => {
+    const wrapper = canvas.closest(".radar-wrapper");
+    if (!wrapper) return false;
+    const topEl = wrapper.querySelector(".radar-label-top");
+    const rightEl = wrapper.querySelector(".radar-label-right");
+    const bottomEl = wrapper.querySelector(".radar-label-bottom");
+    const leftEl = wrapper.querySelector(".radar-label-left");
+    const labelElements = [topEl, rightEl, bottomEl, leftEl];
+    if (labelElements.some((el) => !el)) return false;
 
-    // Directional offsets keep labels clearly outside bubbles on each axis.
-    if (idx === 0) { // Top
-      ctx.textAlign = "center";
-      ctx.textBaseline = "bottom";
-      y -= 2;
-    } else if (idx === 1) { // Right
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
-      x += labelSideOffset;
-    } else if (idx === 2) { // Bottom
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-      y += 2;
-    } else { // Left
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-      x -= labelSideOffset;
-    }
+    const showExternal = true;
+    labelElements.forEach((el) => {
+      el.style.display = showExternal ? "block" : "none";
+    });
+    if (!showExternal) return false;
 
-    ctx.fillStyle = "#25354b";
-    ctx.fillText(label, x, y);
-  });
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    const offsetX = canvasRect.left - wrapperRect.left;
+    const offsetY = canvasRect.top - wrapperRect.top;
+    const gap = labelToBubbleGap + 4;
+    const wrapperWidth = wrapperRect.width;
+    const wrapperHeight = wrapperRect.height;
+    const clampMargin = useMobileTuning ? 4 : 8;
+    const labelFontPx = useMobileTuning ? 11 : 12;
+
+    const placements = [
+      { el: topEl, point: bubblePoints[0], mode: "top" },
+      { el: rightEl, point: bubblePoints[1], mode: "right" },
+      { el: bottomEl, point: bubblePoints[2], mode: "bottom" },
+      { el: leftEl, point: bubblePoints[3], mode: "left" }
+    ];
+
+    placements.forEach(({ el, point, mode }, idx) => {
+      el.textContent = labels[idx];
+      if (!point) return;
+      el.style.position = "absolute";
+      el.style.whiteSpace = "nowrap";
+      el.style.wordBreak = "normal";
+      el.style.overflowWrap = "normal";
+      el.style.textAlign = "center";
+      el.style.fontSize = `${labelFontPx}px`;
+      el.style.fontWeight = "600";
+      el.style.lineHeight = "1.1";
+      el.style.color = "#25354b";
+      el.style.pointerEvents = "none";
+      el.style.transform = "none";
+
+      const px = offsetX + point.x;
+      const py = offsetY + point.y;
+      const labelRect = el.getBoundingClientRect();
+      const labelW = labelRect.width || 0;
+      const labelH = labelRect.height || 0;
+      let left = px - (labelW / 2);
+      let top = py - (labelH / 2);
+
+      if (mode === "top") {
+        left = px - (labelW / 2);
+        top = py - bubbleHalfY - gap - labelH;
+      } else if (mode === "right") {
+        left = px + bubbleHalfX + gap;
+        top = py - (labelH / 2);
+      } else if (mode === "bottom") {
+        left = px - (labelW / 2);
+        top = py + bubbleHalfY + gap;
+      } else {
+        left = px - bubbleHalfX - gap - labelW;
+        top = py - (labelH / 2);
+      }
+
+      left = Math.max(clampMargin, Math.min(wrapperWidth - labelW - clampMargin, left));
+      top = Math.max(clampMargin, Math.min(wrapperHeight - labelH - clampMargin, top));
+      el.style.left = `${left}px`;
+      el.style.top = `${top}px`;
+    });
+
+    return true;
+  };
+
+  const externalLabelsRendered = syncExternalRadarLabels();
+
+  if (!externalLabelsRendered) {
+    const axisDirections = [
+      { x: 0, y: -1 }, // top
+      { x: 1, y: 0 }, // right
+      { x: 0, y: 1 }, // bottom
+      { x: -1, y: 0 } // left
+    ];
+    labels.forEach((label, idx) => {
+      const anchor = pointOnRadius(angles[idx], labelRingRadius);
+      ctx.font = `600 ${labelFontSize}px Manrope, sans-serif`;
+      const block = labelBlocks[idx];
+      const blockWidth = block.width;
+      const blockHeight = block.height;
+      const bubblePoint = bubblePoints[idx] || pointOnRadius(angles[idx], bubbleRingRadius);
+      const labelHalfW = blockWidth / 2;
+      const labelHalfH = blockHeight / 2;
+      let x = anchor.x;
+      let y = anchor.y;
+
+      if (idx === 0) { // Top
+        x = center;
+        y = Math.min(anchor.y, bubblePoint.y - bubbleHalfY - labelToBubbleGap - labelHalfH);
+      } else if (idx === 1) { // Right
+        x = Math.max(anchor.x, bubblePoint.x + bubbleHalfX + labelToBubbleGap + labelHalfW);
+        y = bubblePoint.y;
+      } else if (idx === 2) { // Bottom
+        x = center;
+        y = Math.max(anchor.y, bubblePoint.y + bubbleHalfY + labelToBubbleGap + labelHalfH);
+      } else { // Left
+        x = Math.min(anchor.x, bubblePoint.x - bubbleHalfX - labelToBubbleGap - labelHalfW);
+        y = bubblePoint.y;
+      }
+
+      const bubbleLeft = bubblePoint.x - bubbleHalfX - labelToBubbleGap;
+      const bubbleRight = bubblePoint.x + bubbleHalfX + labelToBubbleGap;
+      const bubbleTop = bubblePoint.y - bubbleHalfY - labelToBubbleGap;
+      const bubbleBottom = bubblePoint.y + bubbleHalfY + labelToBubbleGap;
+      const direction = axisDirections[idx];
+      const pushStep = 4;
+      for (let n = 0; n < 10; n += 1) {
+        const labelLeft = x - labelHalfW;
+        const labelRight = x + labelHalfW;
+        const labelTop = y - labelHalfH;
+        const labelBottom = y + labelHalfH;
+        const intersects = !(labelRight < bubbleLeft || labelLeft > bubbleRight || labelBottom < bubbleTop || labelTop > bubbleBottom);
+        if (!intersects) break;
+        x += direction.x * pushStep;
+        y += direction.y * pushStep;
+      }
+
+      x = Math.max(labelHalfW + outerPadding, Math.min(size - labelHalfW - outerPadding, x));
+      y = Math.max(labelHalfH + outerPadding, Math.min(size - labelHalfH - outerPadding, y));
+
+      ctx.fillStyle = "#25354b";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, x, y);
+    });
+  }
 
   ctx.beginPath();
   ctx.arc(center, center, 31, 0, Math.PI * 2);

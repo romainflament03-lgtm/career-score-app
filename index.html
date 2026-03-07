@@ -50,7 +50,6 @@
           <p class="eyebrow">&Eacute;tape 1 sur 3</p>
           <h2>Ce qui compte le plus pour vous</h2>
           <p class="subtitle">Classez ces 4 dimensions de la plus importante (1) &agrave; la moins importante (4).</p>
-          <p class="field-note">Sur mobile: utilisez les fl&egrave;ches pour monter ou descendre chaque carte.</p>
 
           <div class="preset-wrap" role="group" aria-label="Pr&eacute;r&eacute;glages priorit&eacute;s">
             <button id="preset-balanced-btn" class="btn btn-secondary preset-btn" type="button">&Eacute;quilibr&eacute;</button>
@@ -369,7 +368,15 @@
           <summary>Votre &eacute;quilibre professionnel</summary>
           <div class="details-content">
             <div class="radar-wrap">
-              <canvas id="radarChart" class="radar-chart" width="320" height="320" aria-label="Graphique radar des 4 dimensions"></canvas>
+              <div class="radar-wrapper">
+                <div class="radar-chart-area">
+                  <canvas id="radarChart" class="radar-chart" width="320" height="320" aria-label="Graphique radar des 4 dimensions"></canvas>
+                </div>
+                <div class="radar-label radar-label-top">Sens</div>
+                <div class="radar-label radar-label-right">Evolution</div>
+                <div class="radar-label radar-label-bottom">Reconnaissance</div>
+                <div class="radar-label radar-label-left">Environnement</div>
+              </div>
               <p class="radar-context-note">Votre score ISC se construit &agrave; partir de 4 dimensions cl&eacute;s de votre exp&eacute;rience professionnelle.</p>
             </div>
             <p id="dimensionSummary" class="calc-note"></p>
