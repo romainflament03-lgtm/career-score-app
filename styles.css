@@ -1680,7 +1680,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .radar-chart {
-  width: min(100%, 340px);
+  width: min(100%, 400px);
 }
 
 .radar-context-note {
