@@ -394,7 +394,7 @@
         <article class="card score-card hero-score-card">
           <div class="hero-identity">
             <p class="identity-kicker">Votre profil carri&egrave;re est :</p>
-            <p id="careerProfileName" class="identity-name">Strat&egrave;ge</p>
+            <p id="careerProfileName" class="identity-name"></p>
 
             <div class="career-profile-visual">
               <div class="career-profile-media">
@@ -405,30 +405,29 @@
               </div>
             </div>
 
-            <p id="careerProfileDescription" class="identity-signature">Vous avancez lorsque votre travail combine impact et progression.</p>
+            <p id="careerProfileDescription" class="identity-signature"></p>
 
             <div id="chiGauge" class="hero-score-panel">
-              <p class="hero-isc-line"><span class="hero-isc-prefix">ISC</span><span id="chiScore" class="chi-score">0</span></p>
+              <p class="hero-isc-line"><span class="hero-isc-prefix">ISC</span><span id="chiScore" class="chi-score"></span></p>
               <div class="isc-progress-track" aria-hidden="true">
                 <div id="heroProgressFill" class="isc-progress-fill"></div>
               </div>
-              <p id="chiLabel" class="chi-label">En progression</p>
-              <p id="socialComparisonLine" class="social-comparison">Vous faites partie des 22% de profils Strat&egrave;ge.</p>
+              <p id="chiLabel" class="chi-label"></p>
+              <p id="socialComparisonLine" class="social-comparison"></p>
             </div>
 
             <div class="share-buttons">
               <button id="share-btn" class="btn btn-primary" type="button">Partager mon profil carri&egrave;re</button>
-              <button id="download-card-btn" class="btn btn-secondary" type="button">T&eacute;l&eacute;charger ma carte</button>
             </div>
 
             <div id="shareResultCard" class="share-result-card" hidden>
               <p class="share-card-title">R&eacute;sum&eacute; partageable</p>
-              <p id="shareCardProfileLine" class="share-card-profile">Strat&egrave;ge</p>
-              <p id="shareCardISCLine" class="share-card-isc">ISC : 0</p>
-              <p id="shareCardStateLine" class="share-card-state">En progression</p>
+              <p id="shareCardProfileLine" class="share-card-profile"></p>
+              <p id="shareCardISCLine" class="share-card-isc"></p>
+              <p id="shareCardStateLine" class="share-card-state"></p>
               <div class="share-card-diagnostic">
-                <p id="shareCardStrongLine">Moteur : -</p>
-                <p id="shareCardWeakLine">Vigilance : -</p>
+                <p id="shareCardStrongLine"></p>
+                <p id="shareCardWeakLine"></p>
               </div>
               <p class="share-card-brand">jobpulse.app</p>
             </div>
@@ -436,13 +435,13 @@
 
           <p id="calcFormula" class="calc-note" hidden></p>
           <p id="result-date" class="calc-note" hidden></p>
-          <p id="careerStateLabel" class="career-state-label" hidden>En progression</p>
-          <p id="careerISCScore" class="career-isc-score" hidden>ISC: 0 / 100</p>
+          <p id="careerStateLabel" class="career-state-label" hidden></p>
+          <p id="careerISCScore" class="career-isc-score" hidden></p>
           <p id="careerShareLine" class="career-share-line" hidden></p>
-          <p id="careerStrongestDimension" hidden>-</p>
-          <p id="careerWeakestDimension" hidden>-</p>
+          <p id="careerStrongestDimension" hidden></p>
+          <p id="careerWeakestDimension" hidden></p>
           <p id="careerSecondRow" hidden></p>
-          <p id="careerSecondDimension" hidden>-</p>
+          <p id="careerSecondDimension" hidden></p>
           <button id="copy-summary-btn" type="button" hidden>Copier</button>
         </article>
 
@@ -451,14 +450,14 @@
           <div class="quick-diagnostic">
             <div class="diag-card">
               <p class="diag-label">&#128293; Ce qui vous motive</p>
-              <p id="quickStrongestDimension" class="diag-value">-</p>
+              <p id="quickStrongestDimension" class="diag-value"></p>
             </div>
             <div class="diag-card">
               <p class="diag-label">&#9888; Ce qui peut vous freiner</p>
-              <p id="quickWeakestDimension" class="diag-value">-</p>
+              <p id="quickWeakestDimension" class="diag-value"></p>
             </div>
           </div>
-          <p id="chiSummary" class="hero-summary">Votre situation est globalement positive mais certains leviers peuvent encore &ecirc;tre renforc&eacute;s.</p>
+          <p id="chiSummary" class="hero-summary"></p>
         </article>
 
         <article class="card actions-card">
@@ -489,7 +488,7 @@
         <details class="card details-card">
           <summary>Comprendre le diagnostic</summary>
           <div class="details-content">
-            <p id="analysisText" class="analysis-text">Votre analyse personnalis&eacute;e appara&icirc;tra ici.</p>
+            <p id="analysisText" class="analysis-text"></p>
             <p id="recommendationContext" class="calc-note" hidden></p>
           </div>
         </details>
@@ -500,7 +499,9 @@
     </section>
   </main>
 
-  <script src="script.js"></script>
+  <script src="scripts/core.js"></script>
+  <script src="scripts/app.js"></script>
 </body>
 </html>
+
 

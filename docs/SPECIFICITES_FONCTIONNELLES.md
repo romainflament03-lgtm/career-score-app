@@ -1,4 +1,4 @@
-﻿# Spécificités Fonctionnelles - Career Score App (JobPulse) - V2
+# Spécificités Fonctionnelles - Career Score App (JobPulse) - V2
 
 ## 1. Objectif produit
 JobPulse fournit un diagnostic carrière court, déterministe et actionnable à partir de :

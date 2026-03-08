@@ -1476,10 +1476,7 @@ h1 {
 
 #screen-results #share-btn {
   min-width: 260px;
-}
-
-#screen-results #download-card-btn {
-  min-width: 220px;
+  margin-inline: auto;
 }
 
 #screen-results [hidden] {
@@ -1532,8 +1529,7 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  #screen-results #share-btn,
-  #screen-results #download-card-btn {
+  #screen-results #share-btn {
     min-width: 0;
     width: 100%;
   }
@@ -1787,8 +1783,7 @@ input[type="range"]::-moz-range-thumb {
   gap: 14px;
 }
 
-#screen-results #share-btn,
-#screen-results #download-card-btn {
+#screen-results #share-btn {
   width: min(100%, 268px);
   min-width: 240px;
   max-width: 280px;
@@ -1909,8 +1904,7 @@ input[type="range"]::-moz-range-thumb {
     gap: 10px;
   }
 
-  #screen-results #share-btn,
-  #screen-results #download-card-btn {
+  #screen-results #share-btn {
     width: auto;
     min-width: 0;
   }
@@ -1948,8 +1942,7 @@ input[type="range"]::-moz-range-thumb {
     gap: 10px;
   }
 
-  #screen-results #share-btn,
-  #screen-results #download-card-btn {
+  #screen-results #share-btn {
     flex: 0 1 192px;
     width: min(46%, 198px);
     min-width: 168px;
@@ -2002,8 +1995,7 @@ input[type="range"]::-moz-range-thumb {
     gap: 10px;
   }
 
-  #screen-results #share-btn,
-  #screen-results #download-card-btn {
+  #screen-results #share-btn {
     flex-basis: 188px;
     width: 188px;
     min-width: 188px;
