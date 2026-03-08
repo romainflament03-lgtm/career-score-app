@@ -1,29 +1,41 @@
-const questions = [
-  "Je suis satisfait(e) de mon travail au quotidien.",
-  "Mon salaire me semble juste par rapport à la valeur que j'apporte.",
-  "Je vois des opportunités claires d'évolution de carrière.",
-  "Mon manager soutient ma progression.",
-  "L'ambiance dans mon équipe est bonne.",
-  "J'apprends des compétences utiles pour l'avenir.",
-  "Mon équilibre vie pro / vie perso est acceptable.",
-  "Je me sens reconnu(e) pour mes contributions.",
-  "Je suis fier(e) de l'entreprise pour laquelle je travaille.",
-  "Je peux m'imaginer encore ici dans 2 ans."
+const INTERNAL_DIMENSION_KEYS = ["meaning", "growth", "recognition", "environment"];
+const INTERNAL_DIMENSION_LABEL_FR = {
+  meaning: "Sens",
+  growth: "Évolution",
+  recognition: "Reconnaissance",
+  environment: "Environnement"
+};
+const LEGACY_TO_INTERNAL_DIMENSION_KEY = {
+  Meaning: "meaning",
+  Growth: "growth",
+  Recognition: "recognition",
+  Environment: "environment"
+};
+const INTERNAL_TO_LEGACY_DIMENSION_KEY = {
+  meaning: "Meaning",
+  growth: "Growth",
+  recognition: "Recognition",
+  environment: "Environment"
+};
+const DEFAULT_INTERNAL_WEIGHTS = {
+  meaning: 0.25,
+  growth: 0.25,
+  recognition: 0.25,
+  environment: 0.25
+};
+const QUESTION_BANK = [
+  { id: "q1", dimension: "meaning", text: "Je suis satisfait(e) de mon travail au quotidien." },
+  { id: "q2", dimension: "recognition", text: "Mon salaire me semble juste par rapport à la valeur que j'apporte." },
+  { id: "q3", dimension: "growth", text: "Je vois des opportunités claires d'évolution de carrière." },
+  { id: "q4", dimension: "growth", text: "Mon manager soutient ma progression." },
+  { id: "q5", dimension: "environment", text: "L'ambiance dans mon équipe est bonne." },
+  { id: "q6", dimension: "growth", text: "J'apprends des compétences utiles pour l'avenir." },
+  { id: "q7", dimension: "environment", text: "Mon équilibre vie pro / vie perso est acceptable." },
+  { id: "q8", dimension: "recognition", text: "Je me sens reconnu(e) pour mes contributions." },
+  { id: "q9", dimension: "meaning", text: "Je suis fier(e) de l'entreprise pour laquelle je travaille." },
+  { id: "q10", dimension: "meaning", text: "Je peux m'imaginer encore ici dans 2 ans." }
 ];
-
-const dimensionConfig = {
-  Meaning: [0, 8, 9],
-  Growth: [2, 3, 5],
-  Recognition: [1, 7],
-  Environment: [4, 6]
-};
-
-const dimensionLabelFr = {
-  Meaning: "Sens",
-  Growth: "Évolution",
-  Recognition: "Reconnaissance",
-  Environment: "Environnement"
-};
+const questions = QUESTION_BANK.map((question) => question.text);
 
 const careerProfiles = {
   explorateur: {
@@ -367,6 +379,313 @@ const rankingPresets = {
   wellbeing: ["Environment", "Meaning", "Recognition", "Growth"],
   impact: ["Meaning", "Growth", "Environment", "Recognition"]
 };
+const DEBUG_TEST_ENGINE = (() => {
+  try {
+    return window.localStorage.getItem("jobpulse_debug_engine") === "1";
+  } catch {
+    return false;
+  }
+})();
+
+function debugEngineLog(label, payload) {
+  if (!DEBUG_TEST_ENGINE) return;
+  console.log(`[JobPulse][Engine] ${label}`, payload);
+}
+
+function toInternalDimensionKey(key) {
+  if (!key) return null;
+  if (INTERNAL_DIMENSION_KEYS.includes(key)) return key;
+  if (LEGACY_TO_INTERNAL_DIMENSION_KEY[key]) return LEGACY_TO_INTERNAL_DIMENSION_KEY[key];
+  return null;
+}
+
+function toLegacyDimensionKey(key) {
+  return INTERNAL_TO_LEGACY_DIMENSION_KEY[key] || key;
+}
+
+function getDimensionLabelFr(key) {
+  const internalKey = toInternalDimensionKey(key);
+  if (!internalKey) return "Environnement";
+  return INTERNAL_DIMENSION_LABEL_FR[internalKey];
+}
+
+function clampScore(value, min = 0, max = 100) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function getScoreFromAny(scores, internalKey) {
+  if (!scores || !internalKey) return 0;
+  if (Number.isFinite(scores[internalKey])) return clampScore(Number(scores[internalKey]));
+  const legacyKey = toLegacyDimensionKey(internalKey);
+  if (Number.isFinite(scores[legacyKey])) return clampScore(Number(scores[legacyKey]));
+  return 0;
+}
+
+function normalizeDimensionScores(scores) {
+  const normalized = {};
+  INTERNAL_DIMENSION_KEYS.forEach((key) => {
+    normalized[key] = getScoreFromAny(scores, key);
+  });
+  return normalized;
+}
+
+function toLegacyDimensionScores(scores) {
+  const normalized = normalizeDimensionScores(scores);
+  return {
+    Meaning: normalized.meaning,
+    Growth: normalized.growth,
+    Recognition: normalized.recognition,
+    Environment: normalized.environment
+  };
+}
+
+function normalizeWeightsForScoring(rawWeights) {
+  const weights = { ...DEFAULT_INTERNAL_WEIGHTS };
+  if (rawWeights && typeof rawWeights === "object") {
+    INTERNAL_DIMENSION_KEYS.forEach((key) => {
+      weights[key] = 0;
+    });
+    Object.entries(rawWeights).forEach(([key, value]) => {
+      const internalKey = toInternalDimensionKey(key);
+      if (!internalKey) return;
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue) || numericValue < 0) return;
+      weights[internalKey] += numericValue;
+    });
+    const total = Object.values(weights).reduce((sum, value) => sum + value, 0);
+    if (total > 0) {
+      INTERNAL_DIMENSION_KEYS.forEach((key) => {
+        weights[key] = weights[key] / total;
+      });
+      return weights;
+    }
+  }
+  return { ...DEFAULT_INTERNAL_WEIGHTS };
+}
+
+function rankDimensionsDeterministic(scores) {
+  const normalized = normalizeDimensionScores(scores);
+  return INTERNAL_DIMENSION_KEYS
+    .map((key) => [key, normalized[key]])
+    .sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1];
+      return INTERNAL_DIMENSION_KEYS.indexOf(a[0]) - INTERNAL_DIMENSION_KEYS.indexOf(b[0]);
+    });
+}
+
+function normalizeAnswerValue(value) {
+  if (value === null || value === undefined) return null;
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return null;
+  const rounded = Math.round(numeric);
+  if (rounded < 1 || rounded > 5) return null;
+  return rounded;
+}
+
+function computeDimensionScoresFromAnswers(answerValues) {
+  const normalizedAnswers = answerValues.map((value) => normalizeAnswerValue(value));
+  const buckets = {
+    meaning: [],
+    growth: [],
+    recognition: [],
+    environment: []
+  };
+
+  QUESTION_BANK.forEach((question, index) => {
+    const answer = normalizedAnswers[index];
+    if (answer === null) return;
+    buckets[question.dimension].push(answer);
+  });
+
+  const scores = {};
+  INTERNAL_DIMENSION_KEYS.forEach((key) => {
+    const bucket = buckets[key];
+    if (!bucket.length) {
+      scores[key] = 0;
+      return;
+    }
+    const average = bucket.reduce((sum, value) => sum + value, 0) / bucket.length;
+    scores[key] = clampScore(Math.round((average / 5) * 100));
+  });
+  return scores;
+}
+
+function computeIscFromScores(scores, weights) {
+  const normalizedScores = normalizeDimensionScores(scores);
+  const normalizedWeights = normalizeWeightsForScoring(weights);
+  const weightedScore = INTERNAL_DIMENSION_KEYS.reduce((sum, key) => {
+    return sum + (normalizedScores[key] * normalizedWeights[key]);
+  }, 0);
+  return clampScore(Math.round(weightedScore));
+}
+
+function determineCareerState(iscScore) {
+  if (iscScore >= 80) return { label: "🚀 Aligné", key: "aligned", helper: "Votre situation professionnelle est bien alignée avec ce qui vous motive aujourd’hui." };
+  if (iscScore >= 65) return { label: "🌱 En progression", key: "progress", helper: "Votre situation est globalement positive mais certains leviers peuvent encore être renforcés." };
+  if (iscScore >= 50) return { label: "⚠️ Désalignement", key: "misaligned", helper: "Certains aspects de votre travail ne correspondent pas totalement à vos attentes." };
+  return { label: "🔥 Risque de rupture", key: "risk", helper: "Votre situation actuelle pourrait conduire à un désengagement si rien ne change." };
+}
+
+// Deterministic profile mapping based on ranked dimensions and final ISC.
+function determineCareerProfile(scores, context = {}) {
+  const ranking = rankDimensionsDeterministic(scores);
+  const strongestKey = ranking[0][0];
+  const secondKey = ranking[1][0];
+  const weakestKey = ranking[ranking.length - 1][0];
+  const topDiff = ranking[0][1] - ranking[1][1];
+  const iscScore = Number.isFinite(context.iscScore) ? context.iscScore : 0;
+
+  let profileKey = "explorateur";
+  let secondDimension = null;
+
+  if (iscScore < 50) {
+    profileKey = "desengage_latent";
+  } else if (topDiff <= 5) {
+    const topPair = [strongestKey, secondKey].sort().join("|");
+    if (topPair === "growth|meaning") profileKey = "stratege";
+    else if (topPair === "environment|meaning") profileKey = "pilier";
+    else if (topPair === "growth|recognition") profileKey = "challenger";
+  }
+
+  if (profileKey === "explorateur") {
+    if (strongestKey === "meaning") profileKey = "architecte";
+    else if (strongestKey === "environment") profileKey = "stabilisateur";
+    else if (strongestKey === "recognition") profileKey = "ambitieux_reconnu";
+  }
+
+  if (profileKey === "stratege" || profileKey === "pilier" || profileKey === "challenger") {
+    secondDimension = getDimensionLabelFr(secondKey);
+  }
+
+  const safeProfileKey = careerProfiles[profileKey] ? profileKey : "explorateur";
+  const profileData = careerProfiles[safeProfileKey];
+  const stateLabel = determineCareerState(iscScore).label;
+
+  return {
+    profileKey: safeProfileKey,
+    profileName: profileData.profileName,
+    icon: profileData.icon,
+    stateLabel,
+    description: profileData.description,
+    strongestDimension: getDimensionLabelFr(strongestKey),
+    secondDimension,
+    weakestDimension: getDimensionLabelFr(weakestKey)
+  };
+}
+
+function isCompleteTestResult(result) {
+  if (!result || typeof result !== "object") return false;
+  if (!Number.isFinite(result.isc)) return false;
+  if (!result.careerProfile?.profileKey) return false;
+  if (!result.strongestDimension || !result.weakestDimension) return false;
+  if (!result.topPriorityDimension || !result.secondStrongestDimension) return false;
+  if (!result.state?.label || !result.state?.key) return false;
+  if (typeof result.analysis !== "string" || !Array.isArray(result.recommendations)) return false;
+  const scores = result.scores;
+  if (!scores || typeof scores !== "object") return false;
+  return INTERNAL_DIMENSION_KEYS.every((key) => Number.isFinite(scores[key]));
+}
+
+// Single source of truth for final scoring, ranking, profile and result payload.
+function computeTestResult(answerValues, context = {}) {
+  if (!Array.isArray(answerValues) || answerValues.length !== QUESTION_BANK.length) {
+    console.error("[JobPulse][Engine] Invalid answer payload shape", answerValues);
+    return null;
+  }
+
+  const normalizedAnswers = answerValues.map((value) => normalizeAnswerValue(value));
+  const missingAnswerIndexes = normalizedAnswers
+    .map((value, index) => (value === null ? index : -1))
+    .filter((index) => index >= 0);
+
+  if (missingAnswerIndexes.length > 0) {
+    console.error("[JobPulse][Engine] Missing answers, result generation aborted", missingAnswerIndexes);
+    return null;
+  }
+
+  const profileContext = context.profile ? { ...context.profile } : {};
+  const weights = normalizeWeightsForScoring(context.weights);
+  const scores = computeDimensionScoresFromAnswers(normalizedAnswers);
+  const isc = computeIscFromScores(scores, weights);
+  const state = determineCareerState(isc);
+  const dimensionRanking = rankDimensionsDeterministic(scores);
+  const strongestDimension = dimensionRanking[0][0];
+  const secondStrongestDimension = dimensionRanking[1][0];
+  const weakestDimension = dimensionRanking[dimensionRanking.length - 1][0];
+  const topPriorityDimension = rankDimensionsDeterministic(weights)[0][0];
+  const topPriorityValue = scores[topPriorityDimension];
+  const careerProfile = determineCareerProfile(scores, { iscScore: isc, profile: profileContext });
+
+  const analysis = buildPersonalizedAnalysis({
+    state,
+    strongestKey: strongestDimension,
+    strongestValue: scores[strongestDimension],
+    weakestKey: weakestDimension,
+    weakestValue: scores[weakestDimension],
+    topPriorityKey: topPriorityDimension,
+    topPriorityValue,
+    profile: profileContext,
+    careerProfile
+  });
+  const recommendations = buildRecommendations({
+    weakestKey: weakestDimension,
+    topPriorityKey: topPriorityDimension,
+    profile: profileContext,
+    careerProfile
+  });
+
+  const result = {
+    answers: normalizedAnswers,
+    scores,
+    dimensions: toLegacyDimensionScores(scores),
+    isc,
+    strongestDimension,
+    secondStrongestDimension,
+    weakestDimension,
+    topPriorityDimension,
+    state,
+    stateLabel: state.label,
+    careerProfile,
+    analysis,
+    recommendations,
+    profile: profileContext,
+    contextData: context.contextData || {},
+    weights,
+    generatedAt: new Date().toISOString()
+  };
+
+  debugEngineLog("answers", normalizedAnswers);
+  debugEngineLog("scores", scores);
+  debugEngineLog("isc", isc);
+  debugEngineLog("profile", careerProfile.profileKey);
+  debugEngineLog("strongest/weakest", { strongestDimension, weakestDimension });
+
+  if (!isCompleteTestResult(result)) {
+    console.error("[JobPulse][Engine] Incomplete result payload", result);
+    return null;
+  }
+
+  return result;
+}
+
+function runEngineValidationScenarios() {
+  if (!DEBUG_TEST_ENGINE) return;
+  const scenarios = [
+    { name: "all_5", answers: new Array(QUESTION_BANK.length).fill(5) },
+    { name: "all_3", answers: new Array(QUESTION_BANK.length).fill(3) },
+    { name: "growth_high_environment_low", answers: [3, 3, 5, 5, 1, 5, 1, 3, 3, 3] },
+    { name: "recognition_dominant", answers: [3, 5, 3, 3, 3, 3, 3, 5, 3, 3] },
+    { name: "environment_dominant", answers: [3, 3, 3, 3, 5, 3, 5, 3, 3, 3] }
+  ];
+
+  scenarios.forEach((scenario) => {
+    const result = computeTestResult(scenario.answers, {
+      weights: customWeights,
+      profile: { ...profile }
+    });
+    debugEngineLog(`scenario:${scenario.name}`, result);
+  });
+}
 
 function showScreen(key) {
   Object.values(screens).forEach((screen) => screen.classList.remove("active"));
@@ -577,96 +896,6 @@ async function playQuestionCardTransition(phase) {
   }
 }
 
-function averageTo100(values) {
-  const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
-  return Math.round((avg / 5) * 100);
-}
-
-function computeDimensions() {
-  const result = {};
-  Object.keys(dimensionConfig).forEach((key) => {
-    result[key] = averageTo100(dimensionConfig[key].map((i) => answers[i] || 3));
-  });
-  return result;
-}
-
-function computeISC(dim, weights) {
-  return Math.round(
-    dim.Meaning * weights.Meaning +
-    dim.Growth * weights.Growth +
-    dim.Recognition * weights.Recognition +
-    dim.Environment * weights.Environment
-  );
-}
-
-function getInterpretation(isc) {
-  if (isc < 40) return { label: "Fragile", summary: "La situation est fragile et demande des ajustements rapides.", tone: "warn", band: "Fragile" };
-  if (isc < 60) return { label: "Zone de stagnation", summary: "La situation est mitigée et peut se débloquer avec les bons leviers.", tone: "warn", band: "Stagnation" };
-  if (isc < 80) return { label: "Sain", summary: "La situation est globalement saine avec quelques optimisations utiles.", tone: "good", band: "Sain" };
-  return { label: "Excellent", summary: "La dynamique est très favorable, consolidez vos leviers de progression.", tone: "good", band: "Excellent" };
-}
-
-function getCareerStateLabel(iscScore) {
-  if (iscScore >= 80) return "\uD83D\uDE80 Align\u00E9";
-  if (iscScore >= 65) return "\uD83C\uDF31 En progression";
-  if (iscScore >= 50) return "\u26A0\uFE0F D\u00E9salignement";
-  return "\uD83D\uDD25 Risque de rupture";
-}
-
-function getCareerProfile({ iscScore, sensScore, evolutionScore, reconnaissanceScore, environnementScore }) {
-  const dimensionScores = {
-    Meaning: sensScore,
-    Growth: evolutionScore,
-    Recognition: reconnaissanceScore,
-    Environment: environnementScore
-  };
-
-  const ranked = rankDimensions(dimensionScores);
-  const strongestKey = ranked[0][0];
-  const secondKey = ranked[1][0];
-  const weakestKey = ranked[ranked.length - 1][0];
-  const topDiff = ranked[0][1] - ranked[1][1];
-  const stateLabel = getCareerStateLabel(iscScore);
-
-  let profileKey = "explorateur";
-  let secondDimension = null;
-
-  if (iscScore < 50) {
-    profileKey = "desengage_latent";
-  } else if (topDiff <= 5) {
-    const topPair = [strongestKey, secondKey].sort().join("|");
-    if (topPair === "Growth|Meaning") profileKey = "stratege";
-    else if (topPair === "Environment|Meaning") profileKey = "pilier";
-    else if (topPair === "Growth|Recognition") profileKey = "challenger";
-  }
-
-  if (profileKey === "explorateur") {
-    if (strongestKey === "Meaning") profileKey = "architecte";
-    else if (strongestKey === "Environment") profileKey = "stabilisateur";
-    else if (strongestKey === "Recognition") profileKey = "ambitieux_reconnu";
-  }
-
-  if (profileKey === "stratege" || profileKey === "pilier" || profileKey === "challenger") {
-    secondDimension = dimensionLabelFr[secondKey];
-  }
-
-  const profileData = careerProfiles[profileKey];
-  return {
-    profileKey,
-    profileName: profileData.profileName,
-    icon: profileData.icon,
-    stateLabel,
-    description: profileData.description,
-    strongestDimension: dimensionLabelFr[strongestKey],
-    secondDimension,
-    weakestDimension: dimensionLabelFr[weakestKey]
-  };
-}
-
-function rankDimensions(dimensions) {
-  return Object.entries(dimensions).sort((a, b) => b[1] - a[1]);
-}
-
 function scoreLevel(value) {
   if (value < 40) return "faible";
   if (value < 70) return "moyen";
@@ -758,13 +987,6 @@ function tenureIndicator(tenure) {
   return "décision de trajectoire interne/externe éclairée par des critères objectifs";
 }
 
-function getCareerState(iscScore) {
-  if (iscScore >= 80) return { label: "\uD83D\uDE80 Align\u00e9", key: "aligned", helper: "Votre situation professionnelle est bien align\u00e9e avec ce qui vous motive aujourd\u2019hui." };
-  if (iscScore >= 65) return { label: "\uD83C\uDF31 En progression", key: "progress", helper: "Votre situation est globalement positive mais certains leviers peuvent encore \u00eatre renforc\u00e9s." };
-  if (iscScore >= 50) return { label: "\u26A0\uFE0F D\u00e9salignement", key: "misaligned", helper: "Certains aspects de votre travail ne correspondent pas totalement \u00e0 vos attentes." };
-  return { label: "\uD83D\uDD25 Risque de rupture", key: "risk", helper: "Votre situation actuelle pourrait conduire \u00e0 un d\u00e9sengagement si rien ne change." };
-}
-
 function movePriorityCard(card, direction) {
   if (!card || !direction) return;
   if (direction === "up") {
@@ -805,29 +1027,8 @@ function getSocialComparisonPercent(profileKey, isc) {
   return Math.max(8, Math.min(58, Math.round(raw)));
 }
 
-function getDimensionRanking(scores) {
-  return Object.entries(scores).sort((a, b) => b[1] - a[1]);
-}
-
-function getStrongestDimension(scores) {
-  return getDimensionRanking(scores)[0][0];
-}
-
-function getWeakestDimension(scores) {
-  const ranking = getDimensionRanking(scores);
-  return ranking[ranking.length - 1][0];
-}
-
-function getSecondStrongestDimension(scores) {
-  return getDimensionRanking(scores)[1][0];
-}
-
-function getTopPriority(weights) {
-  return Object.entries(weights).sort((a, b) => b[1] - a[1])[0][0];
-}
-
 function friendlyDimension(key) {
-  return key === "Meaning" ? "Sens" : key === "Growth" ? "\u00c9volution" : key === "Recognition" ? "Reconnaissance" : "Environnement";
+  return getDimensionLabelFr(key);
 }
 
 function buildPersonalizedAnalysis(data) {
@@ -846,13 +1047,13 @@ function buildPersonalizedAnalysis(data) {
   let actionLine = "Action immediate : formalisez une action visible et mesurable dans les 30 prochains jours.";
   if (data.profile.offerIntent === "leave_immediately" || data.profile.offerIntent === "consider_seriously") {
     actionLine = "Action immediate : comparez objectivement votre option interne et une option externe avant decision.";
-  } else if (data.weakestKey === "Recognition") {
+  } else if (data.weakestKey === "recognition") {
     actionLine = "Action immediate : alignez des criteres de reconnaissance ecrits avec votre manager.";
-  } else if (data.weakestKey === "Growth") {
+  } else if (data.weakestKey === "growth") {
     actionLine = "Action immediate : obtenez une nouvelle responsabilite avec objectif clair et date de revue.";
-  } else if (data.weakestKey === "Meaning") {
+  } else if (data.weakestKey === "meaning") {
     actionLine = "Action immediate : reallouez du temps vers des missions plus utiles et plus visibles.";
-  } else if (data.weakestKey === "Environment") {
+  } else if (data.weakestKey === "environment") {
     actionLine = "Action immediate : mettez en place un rituel hebdomadaire de priorisation avec votre manager.";
   }
 
@@ -862,21 +1063,21 @@ function buildRecommendations(data) {
   const items = [];
   const profileHint = data.careerProfile?.profileName ? `Coherent avec votre profil ${data.careerProfile.profileName}, ` : "";
 
-  if (data.weakestKey === "Recognition") {
+  if (data.weakestKey === "recognition") {
     items.push({ title: "Rendre vos contributions visibles", desc: "Planifiez un point mensuel avec preuves concretes de vos resultats et impacts." });
-  } else if (data.weakestKey === "Growth") {
+  } else if (data.weakestKey === "growth") {
     items.push({ title: "Negocier une prochaine etape", desc: "Demandez une responsabilite additionnelle avec objectifs, perimetre et date de revue." });
-  } else if (data.weakestKey === "Meaning") {
+  } else if (data.weakestKey === "meaning") {
     items.push({ title: "Reconnecter votre role a l'impact", desc: "Reallouez du temps vers des missions utiles et visibles pour renforcer le sens au quotidien." });
   } else {
     items.push({ title: "Stabiliser votre environnement", desc: "Isolez un irritant majeur d'equipe et traitez-le via un rituel d'alignement hebdomadaire." });
   }
 
-  if (data.topPriorityKey === "Growth") {
+  if (data.topPriorityKey === "growth") {
     items.push({ title: "Prioriser votre progression", desc: `${profileHint}formalisez un plan 90 jours oriente competences et mobilite interne.`.trim() });
-  } else if (data.topPriorityKey === "Meaning") {
+  } else if (data.topPriorityKey === "meaning") {
     items.push({ title: "Renforcer l'utilite de vos missions", desc: `${profileHint}negociez un ajustement de perimetre autour des sujets a plus fort impact.`.trim() });
-  } else if (data.topPriorityKey === "Recognition") {
+  } else if (data.topPriorityKey === "recognition") {
     items.push({ title: "Clarifier vos criteres de reconnaissance", desc: `${profileHint}alignez avec votre manager les attentes explicites de visibilite, contribution et progression.`.trim() });
   } else {
     items.push({ title: "Ameliorer vos conditions d'execution", desc: `${profileHint}clarifiez charge, priorites et mode de collaboration pour fiabiliser le cadre de travail.`.trim() });
@@ -904,7 +1105,7 @@ function activateZone(isc) {
   return isc;
 }
 
-function drawRadarChart(dimensions) {
+function drawRadarChart(radarData) {
   if (!ui.radarChart) return;
   const canvas = ui.radarChart;
   const ctx = canvas.getContext("2d");
@@ -926,12 +1127,15 @@ function drawRadarChart(dimensions) {
   ctx.clearRect(0, 0, size, size);
 
   const center = size / 2;
-  const keys = ["Meaning", "Growth", "Recognition", "Environment"];
-  const labels = ["Sens", "Evolution", "Reconnaissance", "Environnement"];
-  const values = keys.map((key) => Math.max(0, Math.min(100, Number(dimensions[key] || 0))));
+  const normalizedDimensions = normalizeDimensionScores(radarData);
+  const keys = [...INTERNAL_DIMENSION_KEYS];
+  const labels = keys.map((key) => getDimensionLabelFr(key));
+  const values = keys.map((key) => normalizedDimensions[key]);
   const angles = keys.map((_, i) => (-Math.PI / 2) + (i * 2 * Math.PI / keys.length));
-  const overallScore = Number.isFinite(latestResult?.isc)
-    ? latestResult.isc
+  const overallScore = Number.isFinite(radarData?.isc)
+    ? Math.round(radarData.isc)
+    : Number.isFinite(latestResult?.isc)
+      ? latestResult.isc
     : Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
 
   // Dedicated compact mobile mode:
@@ -1253,16 +1457,17 @@ function drawRadarChart(dimensions) {
   ctx.fillText(String(overallScore), center, center - 2);
 }
 
-function renderDimensionBars(dimensions) {
-  if (ui.valMeaning) ui.valMeaning.textContent = `${dimensions.Meaning}`;
-  if (ui.valGrowth) ui.valGrowth.textContent = `${dimensions.Growth}`;
-  if (ui.valRecognition) ui.valRecognition.textContent = `${dimensions.Recognition}`;
-  if (ui.valEnvironment) ui.valEnvironment.textContent = `${dimensions.Environment}`;
-  if (ui.barMeaning) ui.barMeaning.style.width = `${dimensions.Meaning}%`;
-  if (ui.barGrowth) ui.barGrowth.style.width = `${dimensions.Growth}%`;
-  if (ui.barRecognition) ui.barRecognition.style.width = `${dimensions.Recognition}%`;
-  if (ui.barEnvironment) ui.barEnvironment.style.width = `${dimensions.Environment}%`;
-  drawRadarChart(dimensions);
+function renderDimensionBars(scores, isc = latestResult?.isc) {
+  const normalized = normalizeDimensionScores(scores);
+  if (ui.valMeaning) ui.valMeaning.textContent = `${normalized.meaning}`;
+  if (ui.valGrowth) ui.valGrowth.textContent = `${normalized.growth}`;
+  if (ui.valRecognition) ui.valRecognition.textContent = `${normalized.recognition}`;
+  if (ui.valEnvironment) ui.valEnvironment.textContent = `${normalized.environment}`;
+  if (ui.barMeaning) ui.barMeaning.style.width = `${normalized.meaning}%`;
+  if (ui.barGrowth) ui.barGrowth.style.width = `${normalized.growth}%`;
+  if (ui.barRecognition) ui.barRecognition.style.width = `${normalized.recognition}%`;
+  if (ui.barEnvironment) ui.barEnvironment.style.width = `${normalized.environment}%`;
+  drawRadarChart({ ...normalized, isc });
 }
 
 function renderRecommendations(target, items) {
@@ -1331,29 +1536,39 @@ function buildShareSummary(result) {
   if (!result) return "";
   const profileName = result.careerProfile?.profileName || "Profil carrière";
   const stateLabel = result.state?.label || "Résultat ISC";
+  const strongestKey = result.strongestDimension;
+  const weakestKey = result.weakestDimension;
   const lines = [
     `Mon profil carrière : ${profileName}`,
     `ISC : ${result.isc}/100`,
     `État : ${stateLabel}`
   ];
 
-  if (result.dimensions) {
-    lines.push(`Moteur principal : ${friendlyDimension(getStrongestDimension(result.dimensions))}`);
-    lines.push(`Point de vigilance : ${friendlyDimension(getWeakestDimension(result.dimensions))}`);
+  if (!strongestKey || !weakestKey) {
+    console.error("[JobPulse][Engine] Missing strongest/weakest dimension in final result", result);
+    return lines.join("\n");
   }
+
+  lines.push(`Moteur principal : ${friendlyDimension(strongestKey)}`);
+  lines.push(`Point de vigilance : ${friendlyDimension(weakestKey)}`);
 
   return lines.join("\n");
 }
 
-function renderShareCard(result, strongestKey, weakestKey) {
+function renderShareCard(result) {
   if (!ui.shareResultCard) return;
+  const strongestKey = result.strongestDimension;
+  const weakestKey = result.weakestDimension;
   const profileName = result.careerProfile?.profileName;
   const profileIcon = result.careerProfile?.icon || "";
   ui.shareCardProfileLine.textContent = profileName ? `${profileIcon} ${profileName}`.trim() : "Mon résultat carrière";
   ui.shareCardISCLine.textContent = `ISC : ${result.isc}`;
   ui.shareCardStateLine.textContent = result.state.label;
-  ui.shareCardStrongLine.textContent = `Moteur : ${friendlyDimension(strongestKey)}`;
-  ui.shareCardWeakLine.textContent = `Vigilance : ${friendlyDimension(weakestKey)}`;
+  ui.shareCardStrongLine.textContent = `Moteur : ${friendlyDimension(strongestKey || "meaning")}`;
+  ui.shareCardWeakLine.textContent = `Vigilance : ${friendlyDimension(weakestKey || "environment")}`;
+  if (!strongestKey || !weakestKey) {
+    console.error("[JobPulse][Engine] Share card rendered with fallback dimension labels", result);
+  }
 }
 
 function roundedRect(ctx, x, y, w, h, r) {
@@ -1442,26 +1657,6 @@ function exportShareCard() {
 }
 
 function computeAndShowResults() {
-  const dimensions = computeDimensions();
-  const isc = computeISC(dimensions, customWeights);
-  const state = getCareerState(isc);
-  const dimensionRanking = getDimensionRanking(dimensions);
-  const strongestKey = getStrongestDimension(dimensions);
-  const secondStrongestKey = getSecondStrongestDimension(dimensions);
-  const weakestKey = getWeakestDimension(dimensions);
-  const strongestValue = dimensions[strongestKey];
-  const weakestValue = dimensions[weakestKey];
-  const secondStrongestValue = dimensions[secondStrongestKey];
-  const topPriorityKey = getTopPriority(customWeights);
-  const topPriorityValue = dimensions[topPriorityKey];
-  const careerProfile = getCareerProfile({
-    iscScore: isc,
-    sensScore: dimensions.Meaning,
-    evolutionScore: dimensions.Growth,
-    reconnaissanceScore: dimensions.Recognition,
-    environnementScore: dimensions.Environment
-  });
-
   const contextData = {
     domainLabel: ui.domainSelect.options[ui.domainSelect.selectedIndex]?.text || "N/A",
     functionLabel: ui.functionSelect.options[ui.functionSelect.selectedIndex]?.text || "N/A",
@@ -1471,30 +1666,29 @@ function computeAndShowResults() {
     offerLabel: ui.offerSelect.value ? (ui.offerSelect.options[ui.offerSelect.selectedIndex]?.text || "") : ""
   };
 
-  const analysis = buildPersonalizedAnalysis({
-    state,
-    strongestKey,
-    strongestValue,
-    weakestKey,
-    weakestValue,
-    topPriorityKey,
-    topPriorityValue,
-    profile,
-    careerProfile
-  });
-  const recommendations = buildRecommendations({ weakestKey, topPriorityKey, profile, careerProfile });
-
-  latestResult = {
-    isc,
-    dimensions,
-    careerProfile,
-    analysis,
-    state,
+  const result = computeTestResult(answers, {
+    weights: customWeights,
     profile: { ...profile },
-    contextData,
-    weights: { ...customWeights },
-    generatedAt: new Date().toISOString()
-  };
+    contextData
+  });
+
+  if (!result || !isCompleteTestResult(result)) {
+    console.error("[JobPulse][Engine] Results rendering aborted: incomplete computed result", {
+      answers,
+      customWeights,
+      profile,
+      result
+    });
+    return;
+  }
+
+  latestResult = result;
+
+  const isc = latestResult.isc;
+  const state = latestResult.state;
+  const careerProfile = latestResult.careerProfile;
+  const scores = latestResult.scores;
+  const normalizedWeights = latestResult.weights || normalizeWeightsForScoring(customWeights);
 
   ui.chiScore.textContent = `${isc}`;
   ui.chiLabel.textContent = state.label;
@@ -1504,28 +1698,28 @@ function computeAndShowResults() {
   else if (state.key === "progress") ui.chiLabel.classList.add("state-progress");
   else ui.chiLabel.classList.add("state-aligned");
   ui.chiSummary.textContent = state.helper;
-  ui.calcFormula.textContent = `ISC = Sens*${customWeights.Meaning.toFixed(2)} + Evolution*${customWeights.Growth.toFixed(2)} + Reconnaissance*${customWeights.Recognition.toFixed(2)} + Environnement*${customWeights.Environment.toFixed(2)}`;
+  ui.calcFormula.textContent = `ISC = Sens*${normalizedWeights.meaning.toFixed(2)} + Évolution*${normalizedWeights.growth.toFixed(2)} + Reconnaissance*${normalizedWeights.recognition.toFixed(2)} + Environnement*${normalizedWeights.environment.toFixed(2)}`;
   ui.resultDate.textContent = `Généré le ${new Date(latestResult.generatedAt).toLocaleString("fr-FR")}`;
   updateGauge(isc);
-  renderDimensionBars(dimensions);
+  renderDimensionBars(scores, isc);
   renderCareerProfile(careerProfile, isc);
   if (ui.socialComparisonLine) {
     const percentile = getSocialComparisonPercent(careerProfile.profileKey, isc);
     ui.socialComparisonLine.textContent = `Vous faites partie des ${percentile}% de profils ${careerProfile.profileName}.`;
   }
-  if (ui.quickStrongestDimension) ui.quickStrongestDimension.textContent = friendlyDimension(strongestKey);
-  if (ui.quickWeakestDimension) ui.quickWeakestDimension.textContent = friendlyDimension(weakestKey);
+  if (ui.quickStrongestDimension) ui.quickStrongestDimension.textContent = friendlyDimension(latestResult.strongestDimension);
+  if (ui.quickWeakestDimension) ui.quickWeakestDimension.textContent = friendlyDimension(latestResult.weakestDimension);
   ui.dimensionSummary.textContent = "";
   if (ui.secondDimensionSummary) {
     ui.secondDimensionSummary.hidden = true;
     ui.secondDimensionSummary.textContent = "";
   }
-  ui.analysisText.textContent = analysis;
+  ui.analysisText.textContent = latestResult.analysis;
   if (ui.recommendationContext) {
     ui.recommendationContext.textContent = `Contexte : ${contextData.domainLabel} | ${contextData.functionLabel} | ${contextData.companySizeLabel} | ${contextData.tenureLabel} | ${contextData.hierarchyLabel}${contextData.offerLabel ? ` | ${contextData.offerLabel}` : ""}`;
   }
-  renderRecommendations(ui.actionsList, recommendations);
-  renderShareCard(latestResult, strongestKey, weakestKey);
+  renderRecommendations(ui.actionsList, latestResult.recommendations);
+  renderShareCard(latestResult);
   ui.careerShareLine.textContent = buildShareSummary(latestResult);
   showScreen("results");
 }
@@ -1629,14 +1823,20 @@ setupPriorityDragAndDrop();
 setupPriorityTouchReorder();
 setupPriorityButtonReorder();
 resetWeights();
+runEngineValidationScenarios();
 
 const scoreDetails = document.querySelector(".balance-card.details-card");
 if (scoreDetails) {
   scoreDetails.addEventListener("toggle", () => {
-    if (scoreDetails.open && latestResult?.dimensions) drawRadarChart(latestResult.dimensions);
+    if (scoreDetails.open && latestResult?.scores) {
+      drawRadarChart({ ...latestResult.scores, isc: latestResult.isc });
+    }
   });
 }
 window.addEventListener("resize", () => {
-  if (latestResult?.dimensions) drawRadarChart(latestResult.dimensions);
+  if (latestResult?.scores) {
+    drawRadarChart({ ...latestResult.scores, isc: latestResult.isc });
+  }
 });
+
 
