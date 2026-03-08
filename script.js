@@ -271,7 +271,7 @@ const screens = {
 };
 
 const ui = {
-  startBtn: document.getElementById("start-btn"),
+  startButtons: [...document.querySelectorAll("[data-start-diagnosis]")],
   weightsNextBtn: document.getElementById("weights-next-btn"),
   weightsResetBtn: document.getElementById("weights-reset-btn"),
   priorityList: document.getElementById("priority-list"),
@@ -284,6 +284,8 @@ const ui = {
   progressFill: document.getElementById("progress-fill"),
   questionText: document.getElementById("question-text"),
   questionCard: document.getElementById("question-card"),
+  questionCardProgress: document.getElementById("question-card-progress"),
+  firstQuestionScale: document.getElementById("first-question-scale"),
   answerRange: document.getElementById("answer-range"),
   answerValue: document.getElementById("answer-value"),
   nextBtn: document.getElementById("next-btn"),
@@ -345,6 +347,7 @@ let currentQuestionIndex = 0;
 let answers = new Array(questions.length).fill(null);
 let customWeights = { Meaning: 0.4, Growth: 0.3, Recognition: 0.2, Environment: 0.1 };
 let latestResult = null;
+let isQuestionTransitioning = false;
 const profile = {
   domainInput: "tech_it",
   functionInput: "it_data_product",
@@ -540,6 +543,38 @@ function renderQuestion() {
   const value = answers[currentQuestionIndex] || 3;
   ui.answerRange.value = String(value);
   ui.answerValue.textContent = String(value);
+
+  screens.questions.classList.add("question-prototype-active");
+  ui.questionCard.classList.add("question-card-prototype");
+  if (ui.questionCardProgress) {
+    ui.questionCardProgress.hidden = false;
+    ui.questionCardProgress.textContent = `Question ${currentQuestionIndex + 1} / ${questions.length}`;
+  }
+  if (ui.firstQuestionScale) ui.firstQuestionScale.hidden = false;
+}
+
+function prefersReducedMotion() {
+  return Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+
+async function playQuestionCardTransition(phase) {
+  if (!ui.questionCard || prefersReducedMotion()) return;
+  if (typeof ui.questionCard.animate !== "function") return;
+
+  const toOpacity = 0.92;
+  const keyframes = phase === "out"
+    ? [{ opacity: 1 }, { opacity: toOpacity }]
+    : [{ opacity: toOpacity }, { opacity: 1 }];
+  const timing = phase === "out"
+    ? { duration: 120, easing: "cubic-bezier(0.4, 0, 1, 1)" }
+    : { duration: 140, easing: "cubic-bezier(0, 0, 0.2, 1)" };
+
+  const anim = ui.questionCard.animate(keyframes, timing);
+  try {
+    await anim.finished;
+  } catch {
+    // No-op: if animation is interrupted, continue without blocking navigation.
+  }
 }
 
 function averageTo100(values) {
@@ -1520,9 +1555,11 @@ async function shareISC() {
   }
 }
 
-ui.startBtn.addEventListener("click", () => {
-  resetWeights();
-  showScreen("weights");
+ui.startButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    resetWeights();
+    showScreen("weights");
+  });
 });
 
 ui.weightsNextBtn.addEventListener("click", startQuestions);
@@ -1538,7 +1575,8 @@ ui.answerRange.addEventListener("input", () => {
   ui.answerValue.textContent = String(value);
 });
 
-ui.nextBtn.addEventListener("click", () => {
+ui.nextBtn.addEventListener("click", async () => {
+  if (isQuestionTransitioning) return;
   if (answers[currentQuestionIndex] === null) answers[currentQuestionIndex] = Number(ui.answerRange.value);
   ui.questionCard.classList.remove("bump");
   void ui.questionCard.offsetWidth;
@@ -1546,8 +1584,12 @@ ui.nextBtn.addEventListener("click", () => {
   if (navigator.vibrate) navigator.vibrate(12);
 
   if (currentQuestionIndex < questions.length - 1) {
+    isQuestionTransitioning = true;
+    await playQuestionCardTransition("out");
     currentQuestionIndex += 1;
     renderQuestion();
+    await playQuestionCardTransition("in");
+    isQuestionTransitioning = false;
     return;
   }
   showScreen("profile");
