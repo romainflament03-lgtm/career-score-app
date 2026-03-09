@@ -1,5 +1,9 @@
 # Plan De Tests QA Strict - JobPulse (MVP)
 
+## 0. Reference Croisee DoD
+- DoD actif: `docs/DOD_RECOMMANDATIONS_ROBUSTE.md`
+- Ce plan QA est la reference d'execution pour valider les criteres bloquants du DoD.
+
 ## 1. Objectif
 Valider de manière stricte que le parcours JobPulse est fonctionnel, lisible, déterministe et exploitable en mobile-first, sans régression desktop.
 
@@ -205,6 +209,46 @@ Valider de manière stricte que le parcours JobPulse est fonctionnel, lisible, d
   - When l'utilisateur clique `Refaire le diagnostic`
   - Then le parcours redémarre depuis l'accueil.
 
+### 6.11 Resultats - Personnalisation Recommandations
+- `TC-RES-REC-PER-01`
+  - Given un role connu et un secteur connu
+  - When les recommandations sont generees
+  - Then au moins 2 actions sur 3 sont explicitement contextualisees (role et/ou secteur).
+- `TC-RES-REC-PER-02`
+  - Given role connu et secteur inconnu
+  - When les recommandations sont generees
+  - Then au moins 1 action est specifique au role et les 3 actions restent valides.
+- `TC-RES-REC-PER-03`
+  - Given role inconnu et secteur connu
+  - When les recommandations sont generees
+  - Then au moins 1 action est specifique au secteur et les 3 actions restent valides.
+- `TC-RES-REC-PER-04`
+  - Given role/secteur absents ou invalides
+  - When les recommandations sont generees
+  - Then le fallback est applique sans crash, avec 3 actions actionnables et non vides.
+- `TC-RES-REC-PER-05`
+  - Given un meme input utilisateur
+  - When le calcul est relance plusieurs fois
+  - Then les recommandations retournees sont strictement identiques (determinisme).
+- `TC-RES-REC-PER-06`
+  - Given l'ecran resultats
+  - When les 3 actions sont affichees
+  - Then les 3 titres sont distincts (pas de doublon direct).
+
+### 6.12 Resultats - Qualite Editoriale
+- `TC-RES-EDIT-01`
+  - Given la section `Vos 3 actions prioritaires`
+  - When les textes sont affiches
+  - Then chaque action commence par un verbe d'action.
+- `TC-RES-EDIT-02`
+  - Given la section `Comprendre le diagnostic`
+  - When le texte est rendu
+  - Then il explique clairement le resultat et les actions proposees.
+- `TC-RES-EDIT-03`
+  - Given les recommandations et le diagnostic
+  - When l'utilisateur lit les contenus
+  - Then aucune contradiction evidente n'apparait avec le score/etat.
+
 ## 7. Matrice Responsive (Vérifications Minimales)
 - `RESP-01` : aucun débordement horizontal à 360px.
 - `RESP-02` : Hero lisible sans zoom à 360px.
@@ -226,3 +270,18 @@ No-go release si :
 - au moins 1 cas critique en échec,
 - ou régression responsive majeure mobile,
 - ou incohérence score/état/diagnostic.
+
+## 10. Mapping DoD -> QA
+- DoD `2) Fonctionnel`: `TC-RES-DIAG-01`, `TC-RES-DIAG-02`, `TC-RES-REC-01`, `TC-RES-STATE-01..04`.
+- DoD `3) Personnalisation role/secteur`: `TC-RES-REC-PER-01..06`.
+- DoD `4) Qualite editoriale`: `TC-RES-EDIT-01..03`.
+- DoD `5) Robustesse donnees`: `TC-RES-REC-PER-04` + `JS-01`.
+- DoD `6) UX responsive/mobile`: `RESP-01..04`, `TC-RES-HERO-01`, `TC-RES-HERO-04`, `TC-RAD-01..07`.
+- DoD `7) Accessibilite`: validation manuelle focus/contraste/ordre tab sur tous les ecrans interactifs.
+- DoD `8) Technique`: `JS-01`, `JS-02`, `TC-SHARE-01`, `TC-SHARE-02`, `TC-RESTART-01`.
+- DoD `9) QA minimale`: sections `3`, `6`, `7`, `8` de ce document.
+- DoD `10) Performance et stabilite`: verification manuelle absence de freeze et saut visuel au rendu resultats.
+
+## 11. Regle Go/No-Go Alignee DoD
+- Toute non-conformite sur un critere DoD bloquant reference dans la section 10 entraine un No-Go release.
+- Les ecarts mineurs non bloquants doivent etre journalises avec owner, impact et date de correction cible.
