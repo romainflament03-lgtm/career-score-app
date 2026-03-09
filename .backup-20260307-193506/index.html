@@ -23,19 +23,107 @@
           <p class="brand-name">JobPulse</p>
         </div>
       </header>
-      <div class="screen-main">
-        <article class="card card-center">
-          <p class="eyebrow">Diagnostic carri&egrave;re express</p>
-          <h1>&Eacute;valuez votre alignement professionnel</h1>
-          <p class="subtitle">10 questions, 3 minutes, 3 actions concr&egrave;tes.</p>
-        </article>
+      <div class="screen-main landing-main">
+        <div class="landing-shell">
+          <section class="landing-hero" aria-labelledby="landing-hero-title">
+            <div class="landing-hero-copy">
+              <p class="landing-eyebrow">Diagnostic carri&egrave;re</p>
+              <h1 id="landing-hero-title">Votre carri&egrave;re est-elle align&eacute;e avec ce qui compte vraiment pour vous&nbsp;?</h1>
+              <p class="landing-description">
+                R&eacute;pondez &agrave; 10 questions et d&eacute;couvrez votre
+                <strong>Indice de Sant&eacute; de Carri&egrave;re.</strong>
+              </p>
+              <p class="landing-description landing-description-secondary">
+                Un diagnostic rapide pour mieux comprendre ce qui vous motive, ce qui vous freine, et comment agir.
+              </p>
+              <button id="start-btn" class="btn btn-primary landing-cta" data-start-diagnosis>
+                <span>Commencer le diagnostic</span>
+              </button>
+              <ul class="landing-proof-points" aria-label="Preuves rapides">
+                <li><span class="proof-check">&#10003;</span><span>2 minutes</span></li>
+                <li><span class="proof-check">&#10003;</span><span>10 questions</span></li>
+                <li><span class="proof-check">&#10003;</span><span>r&eacute;sultat imm&eacute;diat</span></li>
+              </ul>
+            </div>
+            <div class="landing-hero-visual" aria-hidden="true">
+              <div class="landing-visual-glow"></div>
+              <div class="landing-visual-frame">
+                <img
+                  class="landing-hero-illustration"
+                  src="assets/lp-hero.png"
+                  alt="Illustration d'un professionnel face &agrave; un choix de trajectoire de carri&egrave;re"
+                  loading="eager"
+                  decoding="async"
+                >
+              </div>
+              <div class="landing-visual-shine"></div>
+            </div>
+          </section>
+
+          <section class="landing-block" aria-labelledby="landing-value-title">
+            <h2 id="landing-value-title" class="landing-section-title">Un diagnostic simple, mais utile</h2>
+            <div class="landing-step-grid">
+              <article class="landing-step-card">
+                <img class="landing-step-icon-image" src="assets/lp-step-profile.png" alt="" loading="lazy" decoding="async">
+                <h3>Comprendre votre profil</h3>
+                <p>Identifiez vos principales sources de motivation dans votre vie professionnelle.</p>
+              </article>
+              <article class="landing-step-card">
+                <img class="landing-step-icon-image" src="assets/lp-step-score.png" alt="" loading="lazy" decoding="async">
+                <h3>Mesurer votre alignement</h3>
+                <p>Obtenez un score clair pour situer votre niveau d'&eacute;quilibre actuel.</p>
+              </article>
+              <article class="landing-step-card">
+                <img class="landing-step-icon-image" src="assets/lp-step-action.png" alt="" loading="lazy" decoding="async">
+                <h3>Passer &agrave; l'action</h3>
+                <p>Recevez 3 recommandations prioritaires pour am&eacute;liorer votre situation.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="landing-block" aria-labelledby="landing-dimensions-title">
+            <h2 id="landing-dimensions-title" class="landing-section-title">Votre score repose sur 4 dimensions essentielles</h2>
+            <div class="landing-dimension-grid">
+              <article class="landing-dimension-card">
+                <img class="landing-dimension-icon-image" src="assets/lp-dim-meaning.png" alt="" loading="lazy" decoding="async">
+                <div>
+                  <h3>Sens</h3>
+                  <p>Le sentiment d'utilit&eacute; et de coh&eacute;rence dans votre travail.</p>
+                </div>
+              </article>
+              <article class="landing-dimension-card">
+                <img class="landing-dimension-icon-image" src="assets/lp-dim-evolution.png" alt="" loading="lazy" decoding="async">
+                <div>
+                  <h3>&Eacute;volution</h3>
+                  <p>Vos perspectives d'apprentissage, de progression et de trajectoire.</p>
+                </div>
+              </article>
+              <article class="landing-dimension-card">
+                <img class="landing-dimension-icon-image" src="assets/lp-dim-recognition.png" alt="" loading="lazy" decoding="async">
+                <div>
+                  <h3>Reconnaissance</h3>
+                  <p>La visibilit&eacute;, la valorisation et la consid&eacute;ration de vos efforts.</p>
+                </div>
+              </article>
+              <article class="landing-dimension-card">
+                <img class="landing-dimension-icon-image" src="assets/lp-dim-environment.png" alt="" loading="lazy" decoding="async">
+                <div>
+                  <h3>Environnement</h3>
+                  <p>La qualit&eacute; du cadre de travail, de l'&eacute;quipe et du climat pro.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="landing-final-cta" aria-label="Appel &agrave; l'action final">
+            <h2>Faites le point sur <strong>votre &eacute;quilibre professionnel</strong></h2>
+            <p>En 2 minutes, obtenez un diagnostic personnalis&eacute; et un plan d'action clair.</p>
+            <button id="start-btn-bottom" class="btn btn-primary landing-cta landing-cta-secondary" type="button" data-start-diagnosis>
+              <span>Lancer le test</span>
+            </button>
+          </section>
+        </div>
       </div>
-      <footer class="screen-footer">
-        <button id="start-btn" class="btn btn-primary">
-          <span>Commencer</span>
-          <span class="material-symbols-outlined">arrow_forward</span>
-        </button>
-      </footer>
     </section>
 
     <section id="screen-weights" class="screen">
@@ -157,8 +245,22 @@
       </header>
       <div class="screen-main">
         <article id="question-card" class="card card-center">
+          <p id="question-card-progress" class="question-card-progress" hidden>Question 1 / 10</p>
           <h2 id="question-text"></h2>
           <div class="slider-wrap">
+            <div id="first-question-scale" class="first-question-scale" hidden>
+              <div class="first-question-extremes">
+                <span>Pas du tout</span>
+                <span>Totalement</span>
+              </div>
+              <div class="first-question-numbers" aria-hidden="true">
+                <span>1</span>
+                <span>2</span>
+                <span>3</span>
+                <span>4</span>
+                <span>5</span>
+              </div>
+            </div>
             <input id="answer-range" type="range" min="1" max="5" step="1" value="3">
             <div class="slider-labels">
               <span>1 - Pas du tout</span>
@@ -292,7 +394,7 @@
         <article class="card score-card hero-score-card">
           <div class="hero-identity">
             <p class="identity-kicker">Votre profil carri&egrave;re est :</p>
-            <p id="careerProfileName" class="identity-name">Strat&egrave;ge</p>
+            <p id="careerProfileName" class="identity-name"></p>
 
             <div class="career-profile-visual">
               <div class="career-profile-media">
@@ -303,30 +405,29 @@
               </div>
             </div>
 
-            <p id="careerProfileDescription" class="identity-signature">Vous avancez lorsque votre travail combine impact et progression.</p>
+            <p id="careerProfileDescription" class="identity-signature"></p>
 
             <div id="chiGauge" class="hero-score-panel">
-              <p class="hero-isc-line"><span class="hero-isc-prefix">ISC</span><span id="chiScore" class="chi-score">0</span></p>
+              <p class="hero-isc-line"><span class="hero-isc-prefix">ISC</span><span id="chiScore" class="chi-score"></span></p>
               <div class="isc-progress-track" aria-hidden="true">
                 <div id="heroProgressFill" class="isc-progress-fill"></div>
               </div>
-              <p id="chiLabel" class="chi-label">En progression</p>
-              <p id="socialComparisonLine" class="social-comparison">Vous faites partie des 22% de profils Strat&egrave;ge.</p>
+              <p id="chiLabel" class="chi-label"></p>
+              <p id="socialComparisonLine" class="social-comparison"></p>
             </div>
 
             <div class="share-buttons">
               <button id="share-btn" class="btn btn-primary" type="button">Partager mon profil carri&egrave;re</button>
-              <button id="download-card-btn" class="btn btn-secondary" type="button">T&eacute;l&eacute;charger ma carte</button>
             </div>
 
             <div id="shareResultCard" class="share-result-card" hidden>
               <p class="share-card-title">R&eacute;sum&eacute; partageable</p>
-              <p id="shareCardProfileLine" class="share-card-profile">Strat&egrave;ge</p>
-              <p id="shareCardISCLine" class="share-card-isc">ISC : 0</p>
-              <p id="shareCardStateLine" class="share-card-state">En progression</p>
+              <p id="shareCardProfileLine" class="share-card-profile"></p>
+              <p id="shareCardISCLine" class="share-card-isc"></p>
+              <p id="shareCardStateLine" class="share-card-state"></p>
               <div class="share-card-diagnostic">
-                <p id="shareCardStrongLine">Moteur : -</p>
-                <p id="shareCardWeakLine">Vigilance : -</p>
+                <p id="shareCardStrongLine"></p>
+                <p id="shareCardWeakLine"></p>
               </div>
               <p class="share-card-brand">jobpulse.app</p>
             </div>
@@ -334,13 +435,13 @@
 
           <p id="calcFormula" class="calc-note" hidden></p>
           <p id="result-date" class="calc-note" hidden></p>
-          <p id="careerStateLabel" class="career-state-label" hidden>En progression</p>
-          <p id="careerISCScore" class="career-isc-score" hidden>ISC: 0 / 100</p>
+          <p id="careerStateLabel" class="career-state-label" hidden></p>
+          <p id="careerISCScore" class="career-isc-score" hidden></p>
           <p id="careerShareLine" class="career-share-line" hidden></p>
-          <p id="careerStrongestDimension" hidden>-</p>
-          <p id="careerWeakestDimension" hidden>-</p>
+          <p id="careerStrongestDimension" hidden></p>
+          <p id="careerWeakestDimension" hidden></p>
           <p id="careerSecondRow" hidden></p>
-          <p id="careerSecondDimension" hidden>-</p>
+          <p id="careerSecondDimension" hidden></p>
           <button id="copy-summary-btn" type="button" hidden>Copier</button>
         </article>
 
@@ -349,14 +450,14 @@
           <div class="quick-diagnostic">
             <div class="diag-card">
               <p class="diag-label">&#128293; Ce qui vous motive</p>
-              <p id="quickStrongestDimension" class="diag-value">-</p>
+              <p id="quickStrongestDimension" class="diag-value"></p>
             </div>
             <div class="diag-card">
               <p class="diag-label">&#9888; Ce qui peut vous freiner</p>
-              <p id="quickWeakestDimension" class="diag-value">-</p>
+              <p id="quickWeakestDimension" class="diag-value"></p>
             </div>
           </div>
-          <p id="chiSummary" class="hero-summary">Votre situation est globalement positive mais certains leviers peuvent encore &ecirc;tre renforc&eacute;s.</p>
+          <p id="chiSummary" class="hero-summary"></p>
         </article>
 
         <article class="card actions-card">
@@ -368,7 +469,15 @@
           <summary>Votre &eacute;quilibre professionnel</summary>
           <div class="details-content">
             <div class="radar-wrap">
-              <canvas id="radarChart" class="radar-chart" width="320" height="320" aria-label="Graphique radar des 4 dimensions"></canvas>
+              <div class="radar-wrapper">
+                <div class="radar-chart-area">
+                  <canvas id="radarChart" class="radar-chart" width="320" height="320" aria-label="Graphique radar des 4 dimensions"></canvas>
+                </div>
+                <div class="radar-label radar-label-top">Sens</div>
+                <div class="radar-label radar-label-right">Evolution</div>
+                <div class="radar-label radar-label-bottom">Reconnaissance</div>
+                <div class="radar-label radar-label-left">Environnement</div>
+              </div>
               <p class="radar-context-note">Votre score ISC se construit &agrave; partir de 4 dimensions cl&eacute;s de votre exp&eacute;rience professionnelle.</p>
             </div>
             <p id="dimensionSummary" class="calc-note"></p>
@@ -379,7 +488,7 @@
         <details class="card details-card">
           <summary>Comprendre le diagnostic</summary>
           <div class="details-content">
-            <p id="analysisText" class="analysis-text">Votre analyse personnalis&eacute;e appara&icirc;tra ici.</p>
+            <p id="analysisText" class="analysis-text"></p>
             <p id="recommendationContext" class="calc-note" hidden></p>
           </div>
         </details>
@@ -390,7 +499,9 @@
     </section>
   </main>
 
-  <script src="script.js"></script>
+  <script src="scripts/core.js"></script>
+  <script src="scripts/app.js"></script>
 </body>
 </html>
+
 
