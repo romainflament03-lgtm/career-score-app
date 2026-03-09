@@ -242,7 +242,7 @@ function jobIndicator(job) {
     case "it_ops":
       return "1 indicateur technique (fiabilité, lead time ou incidents) amélioré";
     case "data":
-      return "1 cas d'usage data prioritaire validé par le métier";
+      return "1 resultat concret (produit, process ou service) valide par le metier";
     case "product":
       return "1 décision produit formalisée avec impact mesuré";
     case "compta":
@@ -365,70 +365,525 @@ function friendlyDimension(key) {
   return getDimensionLabelFr(key);
 }
 
-function buildPersonalizedAnalysis(data) {
-  const strongest = friendlyDimension(data.strongestKey);
-  const weakest = friendlyDimension(data.weakestKey);
+const ROLE_LABEL_BY_INPUT = {
+  direction_leadership: "direction",
+  team_management: "management d'equipe",
+  manager_of_managers: "management transverse",
+  engineering_technical: "ingenierie technique",
+  it_data_product: "it/data/produit",
+  finance_accounting: "finance/comptabilite",
+  marketing_communication: "marketing/communication",
+  sales_business_dev: "business development",
+  operations_production: "operations/production",
+  support_admin: "support/administration",
+  human_resources: "ressources humaines",
+  research_expertise: "recherche/expertise",
+  other_function: "fonction transverse"
+};
 
-  let stateLine = "Votre résultat montre un besoin de réalignement progressif.";
-  if (data.state.key === "aligned") stateLine = "Votre resultat montre une situation actuellement bien alignee avec vos attentes.";
-  else if (data.state.key === "progress") stateLine = "Votre resultat montre une base solide avec une marge de progression ciblee.";
-  else if (data.state.key === "misaligned") stateLine = "Votre resultat montre un decalage entre vos attentes et votre experience actuelle.";
+const ROLE_LABEL_BY_LEGACY = {
+  manager_conseil: "management",
+  project_manager: "pilotage de projet",
+  dev: "ingenierie technique",
+  data: "it/data/produit",
+  compta: "finance/comptabilite",
+  marketing: "marketing/communication",
+  vente: "business development",
+  production: "operations/production",
+  backoffice_conseil: "support/administration",
+  consultant: "expertise/conseil",
+  autre_metier: "metier transverse"
+};
 
-  const priorityLine = data.topPriorityValue < 60
-    ? `Votre priorite principale est ${friendlyDimension(data.topPriorityKey)}, mais cet axe est aujourd'hui en retrait.`
-    : `Votre moteur principal est ${strongest}, avec un point de vigilance sur ${weakest.toLowerCase()}.`;
+const SECTOR_LABEL_BY_INPUT = {
+  tech_it: "tech/it",
+  finance_banking_insurance: "finance/assurance",
+  industry_engineering: "industrie/ingenierie",
+  health_pharma: "sante/pharma",
+  consulting_audit: "conseil/audit",
+  marketing_communication: "marketing/communication",
+  commerce_distribution: "commerce/distribution",
+  education_research: "education/recherche",
+  public_admin: "administration publique",
+  construction_real_estate: "construction/immobilier",
+  transport_logistics: "transport/logistique",
+  energy_environment: "energie/environnement",
+  media_creation: "media/creation",
+  hospitality_tourism: "hotellerie/tourisme",
+  other_domain: "secteur transverse"
+};
 
-  let actionLine = "Action immediate : formalisez une action visible et mesurable dans les 30 prochains jours.";
-  if (data.profile.offerIntent === "leave_immediately" || data.profile.offerIntent === "consider_seriously") {
-    actionLine = "Action immediate : comparez objectivement votre option interne et une option externe avant decision.";
-  } else if (data.weakestKey === "recognition") {
-    actionLine = "Action immediate : alignez des criteres de reconnaissance ecrits avec votre manager.";
-  } else if (data.weakestKey === "growth") {
-    actionLine = "Action immediate : obtenez une nouvelle responsabilite avec objectif clair et date de revue.";
-  } else if (data.weakestKey === "meaning") {
-    actionLine = "Action immediate : reallouez du temps vers des missions plus utiles et plus visibles.";
-  } else if (data.weakestKey === "environment") {
-    actionLine = "Action immediate : mettez en place un rituel hebdomadaire de priorisation avec votre manager.";
+const SECTOR_LABEL_BY_LEGACY = {
+  tech: "tech/it",
+  finance: "finance/assurance",
+  industrie: "industrie/ingenierie",
+  sante: "sante/pharma",
+  conseil: "conseil/audit",
+  commerce: "commerce/distribution",
+  education: "education/recherche",
+  public: "administration publique",
+  transport: "transport/logistique",
+  autre: "secteur transverse"
+};
+
+const ROLE_LEVER_BY_LEGACY = {
+  manager_conseil: "clarifiez les priorites, arbitrages et attentes de l'equipe",
+  project_manager: "cadrez objectifs, roles et decisions avec les parties prenantes",
+  dev: "rendez visible un gain concret de fiabilite ou de lead time",
+  data: "rendez visible un resultat concret sur un sujet prioritaire",
+  compta: "securisez les livrables critiques et clarifiez les priorites de charge",
+  marketing: "reliez chaque action a un objectif clair de performance",
+  vente: "concentrez l'effort sur les opportunites a plus forte valeur",
+  production: "stabilisez un irritant operationnel avec un resultat mesurable",
+  backoffice_conseil: "formalisez votre contribution aux objectifs de l'equipe",
+  consultant: "rendez visible la valeur de vos livrables pour les parties prenantes",
+  autre_metier: "rendez visible une contribution mesurable sur un cycle de 30 jours"
+};
+
+const ROLE_METRIC_BY_LEGACY = {
+  manager_conseil: "1 arbitrage prioritaire formalise chaque semaine",
+  project_manager: "1 decision cle documentee chaque semaine",
+  dev: "1 indicateur technique en amelioration continue",
+  data: "1 resultat concret documente et partage chaque mois",
+  compta: "1 livrable critique fiabilise avec moins de retours ou corrections",
+  marketing: "1 indicateur de performance en progression continue",
+  vente: "1 indicateur de conversion ou retention en amelioration",
+  production: "1 indicateur qualite, delai ou flux mieux maitrise",
+  backoffice_conseil: "1 contribution prioritaire visible en revue mensuelle",
+  consultant: "1 livrable a forte valeur reconnu en revue mensuelle",
+  autre_metier: "1 indicateur metier suivi chaque semaine"
+};
+
+const SECTOR_LEVER_BY_LEGACY = {
+  tech: "reliez vos actions a un impact produit ou a une meilleure qualite de livraison",
+  finance: "rattachez chaque action a risque, conformite ou performance",
+  industrie: "suivez un levier qualite, cadence ou securite",
+  sante: "priorisez la coordination pour reduire la surcharge",
+  conseil: "clarifiez valeur livree, visibilite et progression",
+  commerce: "ciblez un effet sur marge, conversion ou retention",
+  education: "equilibrez impact pedagogique et charge administrative",
+  public: "cadrez des objectifs de service atteignables",
+  transport: "ciblez un levier de fluidite operationnelle",
+  autre: "ancrez vos actions sur un indicateur metier concret"
+};
+
+const SECTOR_METRIC_BY_LEGACY = {
+  tech: "1 indicateur produit ou qualite de livraison suivi chaque semaine",
+  finance: "1 KPI risque/conformite/performance pilote chaque semaine",
+  industrie: "1 KPI qualite/cadence/securite stabilise sur 4 semaines",
+  sante: "1 indicateur de charge et coordination en amelioration",
+  conseil: "1 indicateur de valeur livree reconnu mensuellement",
+  commerce: "1 KPI marge/conversion/retention en progression",
+  education: "1 indicateur charge/impact pedagogique stabilise",
+  public: "1 indicateur de service valide avec la hierarchie",
+  transport: "1 indicateur de fluidite operationnelle en progression",
+  autre: "1 indicateur metier prioritaire suivi chaque semaine"
+};
+
+const ROLE_RISK_BY_LEGACY = {
+  manager_conseil: "des arbitrages instables qui fragilisent l'equipe",
+  project_manager: "des decisions tardives qui bloquent l'execution",
+  dev: "du rework technique et des interruptions de livraison",
+  data: "des contributions utiles qui n'influencent pas assez les decisions",
+  compta: "des livrables critiques renvoyes tardivement pour correction",
+  marketing: "des actions dispersees sans priorite ROI claire",
+  vente: "un pipe disperse sur des opportunites peu rentables",
+  production: "des irritants terrain qui degradent qualite et cadence",
+  backoffice_conseil: "des contributions utiles mais peu visibles",
+  consultant: "une valeur livree insuffisamment visible",
+  autre_metier: "des efforts qui peinent a se traduire en impact visible"
+};
+
+const ROLE_QUICK_WIN_BY_LEGACY = {
+  manager_conseil: "tenez une revue hebdomadaire courte pour trancher les priorites de l'equipe",
+  project_manager: "tenez un journal simple des decisions avec responsable et echeance",
+  dev: "traitez un irritant recurrent avec une cible de reduction mesurable",
+  data: "choisissez un sujet prioritaire et demontrez un impact concret pour l'equipe",
+  compta: "identifiez vos 3 livrables les plus sensibles et clarifiez proprietaires, echeances et niveau de qualite",
+  marketing: "arretez une action peu utile et concentrez l'effort sur un levier prioritaire",
+  vente: "segmentez le pipe et concentrez-vous sur le segment le plus rentable",
+  production: "stabilisez un poste critique avec standard operatoire et suivi quotidien",
+  backoffice_conseil: "formalisez vos 3 livrables critiques et leurs clients internes",
+  consultant: "reallouez votre temps vers les livrables a plus forte valeur client",
+  autre_metier: "choisissez un levier metier prioritaire et formalisez un plan 30 jours"
+};
+
+const SECTOR_RISK_BY_LEGACY = {
+  tech: "les cycles courts amplifient vite les dettes de priorisation",
+  finance: "les exigences de conformite rendent chaque erreur plus couteuse",
+  industrie: "les variations de qualite/cadence impactent rapidement les couts",
+  sante: "la surcharge degrade rapidement la coordination",
+  conseil: "la pression client masque facilement la progression de fond",
+  commerce: "la dispersion commerciale deteriore marge et retention",
+  education: "la charge administrative peut prendre le dessus",
+  public: "les contraintes administratives diluent la marge d'action",
+  transport: "les incidents operationnels se propagent vite sur la chaine",
+  autre: "l'absence de priorites explicites cree des arbitrages reactifs"
+};
+
+const SECTOR_OUTCOME_BY_LEGACY = {
+  tech: "fiabilite des livraisons et reduction des incidents",
+  finance: "fiabilite des livrables et tenue des jalons de conformite",
+  industrie: "stabilite qualite/cadence sur les operations critiques",
+  sante: "charge mieux regulee et coordination plus fluide",
+  conseil: "valeur client visible et progression clarifiee",
+  commerce: "marge, conversion et retention mieux pilotees",
+  education: "impact pedagogique protege malgre la charge",
+  public: "objectifs de service atteignables et suivis",
+  transport: "ponctualite et fluidite operationnelle en progression",
+  autre: "impact metier mesurable sur un cycle de 30 jours"
+};
+
+const WEAKNESS_PLAYBOOK = {
+  meaning: {
+    title: "Recentrer votre energie sur ce qui compte",
+    why: "Le risque actuel est de rester occupe sans renforcer votre impact reel.",
+    action: "Recadrez vos priorites autour d'un seul chantier a forte valeur et protegez du temps d'execution.",
+    indicator: "Un livrable a forte valeur livre et reconnu dans les 30 jours."
+  },
+  growth: {
+    title: "Declencher une progression visible",
+    why: "Le risque actuel est de contribuer fortement sans faire evoluer votre trajectoire.",
+    action: "Demandez une responsabilite supplementaire bien definie: objectif, perimetre et date de bilan.",
+    indicator: "Cette responsabilite est validee et ses criteres de reussite sont ecrits."
+  },
+  recognition: {
+    title: "Rendre votre contribution incontestable",
+    why: "Le risque actuel est que vos resultats restent utiles mais insuffisamment visibles.",
+    action: "Installez une revue courte et reguliere des resultats avec preuves factuelles.",
+    indicator: "Un rituel de revue actif avec criteres de reconnaissance explicites."
+  },
+  environment: {
+    title: "Stabiliser votre cadre d'execution",
+    why: "Le risque actuel est une execution reactive qui use votre energie et degrade la qualite.",
+    action: "Posez un rituel hebdomadaire d'arbitrage charge/priorites avec votre manager.",
+    indicator: "Baisse visible des urgences et des replanifications sur 4 semaines."
   }
+};
 
-  return `${stateLine} ${priorityLine} ${actionLine}`;
+const PRIORITY_PLAYBOOK = {
+  meaning: {
+    title: "Transformer votre utilite en impact visible",
+    why: "Votre attente principale est d'etre utile sur des sujets qui comptent vraiment.",
+    action: "Concentrez 20% de votre charge sur un chantier a effet concret et visible.",
+    indicator: "Un chantier prioritaire suivi jusqu'a impact concret en revue mensuelle."
+  },
+  growth: {
+    title: "Rendre votre progression incontestable",
+    why: "Votre attente principale est d'avancer, pas seulement de tenir le poste.",
+    action: "Construisez un plan 30 jours simple: competence ciblee, livrable attendu et sponsor identifie.",
+    indicator: "Le plan avance chaque semaine et debouche sur une preuve concrete."
+  },
+  recognition: {
+    title: "Installer une reconnaissance durable",
+    why: "Votre attente principale est que la valeur apportee soit clairement reconnue.",
+    action: "Formalisez vos preuves d'impact et alignez les criteres de reconnaissance avec votre manager.",
+    indicator: "Criteres de reconnaissance ecrits, partages et utilises en revue."
+  },
+  environment: {
+    title: "Poser un cadre de travail non negociable",
+    why: "Votre attente principale est de travailler dans un cadre clair et tenable.",
+    action: "Fixez des limites de charge, des priorites explicites et une regle d'escalade simple.",
+    indicator: "Cadre de priorisation applique de facon continue pendant 4 semaines."
+  }
+};
+
+const DIMENSION_THEME_BY_KEY = {
+  meaning: "l'utilite de vos missions",
+  growth: "votre progression de trajectoire",
+  recognition: "la visibilite de votre contribution",
+  environment: "la qualite de votre cadre d'execution"
+};
+
+const DIMENSION_CONTEXT_RISK_BY_KEY = {
+  meaning: "la dispersion sur des taches peu decisives",
+  growth: "la stagnation de trajectoire",
+  recognition: "une valeur livree qui reste insuffisamment visible",
+  environment: "une execution reactive qui epuise dans la duree"
+};
+
+const STATE_NARRATIVE_BY_KEY = {
+  aligned: "Votre dynamique actuelle est globalement coherente.",
+  progress: "Votre dynamique actuelle est saine, avec une marge d'acceleration reelle.",
+  misaligned: "Votre dynamique actuelle montre un decalage concret a corriger.",
+  risk: "Votre dynamique actuelle est sous tension et demande un recadrage rapide."
+};
+
+function hasKnownRole(profile = {}) {
+  if (profile.functionInput) {
+    return profile.functionInput !== "other_function"
+      && Object.prototype.hasOwnProperty.call(ROLE_LABEL_BY_INPUT, profile.functionInput);
+  }
+  if (profile.job) {
+    return profile.job !== "autre_metier"
+      && Object.prototype.hasOwnProperty.call(ROLE_LABEL_BY_LEGACY, profile.job);
+  }
+  return false;
 }
+
+function hasKnownSector(profile = {}) {
+  if (profile.domainInput) {
+    return profile.domainInput !== "other_domain"
+      && Object.prototype.hasOwnProperty.call(SECTOR_LABEL_BY_INPUT, profile.domainInput);
+  }
+  if (profile.domain) {
+    return profile.domain !== "autre"
+      && Object.prototype.hasOwnProperty.call(SECTOR_LABEL_BY_LEGACY, profile.domain);
+  }
+  return false;
+}
+
+function getRoleLabel(profile = {}) {
+  if (profile.functionInput && ROLE_LABEL_BY_INPUT[profile.functionInput]) {
+    return ROLE_LABEL_BY_INPUT[profile.functionInput];
+  }
+  if (profile.job && ROLE_LABEL_BY_LEGACY[profile.job]) {
+    return ROLE_LABEL_BY_LEGACY[profile.job];
+  }
+  return "role non precise";
+}
+
+function getSectorLabel(profile = {}) {
+  if (profile.domainInput && SECTOR_LABEL_BY_INPUT[profile.domainInput]) {
+    return SECTOR_LABEL_BY_INPUT[profile.domainInput];
+  }
+  if (profile.domain && SECTOR_LABEL_BY_LEGACY[profile.domain]) {
+    return SECTOR_LABEL_BY_LEGACY[profile.domain];
+  }
+  return "secteur non precise";
+}
+
+function getRoleLever(profile = {}) {
+  return ROLE_LEVER_BY_LEGACY[profile.job] || ROLE_LEVER_BY_LEGACY.autre_metier;
+}
+
+function getRoleMetric(profile = {}) {
+  return ROLE_METRIC_BY_LEGACY[profile.job] || ROLE_METRIC_BY_LEGACY.autre_metier;
+}
+
+function getSectorLever(profile = {}) {
+  return SECTOR_LEVER_BY_LEGACY[profile.domain] || SECTOR_LEVER_BY_LEGACY.autre;
+}
+
+function getSectorMetric(profile = {}) {
+  return SECTOR_METRIC_BY_LEGACY[profile.domain] || SECTOR_METRIC_BY_LEGACY.autre;
+}
+
+function getRoleRisk(profile = {}) {
+  return ROLE_RISK_BY_LEGACY[profile.job] || ROLE_RISK_BY_LEGACY.autre_metier;
+}
+
+function getRoleQuickWin(profile = {}) {
+  return ROLE_QUICK_WIN_BY_LEGACY[profile.job] || ROLE_QUICK_WIN_BY_LEGACY.autre_metier;
+}
+
+function getSectorRisk(profile = {}) {
+  return SECTOR_RISK_BY_LEGACY[profile.domain] || SECTOR_RISK_BY_LEGACY.autre;
+}
+
+function getSectorOutcome(profile = {}) {
+  return SECTOR_OUTCOME_BY_LEGACY[profile.domain] || SECTOR_OUTCOME_BY_LEGACY.autre;
+}
+
+function getDimensionTheme(key) {
+  return DIMENSION_THEME_BY_KEY[key] || "votre experience professionnelle";
+}
+
+function getDimensionContextRisk(key) {
+  return DIMENSION_CONTEXT_RISK_BY_KEY[key] || "une execution peu alignee";
+}
+
+function buildContextSnapshot(profile = {}) {
+  const roleKnown = hasKnownRole(profile);
+  const sectorKnown = hasKnownSector(profile);
+  const roleLabel = getRoleLabel(profile);
+  const sectorLabel = getSectorLabel(profile);
+  const target = roleKnown && sectorKnown
+    ? `${roleLabel} en ${sectorLabel}`
+    : roleKnown
+      ? roleLabel
+      : sectorKnown
+        ? sectorLabel
+        : "contexte non precise";
+
+  let contextSentence = "Contexte incomplet: recommandations basees uniquement sur vos reponses.";
+  if (roleKnown && sectorKnown) {
+    contextSentence = `Contexte: ${roleLabel} dans ${sectorLabel}.`;
+  } else if (roleKnown) {
+    contextSentence = `Contexte: ${roleLabel}.`;
+  } else if (sectorKnown) {
+    contextSentence = `Contexte: ${sectorLabel}.`;
+  }
+
+  return {
+    roleKnown,
+    sectorKnown,
+    roleLabel,
+    sectorLabel,
+    target,
+    scopeLabel: roleKnown && sectorKnown
+      ? `${roleLabel} en ${sectorLabel}`
+      : roleKnown
+        ? roleLabel
+        : sectorKnown
+          ? sectorLabel
+          : "votre contexte actuel",
+    contextSentence,
+    roleLever: getRoleLever(profile),
+    roleMetric: getRoleMetric(profile),
+    sectorLever: getSectorLever(profile),
+    sectorMetric: getSectorMetric(profile),
+    roleRisk: getRoleRisk(profile),
+    roleQuickWin: getRoleQuickWin(profile),
+    sectorRisk: getSectorRisk(profile),
+    sectorOutcome: getSectorOutcome(profile)
+  };
+}
+
+function createRecommendationItem(title, payload) {
+  const horizon = payload?.horizon || "30 jours";
+  const why = payload?.why || "Clarifier le levier prioritaire.";
+  const action = payload?.action || "Definir une action concrete et la lancer cette semaine.";
+  const indicator = payload?.indicator || "Verifier un indicateur de progression chaque semaine.";
+  const contextualized = Boolean(payload?.contextualized);
+  return {
+    title,
+    horizon,
+    why,
+    action,
+    indicator,
+    contextualized,
+    desc: `${why} ${action} ${indicator}`
+  };
+}
+
+function buildPersonalizedAnalysis(data) {
+  const strongestTheme = getDimensionTheme(data.strongestKey);
+  const weakestTheme = getDimensionTheme(data.weakestKey);
+  const topPriorityTheme = getDimensionTheme(data.topPriorityKey);
+  const context = buildContextSnapshot(data.profile || {});
+
+  const stateLine = STATE_NARRATIVE_BY_KEY[data.state?.key] || "Votre dynamique actuelle demande un ajustement progressif.";
+  const dynamicLine = `Votre energie se construit surtout autour de ${strongestTheme}, mais ${weakestTheme} reste la zone la plus fragile.`;
+
+  let priorityLine = "Votre attente principale merite un plan court, lisible et exigeant.";
+  if (data.topPriorityKey === data.weakestKey) {
+    priorityLine = "Ce que vous attendez le plus est aussi ce qui vous freine aujourd'hui: c'est la priorite a traiter en premier.";
+  } else if (data.topPriorityKey === data.strongestKey) {
+    priorityLine = "Votre attente principale s'appuie deja sur un point fort: vous pouvez accelerer sans vous disperser.";
+  } else {
+    priorityLine = `Votre attente principale porte sur ${topPriorityTheme}; elle progressera vite si vous securisez d'abord ${weakestTheme}.`;
+  }
+
+  let contextLine = "Les recommandations ci-dessous visent des decisions observables et suivies dans le temps.";
+  if (context.roleKnown || context.sectorKnown) {
+    contextLine = "Dans votre domaine d'activite, les recommandations privilegient des decisions visibles cote execution, valeur et trajectoire.";
+  }
+
+  return `${stateLine} ${dynamicLine} ${priorityLine} ${contextLine}`;
+}
+
 function buildRecommendations(data) {
+  const profile = data.profile || {};
+  const context = buildContextSnapshot(profile);
+  const weakPlan = WEAKNESS_PLAYBOOK[data.weakestKey] || WEAKNESS_PLAYBOOK.environment;
+  const priorityPlan = PRIORITY_PLAYBOOK[data.topPriorityKey] || PRIORITY_PLAYBOOK.environment;
+  const weaknessRisk = getDimensionContextRisk(data.weakestKey);
+  const priorityOverlap = data.topPriorityKey === data.weakestKey;
+  const activityAnchor = context.roleKnown || context.sectorKnown
+    ? "dans votre domaine d'activite"
+    : "dans votre contexte professionnel";
+
   const items = [];
-  const profileHint = data.careerProfile?.profileName ? `Coherent avec votre profil ${data.careerProfile.profileName}, ` : "";
+  const usedTitles = new Set();
 
-  if (data.weakestKey === "recognition") {
-    items.push({ title: "Rendre vos contributions visibles", desc: "Planifiez un point mensuel avec preuves concretes de vos resultats et impacts." });
-  } else if (data.weakestKey === "growth") {
-    items.push({ title: "Negocier une prochaine etape", desc: "Demandez une responsabilite additionnelle avec objectifs, perimetre et date de revue." });
-  } else if (data.weakestKey === "meaning") {
-    items.push({ title: "Reconnecter votre role a l'impact", desc: "Reallouez du temps vers des missions utiles et visibles pour renforcer le sens au quotidien." });
+  const pushUnique = (item) => {
+    if (!item || !item.title) return false;
+    if (usedTitles.has(item.title)) return false;
+    items.push(item);
+    usedTitles.add(item.title);
+    return true;
+  };
+
+  pushUnique(createRecommendationItem(weakPlan.title, {
+    horizon: "7 jours",
+    why: `${weakPlan.why} Dans ce contexte, le risque principal est ${weaknessRisk}. En pratique, cela peut provoquer ${context.roleRisk}.`,
+    action: `${weakPlan.action} Pour passer a l'action ${activityAnchor}, ${context.roleQuickWin}.`,
+    indicator: `${weakPlan.indicator} Cette semaine: objectif valide, responsabilite attribuee et premier point de suivi planifie. Suivi a tenir ensuite: ${context.roleMetric}.`,
+    contextualized: context.roleKnown || context.sectorKnown
+  }));
+
+  const priorityTitle = priorityOverlap ? "Transformer l'intention en preuve concrete" : priorityPlan.title;
+  pushUnique(createRecommendationItem(priorityTitle, {
+    horizon: "30 jours",
+    why: priorityOverlap
+      ? "Ce que vous attendez le plus est justement ce qui vous freine aujourd'hui. L'objectif est de passer de l'intention a une preuve concrete."
+      : `${priorityPlan.why} C'est le meilleur levier pour renforcer votre trajectoire sans perdre en execution.`,
+    action: `${priorityPlan.action} Ciblez un livrable utile, visible et facile a expliquer ${activityAnchor}.`,
+    indicator: `${priorityPlan.indicator} Impact vise: ${context.sectorOutcome}.`,
+    contextualized: context.roleKnown || context.sectorKnown
+  }));
+
+  const highMobility = profile.offerIntent === "leave_immediately" || profile.offerIntent === "consider_seriously";
+  const longTenure = ["5_10y", "10_20y", "20plus"].includes(profile.tenureInput);
+
+  if (highMobility) {
+    pushUnique(createRecommendationItem("Arbitrer votre trajectoire interne/externe", {
+      horizon: "90 jours",
+      why: "Votre intention de mobilite est elevee: une decision prise trop vite peut deplacer le probleme au lieu de le resoudre.",
+      action: "Comparez votre poste actuel, 1 option interne et 2 options externes avec une grille unique (impact reel, charge soutenable, progression, remuneration, qualite manageriale).",
+      indicator: "Decision datee, criteres explicites et plan d'execution des 30 premiers jours.",
+      contextualized: true
+    }));
+  } else if (longTenure) {
+    pushUnique(createRecommendationItem("Repositionner votre trajectoire a 90 jours", {
+      horizon: "90 jours",
+      why: "Avec une anciennete longue, le risque est de rester dans une trajectoire confortable mais subie.",
+      action: `Cadrez une evolution de perimetre ${activityAnchor}, avec un sponsor et des jalons trimestriels.`,
+      indicator: "Nouveau perimetre valide avec objectifs, jalons et criteres de succes ecrits.",
+      contextualized: context.roleKnown || context.sectorKnown
+    }));
   } else {
-    items.push({ title: "Stabiliser votre environnement", desc: "Isolez un irritant majeur d'equipe et traitez-le via un rituel d'alignement hebdomadaire." });
+    pushUnique(createRecommendationItem("Consolider un plan de progression a 90 jours", {
+      horizon: "90 jours",
+      why: "Une progression durable exige une trajectoire explicite, pas une succession d'actions ponctuelles.",
+      action: `Definissez 3 jalons ${activityAnchor} avec sponsor, responsabilites et revues mensuelles.`,
+      indicator: "3 jalons dates, suivis et ajustes en revue mensuelle.",
+      contextualized: context.roleKnown || context.sectorKnown
+    }));
   }
 
-  if (data.topPriorityKey === "growth") {
-    items.push({ title: "Prioriser votre progression", desc: `${profileHint}formalisez un plan 90 jours oriente competences et mobilite interne.`.trim() });
-  } else if (data.topPriorityKey === "meaning") {
-    items.push({ title: "Renforcer l'utilite de vos missions", desc: `${profileHint}negociez un ajustement de perimetre autour des sujets a plus fort impact.`.trim() });
-  } else if (data.topPriorityKey === "recognition") {
-    items.push({ title: "Clarifier vos criteres de reconnaissance", desc: `${profileHint}alignez avec votre manager les attentes explicites de visibilite, contribution et progression.`.trim() });
-  } else {
-    items.push({ title: "Ameliorer vos conditions d'execution", desc: `${profileHint}clarifiez charge, priorites et mode de collaboration pour fiabiliser le cadre de travail.`.trim() });
-  }
+  const genericFallbacks = [
+    createRecommendationItem("Structurer vos priorites hebdomadaires", {
+      horizon: "7 jours",
+      why: "Sans priorisation explicite, les urgences reprennent le dessus.",
+      action: "Listez 3 priorites, validez-les avec votre manager et bloquez des plages de livraison.",
+      indicator: "3 priorites tenues chaque semaine sur 1 mois."
+    }),
+    createRecommendationItem("Formaliser un indicateur de progression", {
+      horizon: "30 jours",
+      why: "Ce qui n'est pas mesure est rarement reconnu.",
+      action: "Choisissez un indicateur, une cible et un rythme de revue fixe.",
+      indicator: "Tableau de suivi mis a jour chaque semaine."
+    }),
+    createRecommendationItem("Documenter vos resultats", {
+      horizon: "30 jours",
+      why: "La progression depend de preuves concretes et partagees.",
+      action: "Conservez vos resultats, impacts et apprentissages dans un format de revue simple.",
+      indicator: "1 revue mensuelle avec preuves factuelles."
+    })
+  ];
 
-  if (data.profile.offerIntent === "leave_immediately" || data.profile.offerIntent === "consider_seriously") {
-    items.push({ title: "Arbitrer votre option de mobilite", desc: "Comparez votre poste actuel a 2 options externes avec une grille factuelle." });
-  } else if (["5_10y", "10_20y", "20plus"].includes(data.profile.tenureInput)) {
-    items.push({ title: "Relancer votre trajectoire", desc: "Apres une anciennete longue, cadrez une etape de repositionnement sur 90 jours." });
-  } else {
-    const jobTip = jobActions[data.profile.job] || jobActions.autre_metier;
-    const domainTip = domainActions[data.profile.domain] || domainActions.autre;
-    items.push({ title: "Adapter l'action a votre contexte", desc: `${jobTip} ${domainTip}` });
-  }
+  genericFallbacks.forEach((fallback) => {
+    if (items.length >= 3) return;
+    if (usedTitles.has(fallback.title)) return;
+    items.push(fallback);
+    usedTitles.add(fallback.title);
+  });
 
   return items.slice(0, 3);
 }
+
 function updateGauge(isc) {
   const angle = Math.round((isc / 100) * 360);
   if (ui.chiGauge) ui.chiGauge.style.setProperty("--gauge-angle", `${angle}deg`);
@@ -809,9 +1264,15 @@ function renderRecommendations(target, items) {
   items.forEach((item, index) => {
     const li = document.createElement("li");
     li.className = "action-step";
+    const hasStructuredFields = item && item.why && item.action && item.indicator;
     li.innerHTML = `
+      <p class="action-step-meta">Horizon: ${item.horizon || "30 jours"}</p>
       <p class="action-step-title">${index + 1}. ${item.title}</p>
-      <p class="action-step-desc">${item.desc}</p>
+      ${hasStructuredFields ? `
+        <p class="action-step-line"><span class="action-step-label">Pourquoi:</span> ${item.why}</p>
+        <p class="action-step-line"><span class="action-step-label">Action:</span> ${item.action}</p>
+        <p class="action-step-line"><span class="action-step-label">Indicateur:</span> ${item.indicator}</p>
+      ` : `<p class="action-step-desc">${item.desc}</p>`}
     `;
     target.appendChild(li);
   });
@@ -1182,6 +1643,7 @@ window.addEventListener("resize", () => {
     drawRadarChart({ ...latestResult.scores, isc: latestResult.isc });
   }
 });
+
 
 
 

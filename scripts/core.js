@@ -617,6 +617,7 @@ function computeTestResult(answerValues, context = {}) {
   const careerProfile = determineCareerProfile(scores, { iscScore: isc, profile: profileContext });
 
   const analysis = buildPersonalizedAnalysis({
+    isc,
     state,
     strongestKey: strongestDimension,
     strongestValue: scores[strongestDimension],
@@ -629,7 +630,11 @@ function computeTestResult(answerValues, context = {}) {
   });
   const recommendations = buildRecommendations({
     weakestKey: weakestDimension,
+    weakestValue: scores[weakestDimension],
     topPriorityKey: topPriorityDimension,
+    topPriorityValue,
+    isc,
+    state,
     profile: profileContext,
     careerProfile
   });
