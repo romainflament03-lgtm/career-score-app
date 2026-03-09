@@ -4,6 +4,9 @@ function showScreen(key) {
   document.body.classList.toggle("results-screen", key === "results");
   if (key === "landing") ui.progressFill.style.width = "0%";
   if (key === "results") ui.progressFill.style.width = "100%";
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
 }
 
 function getRankingFromDOM() {
@@ -49,6 +52,19 @@ function setupPriorityDragAndDrop() {
   let draggingCard = null;
 
   const cards = [...ui.priorityList.querySelectorAll(".priority-card")];
+  const isTouchPrimary = Boolean(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  const isNarrowViewport = Boolean(
+    (window.matchMedia && window.matchMedia("(max-width: 768px)").matches)
+    || window.innerWidth <= 768
+  );
+
+  if (isTouchPrimary && isNarrowViewport) {
+    cards.forEach((card) => {
+      card.draggable = false;
+    });
+    return;
+  }
+
   cards.forEach((card) => {
     card.draggable = true;
   });
@@ -81,6 +97,13 @@ function setupPriorityDragAndDrop() {
 }
 
 function setupPriorityTouchReorder() {
+  const isTouchPrimary = Boolean(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  const isNarrowViewport = Boolean(
+    (window.matchMedia && window.matchMedia("(max-width: 768px)").matches)
+    || window.innerWidth <= 768
+  );
+  if (isTouchPrimary && isNarrowViewport) return;
+
   let activeCard = null;
 
   ui.priorityList.addEventListener("touchstart", (event) => {
@@ -1038,26 +1061,36 @@ function computeAndShowResults() {
 async function shareISC() {
   if (!latestResult) return;
   const text = buildShareSummary(latestResult);
+  const resetLabel = () => {
+    ui.shareBtn.textContent = "Partager mon profil carrière";
+  };
+  const flashLabel = (label) => {
+    ui.shareBtn.textContent = label;
+    setTimeout(resetLabel, 1200);
+  };
 
   if (navigator.share) {
     try {
       await navigator.share({ title: "Indice de Santé de Carrière (ISC)", text });
+      flashLabel("Partage effectue");
       return;
     } catch {
-      return;
+      // Continue to clipboard fallback when native sharing fails.
     }
   }
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     try {
       await navigator.clipboard.writeText(text);
-      ui.shareBtn.textContent = "Copie";
-      setTimeout(() => { ui.shareBtn.textContent = "Partager mon profil carrière"; }, 1200);
+      flashLabel("Copie");
+      return;
     } catch {
-      ui.shareBtn.textContent = "Copie impossible";
-      setTimeout(() => { ui.shareBtn.textContent = "Partager mon profil carrière"; }, 1200);
+      flashLabel("Copie impossible");
+      return;
     }
   }
+
+  flashLabel("Partage impossible");
 }
 
 ui.startButtons.forEach((button) => {
