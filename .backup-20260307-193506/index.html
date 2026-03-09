@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobPulse - ISC (Indice de Sant&eacute; de Carri&egrave;re)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="progress-top">
+    <div id="progress-fill" class="progress-top-fill"></div>
+  </div>
+
+  <main class="app">
+    <section id="screen-landing" class="screen active">
+      <header class="screen-header">
+        <div class="brand">
+          <span class="material-symbols-outlined brand-icon">pulse_alert</span>
+          <p class="brand-name">JobPulse</p>
+        </div>
+      </header>
+      <div class="screen-main">
+        <article class="card card-center">
+          <p class="eyebrow">Diagnostic carri&egrave;re express</p>
+          <h1>&Eacute;valuez votre alignement professionnel</h1>
+          <p class="subtitle">10 questions, 3 minutes, 3 actions concr&egrave;tes.</p>
+        </article>
+      </div>
+      <footer class="screen-footer">
+        <button id="start-btn" class="btn btn-primary">
+          <span>Commencer</span>
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </footer>
+    </section>
+
+    <section id="screen-weights" class="screen">
+      <header class="screen-header">
+        <div class="brand">
+          <span class="material-symbols-outlined brand-icon">tune</span>
+          <p class="brand-name">Vos priorit&eacute;s</p>
+        </div>
+      </header>
+      <div class="screen-main">
+        <article class="card card-center">
+          <p class="eyebrow">&Eacute;tape 1 sur 3</p>
+          <h2>Ce qui compte le plus pour vous</h2>
+          <p class="subtitle">Classez ces 4 dimensions de la plus importante (1) &agrave; la moins importante (4).</p>
+
+          <div class="preset-wrap" role="group" aria-label="Pr&eacute;r&eacute;glages priorit&eacute;s">
+            <button id="preset-balanced-btn" class="btn btn-secondary preset-btn" type="button">&Eacute;quilibr&eacute;</button>
+            <button id="preset-career-btn" class="btn btn-secondary preset-btn" type="button">Carri&egrave;re</button>
+            <button id="preset-wellbeing-btn" class="btn btn-secondary preset-btn" type="button">Bien-&ecirc;tre</button>
+            <button id="preset-impact-btn" class="btn btn-secondary preset-btn" type="button">Impact</button>
+          </div>
+
+          <ul id="priority-list" class="priority-list">
+            <li class="priority-card" data-dimension="Meaning">
+              <p class="priority-rank">1</p>
+              <div class="priority-content">
+                <p class="priority-title">Sens du travail</p>
+                <p class="priority-desc">L'utilit&eacute; et l'impact de ce que je fais</p>
+              </div>
+              <div class="priority-card-end">
+                <span class="material-symbols-outlined priority-icon">volunteer_activism</span>
+                <div class="priority-controls" role="group" aria-label="R&eacute;ordonner la priorit&eacute;">
+                  <button class="priority-move-btn" type="button" data-move="up" aria-label="Monter la priorit&eacute;">
+                    <span class="material-symbols-outlined">arrow_upward</span>
+                  </button>
+                  <button class="priority-move-btn" type="button" data-move="down" aria-label="Descendre la priorit&eacute;">
+                    <span class="material-symbols-outlined">arrow_downward</span>
+                  </button>
+                </div>
+              </div>
+            </li>
+            <li class="priority-card" data-dimension="Growth">
+              <p class="priority-rank">2</p>
+              <div class="priority-content">
+                <p class="priority-title">&Eacute;volution</p>
+                <p class="priority-desc">Apprendre, progresser et d&eacute;velopper ma carri&egrave;re</p>
+              </div>
+              <div class="priority-card-end">
+                <span class="material-symbols-outlined priority-icon">trending_up</span>
+                <div class="priority-controls" role="group" aria-label="R&eacute;ordonner la priorit&eacute;">
+                  <button class="priority-move-btn" type="button" data-move="up" aria-label="Monter la priorit&eacute;">
+                    <span class="material-symbols-outlined">arrow_upward</span>
+                  </button>
+                  <button class="priority-move-btn" type="button" data-move="down" aria-label="Descendre la priorit&eacute;">
+                    <span class="material-symbols-outlined">arrow_downward</span>
+                  </button>
+                </div>
+              </div>
+            </li>
+            <li class="priority-card" data-dimension="Recognition">
+              <p class="priority-rank">3</p>
+              <div class="priority-content">
+                <p class="priority-title">Reconnaissance</p>
+                <p class="priority-desc">&Ecirc;tre valoris&eacute; pour mon travail et mes r&eacute;sultats</p>
+              </div>
+              <div class="priority-card-end">
+                <span class="material-symbols-outlined priority-icon">workspace_premium</span>
+                <div class="priority-controls" role="group" aria-label="R&eacute;ordonner la priorit&eacute;">
+                  <button class="priority-move-btn" type="button" data-move="up" aria-label="Monter la priorit&eacute;">
+                    <span class="material-symbols-outlined">arrow_upward</span>
+                  </button>
+                  <button class="priority-move-btn" type="button" data-move="down" aria-label="Descendre la priorit&eacute;">
+                    <span class="material-symbols-outlined">arrow_downward</span>
+                  </button>
+                </div>
+              </div>
+            </li>
+            <li class="priority-card" data-dimension="Environment">
+              <p class="priority-rank">4</p>
+              <div class="priority-content">
+                <p class="priority-title">Environnement</p>
+                <p class="priority-desc">Travailler dans une bonne &eacute;quipe et un cadre sain</p>
+              </div>
+              <div class="priority-card-end">
+                <span class="material-symbols-outlined priority-icon">groups</span>
+                <div class="priority-controls" role="group" aria-label="R&eacute;ordonner la priorit&eacute;">
+                  <button class="priority-move-btn" type="button" data-move="up" aria-label="Monter la priorit&eacute;">
+                    <span class="material-symbols-outlined">arrow_upward</span>
+                  </button>
+                  <button class="priority-move-btn" type="button" data-move="down" aria-label="Descendre la priorit&eacute;">
+                    <span class="material-symbols-outlined">arrow_downward</span>
+                  </button>
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <button id="weights-reset-btn" class="btn btn-secondary inline-btn" type="button">R&eacute;initialiser l'ordre</button>
+        </article>
+      </div>
+      <footer class="screen-footer">
+        <button id="weights-next-btn" class="btn btn-primary">
+          <span>Continuer</span>
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </footer>
+    </section>
+
+    <section id="screen-questions" class="screen">
+      <header class="screen-header">
+        <div class="brand">
+          <span class="material-symbols-outlined brand-icon">pulse_alert</span>
+          <p class="brand-name">JobPulse</p>
+        </div>
+        <div class="question-meta-wrap">
+          <p id="question-count" class="meta">Question 1/10</p>
+          <p id="remaining-time" class="meta subtle"></p>
+        </div>
+      </header>
+      <div class="screen-main">
+        <article id="question-card" class="card card-center">
+          <h2 id="question-text"></h2>
+          <div class="slider-wrap">
+            <input id="answer-range" type="range" min="1" max="5" step="1" value="3">
+            <div class="slider-labels">
+              <span>1 - Pas du tout</span>
+              <span id="answer-value">3</span>
+              <span>5 - Tout &agrave; fait</span>
+            </div>
+          </div>
+        </article>
+      </div>
+      <footer class="screen-footer">
+        <button id="next-btn" class="btn btn-primary">
+          <span>Suivant</span>
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </footer>
+    </section>
+
+    <section id="screen-profile" class="screen">
+      <header class="screen-header">
+        <div class="brand">
+          <span class="material-symbols-outlined brand-icon">business_center</span>
+          <p class="brand-name">Situation professionnelle</p>
+        </div>
+      </header>
+      <div class="screen-main">
+        <article class="card card-center">
+          <p class="eyebrow">&Eacute;tape 3 sur 3</p>
+          <h2>Votre contexte professionnel</h2>
+          <p class="subtitle">Ces informations restent priv&eacute;es et servent uniquement &agrave; personnaliser vos recommandations.</p>
+          <div class="profile-form">
+            <section class="profile-group" aria-label="R&ocirc;le et secteur">
+              <p class="profile-group-title">R&ocirc;le et secteur</p>
+              <label class="profile-label" for="domain-select">Domaine d'activit&eacute;</label>
+              <select id="domain-select" class="profile-select">
+                <option value="tech_it" selected>Technologie / IT</option>
+                <option value="finance_banking_insurance">Finance / Banque / Assurance</option>
+                <option value="industry_engineering">Industrie / Ing&eacute;nierie</option>
+                <option value="health_pharma">Sant&eacute; / Pharmaceutique</option>
+                <option value="consulting_audit">Conseil / Audit</option>
+                <option value="marketing_communication">Marketing / Communication</option>
+                <option value="commerce_distribution">Commerce / Distribution</option>
+                <option value="education_research">&Eacute;ducation / Recherche</option>
+                <option value="public_admin">Administration / Secteur public</option>
+                <option value="construction_real_estate">Construction / Immobilier</option>
+                <option value="transport_logistics">Transport / Logistique</option>
+                <option value="energy_environment">&Eacute;nergie / Environnement</option>
+                <option value="media_creation">M&eacute;dias / Cr&eacute;ation</option>
+                <option value="hospitality_tourism">H&ocirc;tellerie / Tourisme</option>
+                <option value="other_domain">Autre</option>
+              </select>
+
+              <label class="profile-label" for="function-select">Fonction</label>
+              <select id="function-select" class="profile-select">
+                <option value="direction_leadership">Direction / Leadership</option>
+                <option value="team_management">Management d'&eacute;quipe</option>
+                <option value="engineering_technical">Ing&eacute;nierie / Technique</option>
+                <option value="it_data_product" selected>IT / Data / Produit</option>
+                <option value="finance_accounting">Finance / Comptabilit&eacute;</option>
+                <option value="marketing_communication">Marketing / Communication</option>
+                <option value="sales_business_dev">Commercial / Business Development</option>
+                <option value="operations_production">Op&eacute;rations / Production</option>
+                <option value="support_admin">Support / Administration</option>
+                <option value="human_resources">Ressources Humaines</option>
+                <option value="research_expertise">Recherche / Expertise</option>
+                <option value="other_function">Autre</option>
+              </select>
+            </section>
+
+            <section class="profile-group" aria-label="Entreprise et anciennet&eacute;">
+              <p class="profile-group-title">Entreprise et anciennet&eacute;</p>
+              <label class="profile-label" for="company-size-select">Taille de l'entreprise</label>
+              <select id="company-size-select" class="profile-select">
+                <option value="freelance">Freelance / Ind&eacute;pendant</option>
+                <option value="startup" selected>Startup (&lt;50)</option>
+                <option value="sme">PME (50-250)</option>
+                <option value="mid_cap">ETI (250-1000)</option>
+                <option value="large_company">Grande entreprise (1000+)</option>
+                <option value="global_group">Groupe international</option>
+              </select>
+
+              <label class="profile-label" for="tenure-select">Anciennet&eacute; dans l'entreprise</label>
+              <select id="tenure-select" class="profile-select">
+                <option value="lt6">&lt; 6 mois</option>
+                <option value="6m_2y" selected>6 mois - 2 ans</option>
+                <option value="2_5y">2 - 5 ans</option>
+                <option value="5_10y">5 - 10 ans</option>
+                <option value="10_20y">10 - 20 ans</option>
+                <option value="20plus">20+ ans</option>
+              </select>
+            </section>
+
+            <section class="profile-group" aria-label="Niveau et intention de mobilit&eacute;">
+              <p class="profile-group-title">Niveau et intention de mobilit&eacute;</p>
+              <label class="profile-label" for="hierarchy-select">Niveau hi&eacute;rarchique</label>
+              <select id="hierarchy-select" class="profile-select">
+                <option value="individual_contributor" selected>Contributeur individuel</option>
+                <option value="team_manager">Manager d'&eacute;quipe</option>
+                <option value="manager_of_managers">Manager de managers</option>
+                <option value="executive">Direction / ex&eacute;cutif</option>
+              </select>
+
+              <label class="profile-label" for="offer-select">Si vous recevez une offre int&eacute;ressante demain (facultatif)</label>
+              <select id="offer-select" class="profile-select">
+                <option value="" selected>S&eacute;lectionnez une option (facultatif)</option>
+                <option value="leave_immediately">Je partirais imm&eacute;diatement</option>
+                <option value="consider_seriously">Je r&eacute;fl&eacute;chirais s&eacute;rieusement</option>
+                <option value="likely_stay">Je resterais probablement</option>
+                <option value="would_not_leave">Je ne partirais pas</option>
+              </select>
+            </section>
+          </div>
+        </article>
+      </div>
+      <footer class="screen-footer">
+        <button id="profile-next-btn" class="btn btn-primary">
+          <span>Voir mes r&eacute;sultats</span>
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </footer>
+    </section>
+
+    <section id="screen-results" class="screen">
+      <header class="screen-header">
+        <div class="brand">
+          <span class="material-symbols-outlined brand-icon">pulse_alert</span>
+          <p class="brand-name">Votre r&eacute;sultat</p>
+        </div>
+      </header>
+
+      <div class="results-main">
+        <article class="card score-card hero-score-card">
+          <div class="hero-identity">
+            <p class="identity-kicker">Votre profil carri&egrave;re est :</p>
+            <p id="careerProfileName" class="identity-name">Strat&egrave;ge</p>
+
+            <div class="career-profile-visual">
+              <div class="career-profile-media">
+                <img id="profileImage" src="" alt="Illustration du profil carri&egrave;re" class="career-profile-image">
+                <div id="profileImageFallback" class="career-profile-fallback" hidden>
+                  <span class="material-symbols-outlined">person</span>
+                </div>
+              </div>
+            </div>
+
+            <p id="careerProfileDescription" class="identity-signature">Vous avancez lorsque votre travail combine impact et progression.</p>
+
+            <div id="chiGauge" class="hero-score-panel">
+              <p class="hero-isc-line"><span class="hero-isc-prefix">ISC</span><span id="chiScore" class="chi-score">0</span></p>
+              <div class="isc-progress-track" aria-hidden="true">
+                <div id="heroProgressFill" class="isc-progress-fill"></div>
+              </div>
+              <p id="chiLabel" class="chi-label">En progression</p>
+              <p id="socialComparisonLine" class="social-comparison">Vous faites partie des 22% de profils Strat&egrave;ge.</p>
+            </div>
+
+            <div class="share-buttons">
+              <button id="share-btn" class="btn btn-primary" type="button">Partager mon profil carri&egrave;re</button>
+              <button id="download-card-btn" class="btn btn-secondary" type="button">T&eacute;l&eacute;charger ma carte</button>
+            </div>
+
+            <div id="shareResultCard" class="share-result-card" hidden>
+              <p class="share-card-title">R&eacute;sum&eacute; partageable</p>
+              <p id="shareCardProfileLine" class="share-card-profile">Strat&egrave;ge</p>
+              <p id="shareCardISCLine" class="share-card-isc">ISC : 0</p>
+              <p id="shareCardStateLine" class="share-card-state">En progression</p>
+              <div class="share-card-diagnostic">
+                <p id="shareCardStrongLine">Moteur : -</p>
+                <p id="shareCardWeakLine">Vigilance : -</p>
+              </div>
+              <p class="share-card-brand">jobpulse.app</p>
+            </div>
+          </div>
+
+          <p id="calcFormula" class="calc-note" hidden></p>
+          <p id="result-date" class="calc-note" hidden></p>
+          <p id="careerStateLabel" class="career-state-label" hidden>En progression</p>
+          <p id="careerISCScore" class="career-isc-score" hidden>ISC: 0 / 100</p>
+          <p id="careerShareLine" class="career-share-line" hidden></p>
+          <p id="careerStrongestDimension" hidden>-</p>
+          <p id="careerWeakestDimension" hidden>-</p>
+          <p id="careerSecondRow" hidden></p>
+          <p id="careerSecondDimension" hidden>-</p>
+          <button id="copy-summary-btn" type="button" hidden>Copier</button>
+        </article>
+
+        <article class="card quick-diagnosis-card">
+          <h3>Diagnostic rapide</h3>
+          <div class="quick-diagnostic">
+            <div class="diag-card">
+              <p class="diag-label">&#128293; Ce qui vous motive</p>
+              <p id="quickStrongestDimension" class="diag-value">-</p>
+            </div>
+            <div class="diag-card">
+              <p class="diag-label">&#9888; Ce qui peut vous freiner</p>
+              <p id="quickWeakestDimension" class="diag-value">-</p>
+            </div>
+          </div>
+          <p id="chiSummary" class="hero-summary">Votre situation est globalement positive mais certains leviers peuvent encore &ecirc;tre renforc&eacute;s.</p>
+        </article>
+
+        <article class="card actions-card">
+          <h3>Vos 3 actions prioritaires</h3>
+          <ol id="actionsList" class="action-steps"></ol>
+        </article>
+
+        <details class="card details-card balance-card">
+          <summary>Votre &eacute;quilibre professionnel</summary>
+          <div class="details-content">
+            <div class="radar-wrap">
+              <canvas id="radarChart" class="radar-chart" width="320" height="320" aria-label="Graphique radar des 4 dimensions"></canvas>
+              <p class="radar-context-note">Votre score ISC se construit &agrave; partir de 4 dimensions cl&eacute;s de votre exp&eacute;rience professionnelle.</p>
+            </div>
+            <p id="dimensionSummary" class="calc-note"></p>
+            <p id="secondDimensionSummary" class="calc-note" hidden></p>
+          </div>
+        </details>
+
+        <details class="card details-card">
+          <summary>Comprendre le diagnostic</summary>
+          <div class="details-content">
+            <p id="analysisText" class="analysis-text">Votre analyse personnalis&eacute;e appara&icirc;tra ici.</p>
+            <p id="recommendationContext" class="calc-note" hidden></p>
+          </div>
+        </details>
+      </div>
+      <footer class="screen-footer results-actions">
+        <button id="restart-btn" class="btn btn-primary">Refaire le diagnostic</button>
+      </footer>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
