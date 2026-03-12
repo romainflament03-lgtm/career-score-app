@@ -1516,6 +1516,19 @@ function computeAndShowResults() {
   renderRecommendations(ui.actionsList, latestResult.recommendations);
   renderShareCard(latestResult);
   ui.careerShareLine.textContent = buildShareSummary(latestResult);
+
+  try {
+    window.dispatchEvent(new CustomEvent("jobpulse:result-ready", {
+      detail: {
+        result: latestResult,
+        contextData: latestResult.contextData || contextData,
+        profile: { ...profile }
+      }
+    }));
+  } catch (error) {
+    console.warn("[JobPulse][Supabase] Unable to dispatch result-ready event", error);
+  }
+
   showScreen("results");
 }
 

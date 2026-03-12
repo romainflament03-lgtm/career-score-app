@@ -460,6 +460,22 @@
           <p id="chiSummary" class="hero-summary"></p>
         </article>
 
+        <article class="card account-card">
+          <h3>Compte &amp; sauvegarde</h3>
+          <p id="authStatusText" class="auth-status-line">Mode anonyme: connectez-vous pour sauvegarder vos diagnostics.</p>
+          <div class="account-actions">
+            <button id="auth-open-btn" class="btn btn-secondary" type="button">Se connecter / Cr&eacute;er un compte</button>
+            <button id="save-result-btn" class="btn btn-primary" type="button">Sauvegarder ce diagnostic</button>
+            <button id="history-btn" class="btn btn-secondary" type="button" hidden>Voir mon historique</button>
+            <button id="auth-signout-btn" class="btn btn-secondary" type="button" hidden>Se d&eacute;connecter</button>
+          </div>
+          <p id="saveFeedback" class="calc-note" aria-live="polite"></p>
+          <div id="historySection" class="history-section" hidden>
+            <h4>Mes diagnostics sauvegard&eacute;s</h4>
+            <ul id="historyList" class="history-list"></ul>
+          </div>
+        </article>
+
         <article class="card actions-card">
           <h3>Vos 3 actions prioritaires</h3>
           <ol id="actionsList" class="action-steps"></ol>
@@ -499,8 +515,61 @@
     </section>
   </main>
 
+  <div id="auth-modal" class="auth-modal" hidden>
+    <div class="auth-modal-backdrop" data-auth-close></div>
+    <div class="auth-modal-panel" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+      <button id="auth-close-btn" class="auth-close-btn" type="button" aria-label="Fermer">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <h3 id="authModalTitle">Connexion</h3>
+      <p id="authModalInfo" class="auth-info-line">Connectez-vous pour sauvegarder vos diagnostics.</p>
+
+      <div class="auth-switch-row">
+        <button id="auth-switch-signin" class="btn btn-secondary auth-switch-btn" type="button">Connexion</button>
+        <button id="auth-switch-signup" class="btn btn-secondary auth-switch-btn" type="button">Cr&eacute;er un compte</button>
+        <button id="auth-switch-reset" class="btn btn-secondary auth-switch-btn" type="button">Mot de passe oubli&eacute;</button>
+      </div>
+
+      <form id="auth-signin-form" class="auth-form">
+        <label class="profile-label" for="auth-signin-email">Email</label>
+        <input id="auth-signin-email" class="profile-select auth-input" type="email" autocomplete="email" required>
+        <label class="profile-label" for="auth-signin-password">Mot de passe</label>
+        <input id="auth-signin-password" class="profile-select auth-input" type="password" autocomplete="current-password" required>
+        <button class="btn btn-primary" type="submit">Se connecter</button>
+      </form>
+
+      <form id="auth-signup-form" class="auth-form" hidden>
+        <label class="profile-label" for="auth-signup-email">Email</label>
+        <input id="auth-signup-email" class="profile-select auth-input" type="email" autocomplete="email" required>
+        <label class="profile-label" for="auth-signup-password">Mot de passe</label>
+        <input id="auth-signup-password" class="profile-select auth-input" type="password" autocomplete="new-password" minlength="8" required>
+        <p class="field-note">Minimum 8 caract&egrave;res.</p>
+        <button class="btn btn-primary" type="submit">Cr&eacute;er mon compte</button>
+      </form>
+
+      <form id="auth-reset-form" class="auth-form" hidden>
+        <label class="profile-label" for="auth-reset-email">Email</label>
+        <input id="auth-reset-email" class="profile-select auth-input" type="email" autocomplete="email" required>
+        <button class="btn btn-primary" type="submit">Envoyer le lien de r&eacute;initialisation</button>
+      </form>
+
+      <form id="auth-update-password-form" class="auth-form" hidden>
+        <label class="profile-label" for="auth-new-password">Nouveau mot de passe</label>
+        <input id="auth-new-password" class="profile-select auth-input" type="password" autocomplete="new-password" minlength="8" required>
+        <button class="btn btn-primary" type="submit">Mettre &agrave; jour le mot de passe</button>
+      </form>
+
+      <div class="auth-divider">ou</div>
+      <button id="auth-google-btn" class="btn btn-secondary" type="button">Continuer avec Google</button>
+      <p id="authFeedback" class="calc-note" aria-live="polite"></p>
+    </div>
+  </div>
+
   <script src="scripts/core.js"></script>
   <script src="scripts/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="scripts/supabase-config.js"></script>
+  <script src="scripts/supabase-auth.js"></script>
 </body>
 </html>
 
